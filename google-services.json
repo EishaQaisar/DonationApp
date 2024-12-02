@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "177122065152",
+    "project_id": "zh-test-184f3",
+    "storage_bucket": "zh-test-184f3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:177122065152:android:d2db88ee791d28202a91e5",
+        "android_client_info": {
+          "package_name": "com.zhalay.DK2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtaVhIhhuFfJ7iRpxKOJlLH4YIIwzP3nU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

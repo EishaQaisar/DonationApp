@@ -1,0 +1,99 @@
+import { View, Text } from 'react-native'
+import React from 'react'
+import { createStackNavigator } from '@react-navigation/stack'
+import {theme} from '../core/theme'
+import { ChooseCategory, DonorHomeScreen, ScheduleRDeliveryScreen,  UploadClothes, UploadEdu, UploadFood, HomeScreenRec,Education,Clothes,Food,ClaimsHistory,ItemDetail ,RecepientStartScreen} from '../screens';
+const Stack=createStackNavigator();
+const HomeStackNav = ({navigation, route}) => {
+  const { role } = route.params;
+
+  return (
+    
+    <Stack.Navigator initialRouteName="Start">
+         {role === "donor" && (
+        <Stack.Screen 
+          name="Start" 
+          component={DonorHomeScreen} 
+          options={{ headerShown: false }} 
+        />
+      )}
+      {role === "recipient" && (
+        <Stack.Screen 
+          name="Start" 
+          component={HomeScreenRec} 
+          options={{ headerShown: false }} 
+        />
+      )}
+        <Stack.Screen name='ChooseCategory' component={ChooseCategory} options={{headerShown:false} }/>
+
+        
+        <Stack.Screen name='UploadFood' component={UploadFood} 
+         options={{title:"Food", headerTitleStyle:{textAlign:'center'},
+         headerTitleAlign:'center', headerStyle:{backgroundColor:theme.colors.charcoalBlack,height:70 },
+          headerTintColor:theme.colors.ivory} }/>
+
+        <Stack.Screen name='UploadClothes' component={UploadClothes} 
+         options={{title:"Clothes", headerTitleStyle:{textAlign:'center'},
+         headerTitleAlign:'center', headerStyle:{backgroundColor:theme.colors.charcoalBlack,height:70 },
+          headerTintColor:theme.colors.ivory} }/>
+
+        <Stack.Screen name='UploadEdu' component={UploadEdu} 
+        options={{title:"Education", headerTitleStyle:{textAlign:'center'},
+         headerTitleAlign:'center', headerStyle:{backgroundColor:theme.colors.charcoalBlack,height:70 },
+          headerTintColor:theme.colors.ivory} }/>
+
+<Stack.Screen name='ScheduleRDeliveryScreen' component={ScheduleRDeliveryScreen}
+         options={{title:"Schedule Delivery", headerTitleStyle:{textAlign:'center'},
+         headerTitleAlign:'center', headerStyle:{backgroundColor:theme.colors.charcoalBlack,height:70 },
+          headerTintColor:theme.colors.ivory} }
+        
+        />
+
+<Stack.Screen
+              name="Clothes"
+              component={Clothes}
+              options={{ title: 'Clothes Donations' , headerTitleStyle:{textAlign:'center'},
+              headerTitleAlign:'center', headerStyle:{backgroundColor:theme.colors.charcoalBlack,height:70 },
+               headerTintColor:theme.colors.ivory}} // Optional: Customize header title
+            />
+            <Stack.Screen
+              name="Education"
+              component={Education}
+              options={{ title: 'Education Donations', headerTitleStyle:{textAlign:'center'},
+              headerTitleAlign:'center', headerStyle:{backgroundColor:theme.colors.charcoalBlack,height:70 },
+               headerTintColor:theme.colors.ivory }} // Optional: Customize header title
+            />
+
+            <Stack.Screen
+              name="Food"
+              component={Food}
+              options={{ title: 'Food Donations', headerTitleStyle:{textAlign:'center'},
+              headerTitleAlign:'center', headerStyle:{backgroundColor:theme.colors.charcoalBlack,height:70 },
+               headerTintColor:theme.colors.ivory }} // Optional: Customize header title
+            />
+            <Stack.Screen
+              name="ItemDetail"
+              component={ItemDetail}
+              options={{ title: 'Item Details' , headerTitleStyle:{textAlign:'center'},
+              headerTitleAlign:'center', headerStyle:{backgroundColor:theme.colors.charcoalBlack,height:70 },
+               headerTintColor:theme.colors.ivory}} // Optional: Customize header title
+            />
+              <Stack.Screen
+              name="RecepientStartScreen"
+              component={RecepientStartScreen}
+              options={{ title: 'Categories',  headerTitleStyle:{textAlign:'center'},
+              headerTitleAlign:'center', headerStyle:{backgroundColor:theme.colors.charcoalBlack,height:70 },
+               headerTintColor:theme.colors.ivory}} // Optional: Customize header title
+            />
+
+
+
+
+
+
+
+    </Stack.Navigator>
+  )
+}
+
+export default HomeStackNav;
