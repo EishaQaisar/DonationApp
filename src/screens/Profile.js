@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from "react";
 import {
   View,
   Text,
@@ -11,12 +11,21 @@ import {
 } from 'react-native';
 import { theme } from '../core/theme'; // Importing custom theme
 import { useNavigation } from '@react-navigation/native';
+import { AuthContext } from "../context/AuthContext";
+
+
 
 const Profile = () => {
   const navigation = useNavigation();
 
   // Animating the profile image on mount
   const imageScale = new Animated.Value(0.8);
+  const { user} = useContext(AuthContext); // Access user and logout from AuthContext
+
+  const handleLogout = () => {
+    navigation.navigate("StartScreen");
+    
+  };
 
   React.useEffect(() => {
     Animated.timing(imageScale, {
@@ -65,7 +74,7 @@ const Profile = () => {
 
         <TouchableOpacity
           style={[styles.button, styles.logoutButton]}
-          onPress={() => {}}
+          onPress={handleLogout}
         >
           <Text style={[styles.buttonText, styles.logoutText]}>Logout</Text>
         </TouchableOpacity>

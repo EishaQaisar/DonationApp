@@ -4,54 +4,8 @@ import { theme } from '../core/theme';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { CartContext } from '../CartContext';
-import * as SQLite from 'expo-sqlite';
+import axios from 'axios';
 
-// Open the SQLite database
-const db = SQLite.openDatabaseSync('donations.db');
-
-
-const foodItems = [
-    {
-        id: '1',
-        images: [
-            require('../../assets/items/food1.jpg'),
-            require('../../assets/items/D1.jpg'),
-            require('../../assets/items/food.jpg'),
-        ],
-        title: 'Pasta',
-        description: 'Delicious and healthy pasta in various sauces.',
-    },
-    {
-        id: '2',
-        images: [
-          require('../../assets/items/food1.jpg'),
-          require('../../assets/items/D1.jpg'),
-          require('../../assets/items/food.jpg'),
-        ],
-        title: 'Salads',
-        description: 'Fresh salads with a variety of toppings.',
-    },
-    {
-        id: '3',
-        images: [
-          require('../../assets/items/food1.jpg'),
-          require('../../assets/items/D1.jpg'),
-          require('../../assets/items/food.jpg'),
-        ],
-        title: 'Sandwiches',
-        description: 'Tasty sandwiches for a quick bite.',
-    },
-    {
-        id: '4',
-        images: [
-          require('../../assets/items/food1.jpg'),
-          require('../../assets/items/D1.jpg'),
-          require('../../assets/items/food.jpg'),
-        ],
-        title: 'Desserts',
-        description: 'Sweet and delicious desserts for everyone.',
-    },
-];
 
 const Food = () => {
     const navigation = useNavigation();
@@ -60,30 +14,17 @@ const Food = () => {
     const [foodItems2, setFoodItems] = useState([]);
     const fetchFoodDonations = async () => {
         try {
-            const result = await db.getAllAsync(
-                `SELECT * FROM FoodDonations WHERE claimStatus = ?`,
-                ['Unclaimed']
-            );
-    
-            if (result ) {
-                const data = result.map(item => {
-                    const parsedImages = item.images ? JSON.parse(item.images) : [];
-                    const validImages = parsedImages.map(imagePath => {
-                        return { uri: imagePath }; // Make sure the path is in the correct format
-                    });
-    
-                    return {
-                        ...item,
-                        images: validImages
-                    };
-                });
-                console.log("Fetched data:", data);
-                setFoodItems(data);
-                console.log("food items:", foodItems2)
-            } else {
-                console.warn('No data found or unexpected result structure:', result);
-                setFoodItems([]);
-            }
+            const response = await axios.get('http://10.0.2.2:3000/api/food-donations');
+            const data = response.data.map(item => {
+                const parsedImages = item.images ? JSON.parse(item.images) : [];
+                const validImages = parsedImages.map(imagePath => ({ uri: imagePath }));
+                return {
+                    ...item,
+                    images: validImages,
+                };
+            });
+            console.log('Fetched data:', data);
+            setFoodItems(data);
         } catch (error) {
             console.error('Error fetching data:', error);
         }

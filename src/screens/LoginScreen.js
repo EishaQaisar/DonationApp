@@ -9,92 +9,69 @@ import { theme } from "../core/theme";
 import { emailValidator } from "../helpers/emailValidator";
 import { passwordValidator } from "../helpers/passwordValidator";
 import { AuthContext } from "../context/AuthContext";
-
-
+import CryptoJS from "crypto-js";
 
 const screenWidth = Dimensions.get('window').width;
 
 export default function LoginScreen({ navigation, route }) {
-  //const [email, setEmail] = useState({ value: "", error: "" });
-  const [input, setInput]=useState({value:"", error:""});
+  const [input, setInput] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
-  const [phoneNumber,setPhoneNumber]=useState("");
-  const [code,setCode]=useState("");
-  const [confirm,setConfirm]=useState("");
+  const [code, setCode] = useState("");
   const { role } = route.params;
   const { setUser } = useContext(AuthContext); // Access setUser from AuthContext
+  const [isNGOFound, setIsNGOFound] = useState(false);
+  let collectionFound="";
 
+  // Helper function to get the relevant collection names based on role
+  const getDatabaseCollections = (role) => {
+    if (role === 'donor') return ['users'];
+    if (role === 'rider') return ['riders'];
+    if (role === 'recipient') return ['recipients', 'ngos']; // Recipient checks both 'recipients' and 'ngos'
+    return [];
+  };
 
   async function validateUser(inputValue, passwordInput) {
     try {
-      let db="";
-      console.log(role)
-      if (role=='donor'){
-        db='users';
-      }
-      else if (role=='recipient'){
-        db='recipients'; //indvidual recipients database
-      }
-      else if(role=='rider'){
-        db='riders';
-      }
-      let usersRef = firestore().collection(db);
-  
-      // Query for the username
-      let usernameQuerySnapshot = await usersRef
-        .where("username", "==", inputValue)
-        .get();
-  
-      // Query for the phone number
-      let phoneNumberQuerySnapshot = await usersRef
-        .where("phone", "==", inputValue)
-        .get();
+      const collections = getDatabaseCollections(role);
+      let userDoc = null;
+      
+      // Loop through collections to query for the user
+      for (let db of collections) {
+        let usersRef = firestore().collection(db);
 
-        if (role=='recipient'){ //if recipient check in ngo datbase as well
-          db='ngos'
-          usersRef = firestore().collection(db);
-  
-          const usernameQuerySnapshot1 = await usersRef
-            .where("username", "==", inputValue)
-            .get();
-  
-          const phoneNumberQuerySnapshot1 = await usersRef
-            .where("phone", "==", inputValue)
-            .get();
+        // Query for the username
+        let usernameQuerySnapshot = await usersRef
+          .where("username", "==", inputValue)
+          .get();
 
+        // Query for the phone number
+        let phoneNumberQuerySnapshot = await usersRef
+          .where("phone", "==", inputValue)
+          .get();
+
+        if (!usernameQuerySnapshot.empty || !phoneNumberQuerySnapshot.empty) {
+          userDoc = usernameQuerySnapshot.empty
+            ? phoneNumberQuerySnapshot.docs[0]
+            : usernameQuerySnapshot.docs[0];
+          collectionFound=db;
+          break; // Exit loop once user is found
         }
-    
-  
-      // Combine results: check if either query is not empty
-      const isUserFound =
-        !usernameQuerySnapshot.empty || !phoneNumberQuerySnapshot.empty
-  
-      if (isUserFound) {
-        // Retrieve the user document
-        let userDoc = null;
-        if (!usernameQuerySnapshot.empty) {
-          userDoc = usernameQuerySnapshot.docs[0];
-        } else if (!phoneNumberQuerySnapshot.empty) {
-          userDoc = phoneNumberQuerySnapshot.docs[0];
-        } 
-       
-  
-        // Verify password
+      }
+
+      if (userDoc) {
         const userData = userDoc.data();
-        if (userData.password === passwordInput) {
-          console.log("hereeee");
+        const hashedEnteredPassword = CryptoJS.SHA256(passwordInput).toString();
+
+        // Verify password
+        if (userData.password === hashedEnteredPassword) {
           setUser(userData);
-          // Password matches
           return { success: true, message: "Login successful!" };
         } else {
-          // Password does not match
           setPassword({ ...password, error: "Incorrect password" });
-
           return { success: false, message: "Invalid password" };
         }
       } else {
         setInput({ ...input, error: "User not found" });
-
         return { success: false, message: "User not found" };
       }
     } catch (error) {
@@ -102,43 +79,34 @@ export default function LoginScreen({ navigation, route }) {
       return { success: false, message: "An error occurred during login" };
     }
   }
-  
-  const LoginInPressed= async()=>{
-    if (!input.value || !password.value) {
-      if (!input.value){
-        setInput({ ...input, error: "This field is required." });
-      }
-      if (!password.value){
-      setPassword({ ...password, error: "This field is required." });
-      }
 
+  const LoginInPressed = async () => {
+    if (!input.value || !password.value) {
+      if (!input.value) setInput({ ...input, error: "This field is required." });
+      if (!password.value) setPassword({ ...password, error: "This field is required." });
       return;
     }
+
     validateUser(input.value, password.value).then((result) => {
       if (result.success) {
-        if (role=='donor'){
-          navigation.navigate("TabNavigator",{role:"donor"});
+        if (role === 'donor') {
+          navigation.navigate("TabNavigator", { role: "donor" });
+        } else if (role === 'recipient') {
+          // Handle recipient's navigation after checking NGO status
+          if (collectionFound==="ngos") {
+            console.log("ngo");
+            navigation.navigate("TabNavigator", { role: "recipient" });
+          } else if (collectionFound==='recipients') {
+            console.log("indi");
 
+            navigation.navigate("TabNavigator", { role: "recipient" });
+          }
+        } else if (role === 'rider') {
+          navigation.navigate("TabNavigator", { role: "rider" });
         }
-         // Success message
-        // Proceed with login actions
-        else if(role=='recipient'){
-          console.log("recipient logged in");
-          navigation.navigate("TabNavigator",{role:"recipient"});
-
-        }
-        else if (role=='rider'){
-          console.log("rider logged in");
-        }
-      } 
+      }
     });
-    
-    
-    
-};
-
-
-
+  };
 
   const navigateToRegister = () => {
     if (role === "recipient") {
@@ -151,78 +119,50 @@ export default function LoginScreen({ navigation, route }) {
   };
 
   return (
-    <ImageBackground 
-      source={require('../../assets/items/0d59de270836b6eafe057c8afb642e77.jpg')} // Replace with your image path
+    <ImageBackground
+      source={require('../../assets/items/0d59de270836b6eafe057c8afb642e77.jpg')}
       style={styles.imageBackground}
-      blurRadius={8} // Adjust the blur intensity
+      blurRadius={8}
     >
       <View style={styles.backButtonWrapper}>
         <BackButton goBack={navigation.goBack} />
       </View>
-      
-      {/* <BackButton goBack={navigation.goBack} /> */}
+
       <View style={styles.container}>
-      
-        
         <Text style={styles.header}>Hello.</Text>
-        {!confirm ? (
-        <>
         <View style={styles.inputContainer}>
-        <TextInput
-          label="Username / Phone Number"
-          mode="outlined"
-          style={styles.input}
-          value={input.value}
-          onChangeText={(text) => setInput({ value: text, error: "" })}
-          error={!!input.error}
-          errorText={input.error ? <Text style={styles.errorText}>{input.error}</Text> : null}
-
-         
-        />
+          <TextInput
+            label="Username / Phone Number"
+            mode="outlined"
+            style={styles.input}
+            value={input.value}
+            onChangeText={(text) => setInput({ value: text, error: "" })}
+            error={!!input.error}
+            errorText={input.error ? <Text style={styles.errorText}>{input.error}</Text> : null}
+          />
         </View>
 
         <View style={styles.inputContainer}>
-        <TextInput
-          label="Password"
-          mode="outlined"
-          style={styles.input}
-          value={password.value}
-          onChangeText={(text) => setPassword({ value: text, error: "" })}
-          error={!!password.error}
-          errorText={password.error ? <Text style={styles.errorText}>{password.error}</Text> : null}
-
-          secureTextEntry
-        />
+          <TextInput
+            label="Password"
+            mode="outlined"
+            style={styles.input}
+            value={password.value}
+            onChangeText={(text) => setPassword({ value: text, error: "" })}
+            error={!!password.error}
+            errorText={password.error ? <Text style={styles.errorText}>{password.error}</Text> : null}
+            secureTextEntry
+          />
         </View>
-        
-        
+
         <TouchableOpacity onPress={() => navigation.navigate("ResetPasswordScreen")}>
           <Text style={styles.forgotPassword}>Forgot your password?</Text>
         </TouchableOpacity>
-        
+
         <Button mode="contained" onPress={LoginInPressed} style={styles.button}>
           Log in
         </Button>
-        </>
-        ) : (
-          <>
-          <Text>Enter the code sent to your phone</Text>
-          <TextInput
-          label="code"
-          value={code}
-          onChangeText={setCode}
 
-        />
-        <TouchableOpacity onPress={(confirmCode)}>
-        <Text style={styles.forgotPassword}>confirm code</Text>
-      </TouchableOpacity>
-      </>
-  
-
-        )}
-
-
-        
         <View style={styles.footer}>
           <Text style={styles.footerText}>Don't have an account yet?</Text>
           <TouchableOpacity onPress={navigateToRegister}>
@@ -242,7 +182,7 @@ const styles = StyleSheet.create({
   },
   container: {
     alignItems: 'center',
-    backgroundColor: theme.colors.background, //'rgba(255, 255, 255, 0.65)', // Slightly transparent background for better readability
+    backgroundColor: theme.colors.background,
     borderRadius: 30,
     paddingVertical: 30,
     paddingHorizontal: 20,
@@ -252,15 +192,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     color: theme.colors.sageGreen,
-    textShadowColor: theme.colors.background, // Outline color
-    textShadowOffset: { width: 2, height: 2 }, // Offset for the shadow
-    textShadowRadius: 1, // Spread for the shadow
+    textShadowColor: theme.colors.background,
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 1,
   },
   input: {
-    alignSelf:'center',
-    width: '100%', // Responsive input width
+    alignSelf: 'center',
+    width: '100%',
     marginBottom: 3,
-    backgroundColor: 'white', // Ensures clear visibility of input fields
+    backgroundColor: 'white',
   },
   forgotPassword: {
     fontSize: 13,
@@ -269,7 +209,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   button: {
-    width: '90%', // Responsive button width
+    width: '90%',
     paddingVertical: 8,
     borderRadius: 25,
     marginTop: 10,
@@ -291,18 +231,16 @@ const styles = StyleSheet.create({
   },
   backButtonWrapper: {
     position: 'absolute',
-    top: 10, 
-    left: 30, 
-    padding: 10, 
+    top: 10,
+    left: 30,
+    padding: 10,
   },
   errorText: {
     fontSize: 13,
     marginTop: -5,
   },
   inputContainer: {
-    width:'90%',
-    marginBottom:10
-   
-    
+    width: '90%',
+    marginBottom: 10,
   },
 });

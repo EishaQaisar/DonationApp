@@ -1,3 +1,5 @@
+import auth from "@react-native-firebase/auth";
+import firestore from "@react-native-firebase/firestore";
 import React, { useState } from "react";
 import { TouchableOpacity, StyleSheet, View, ImageBackground, Dimensions } from "react-native";
 import { Text } from "react-native-paper";
@@ -9,10 +11,12 @@ import Button from "../components/Button";
 import TextInput from "../components/TextInput";
 import BackButton from "../components/BackButton";
 import { theme } from "../core/theme";
+import CryptoJS from "crypto-js";
+
 
 
 import { emailValidator } from "../helpers/emailValidator";
-import { nameValidator } from "../helpers/nameValidator";
+import { ngoNameValidator } from "../helpers/ngoNameValidator";
 import { passwordValidator } from "../helpers/passwordValidator";
 import { usernameValidator } from "../helpers/usernameValidator";
 import { numberValidator } from "../helpers/numberValidator";
@@ -28,7 +32,8 @@ export default function RegisterNGOScreen({ navigation }) {
   const [certificate, setCertificate] = useState(null);
   const [approved]=useState({value:"false"});
   const [confirm, setConfirm] = useState("");
-
+  const [code, setCode] = useState("");
+  
 
 
   // Handle the document pick and store the result in state
@@ -65,10 +70,9 @@ export default function RegisterNGOScreen({ navigation }) {
   }
 
   const onSignUpPressed =async () => {
-    console.log("here");
 
     const usernameError=usernameValidator(username.value);
-    const nameError = nameValidator(name.value);
+    const nameError = ngoNameValidator(name.value);
     const numberError=numberValidator(phoneNumber.value);
     const passwordError=passwordValidator(password.value);
     if (nameError  || passwordError || usernameError || numberError ) {
@@ -121,6 +125,8 @@ export default function RegisterNGOScreen({ navigation }) {
         navigation.navigate("TabNavigator");
       } 
       else {
+        const hashedPassword = CryptoJS.SHA256(password.value).toString();
+
         try {
           await firestore()
             .collection("ngos")
@@ -129,7 +135,7 @@ export default function RegisterNGOScreen({ navigation }) {
               name: name.value,
               username: username.value,
               phone: phoneNumber.value,
-              password: password.value, // Hash password before saving
+              password: hashedPassword,
               approved:approved.value
             });
 
@@ -163,7 +169,8 @@ export default function RegisterNGOScreen({ navigation }) {
         style={styles.input}
         onChangeText={(text) => setName({ value: text, error: "" })}
         error={!!name.error}
-        errorText={name.error}
+        errorText={name.error ? <Text style={styles.errorText}>{name.error}</Text> : null}
+
       />
       </View>
       <View style={styles.inputContainer}>
@@ -236,7 +243,7 @@ export default function RegisterNGOScreen({ navigation }) {
           <Text>Enter the code sent to your phone</Text>
             <TextInput label="Code" value={code} onChangeText={setCode} style={styles.input} />
             <TouchableOpacity onPress={confirmCode}>
-              <Text style={styles.forgotPassword}>Confirm Code</Text>
+              <Text style={styles.link}>Confirm Code</Text>
             </TouchableOpacity>
           </>
         )}
@@ -282,7 +289,7 @@ const styles = StyleSheet.create({
   input: {
     alignSelf:'center',
     width: '100%', // Responsive input width
-    marginBottom: 15,
+    marginBottom: 3,
     backgroundColor: 'white', // Ensures clear visibility of input fields
   },
   already: {
@@ -305,7 +312,7 @@ const styles = StyleSheet.create({
     marginTop: -5,
   },
   inputContainer: {
-    width:'90%',
+    width:'100%',
     marginBottom:10
    
   },

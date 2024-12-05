@@ -101,7 +101,7 @@ const UploadClothes = ({ navigation }) => {
       gender: gender.value,
       ageCategory: ageCategory.value,
       size: size.value,
-      condition: condition.value,
+      c_condition: condition.value,
       quantity: quantity.value,
       fabric: fabric.value,
       description:  description.value,

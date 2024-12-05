@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, ImageBackground } from "react-native";
 import {theme} from "../core/theme"; // Ensure theme is imported correctly
 
+
 const RecepientStartScreen = ({ navigation }) => {
   const [hoveredCategory, setHoveredCategory] = useState(null);
 

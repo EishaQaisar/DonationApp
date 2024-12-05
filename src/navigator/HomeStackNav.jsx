@@ -2,7 +2,7 @@ import { View, Text } from 'react-native'
 import React from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
 import {theme} from '../core/theme'
-import { ChooseCategory, DonorHomeScreen, ScheduleRDeliveryScreen,  UploadClothes, UploadEdu, UploadFood, HomeScreenRec,Education,Clothes,Food,ClaimsHistory,ItemDetail ,RecepientStartScreen} from '../screens';
+import { ChooseCategory, DonorHomeScreen, ScheduleRDeliveryScreen,  UploadClothes, UploadEdu, UploadFood, HomeScreenRec,Education,Clothes,Food,ClaimsHistory,ItemDetail ,RecepientStartScreen, DonationSuccessScreen} from '../screens';
 const Stack=createStackNavigator();
 const HomeStackNav = ({navigation, route}) => {
   const { role } = route.params;
@@ -39,6 +39,11 @@ const HomeStackNav = ({navigation, route}) => {
 
         <Stack.Screen name='UploadEdu' component={UploadEdu} 
         options={{title:"Education", headerTitleStyle:{textAlign:'center'},
+         headerTitleAlign:'center', headerStyle:{backgroundColor:theme.colors.charcoalBlack,height:70 },
+          headerTintColor:theme.colors.ivory} }/>
+
+<Stack.Screen name='DonationSuccessScreen' component={DonationSuccessScreen} 
+        options={{title:"", headerTitleStyle:{textAlign:'center'},
          headerTitleAlign:'center', headerStyle:{backgroundColor:theme.colors.charcoalBlack,height:70 },
           headerTintColor:theme.colors.ivory} }/>
 

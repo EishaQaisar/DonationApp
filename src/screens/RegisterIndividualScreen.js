@@ -17,6 +17,7 @@ import { numberValidator } from "../helpers/numberValidator";
 import { IsCnicUnique } from "../helpers/IsCnicUnique";
 import { IsUsernameUnique } from "../helpers/IsUsernameUnique";
 import { IsUniqueNumber } from "../helpers/isUniqueNumber";
+import CryptoJS from "crypto-js";
 
 
 
@@ -108,6 +109,8 @@ export default function RegisterIndividualScreen({ navigation }) {
         navigation.navigate("TabNavigator");
       } 
       else {
+        const hashedPassword = CryptoJS.SHA256(password.value).toString();
+
         try {
           await firestore()
             .collection("recipients")
@@ -117,7 +120,7 @@ export default function RegisterIndividualScreen({ navigation }) {
               username: username.value,
               phone: phoneNumber.value,
               idCard: idCard.value,
-              password: password.value, // Hash password before saving
+              password: hashedPassword,
               approved:approved.value
             });
 
@@ -130,6 +133,7 @@ export default function RegisterIndividualScreen({ navigation }) {
       console.log("Invalid verification code:", error);
     }
   };
+
 
   return (
 
@@ -173,16 +177,14 @@ export default function RegisterIndividualScreen({ navigation }) {
             <TextInput
               label="Phone Number"
               returnKeyType="next"
-              onChangeText={(text) => setPhoneNumber({ value: text, error: "" })}
-              value={phoneNumber}
+              value={phoneNumber.value}
               style={styles.input}
+              onChangeText={(text) => setPhoneNumber({ value: text, error: "" })}
               error={!!phoneNumber.error}
               errorText={phoneNumber.error ? <Text style={styles.errorText}>{phoneNumber.error}</Text> : null}
-
-              
-
             />
             </View>
+
             <View style={styles.inputContainer}>
             <TextInput
               label="Password"
@@ -220,7 +222,7 @@ export default function RegisterIndividualScreen({ navigation }) {
             <Text>Enter the code sent to your phone</Text>
             <TextInput label="Code" value={code} onChangeText={setCode} style={styles.input} />
             <TouchableOpacity onPress={confirmCode}>
-              <Text style={styles.forgotPassword}>Confirm Code</Text>
+              <Text style={styles.link}>Confirm Code</Text>
             </TouchableOpacity>
           </>
         )}

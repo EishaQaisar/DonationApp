@@ -10,7 +10,7 @@ import { addFoodDonation } from '../helpers/addFoodDonation';
 import { AuthContext } from "../context/AuthContext";
 
 
-const UploadFood = () => {
+const UploadFood = ({navigation}) => {
   const { user } = useContext(AuthContext);
   const tabBarHeight = useBottomTabBarHeight();
   const mealOptions = ['Breakfast', 'Brunch', 'Lunch', 'Dinner'];
@@ -82,6 +82,7 @@ const UploadFood = () => {
     try {
       await addFoodDonation(foodData);
       console.log('Food donation successfully submitted:', foodData);
+      navigation.navigate("DonationSuccessScreen");
     } catch (error) {
       console.error('Error submitting food donation:', error);
     }

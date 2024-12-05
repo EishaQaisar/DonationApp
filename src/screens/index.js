@@ -20,6 +20,8 @@ export { default as RegisterIndividualScreen } from "./RegisterIndividualScreen"
 export { default as RegisterNGOScreen } from "./RegisterNGOScreen";
 export { default as ResetPasswordScreen } from "./ResetPasswordScreen";
 export { default as  ScheduleRDeliveryScreen} from "./ScheduleRDeliveryScreen";
+export {default as DonationSuccessScreen} from './DonationSuccessScreen';
+
 //eishah nadeem screens:
 // Exporting all the screens from a single file for easy imports
 

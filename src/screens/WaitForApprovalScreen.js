@@ -16,8 +16,7 @@ export default function WaitForApprovalScreen({ navigation }) {
         {/* Header at the top left */}
         <View style={styles.header}>
           <Text style={styles.headerText}>Dast-e-khair</Text>
-          <Text style={styles.WText}>We got your Information,Please wait while{'\n'}Our representatives varify it.</Text>
-          <Text style={styles.W1Text}>Your Credentials will be sent to you through the email you entered.</Text>
+          <Text style={styles.WText}>We got your information,Please wait while{'\n'}our representatives verify it.</Text>
         </View>
 
         {/* Button container at the bottom */}
