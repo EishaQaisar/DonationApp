@@ -48,7 +48,10 @@ const Education = () => {
 
     const fetchClothesDonations = async () => {
         try {
-            const response = await axios.get('http://10.0.2.2:3000/api/education-donations');
+            const BASE_URL = await getBaseUrl();
+            console.log("this is the base url is", BASE_URL)
+            const response = await axios.post(`${BASE_URL}/api/education-donations`);
+            // const response = await axios.get('http://10.0.2.2:3000/api/education-donations');
             const data = response.data.map(item => {
                 const parsedImages = item.images ? JSON.parse(item.images) : [];
                 const validImages = parsedImages.map(imagePath => ({ uri: imagePath }));

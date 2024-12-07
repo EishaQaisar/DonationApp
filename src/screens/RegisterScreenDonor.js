@@ -49,6 +49,7 @@ export default function RegisterScreenDonor({ navigation }) {
   const onSignUpPressed = async () => {
     console.log("here");
 
+
     const usernameError=usernameValidator(username.value);
     const nameError = nameValidator(name.value);
     const numberError=numberValidator(phoneNumber.value);
@@ -70,14 +71,17 @@ export default function RegisterScreenDonor({ navigation }) {
     );
 
     if (!isUsernameUnique) {
+      console.log("in set username wali if");
       setUsername({ ...username, error: "This username is already taken." });
       return;
     }
     if (!isPhoneUnique) {
+      console.log("in set phone wali if");
       setPhoneNumber({...phoneNumber, error: "Phone number is already registered."});
       return;
     }
     if (!isCnicUnique) {
+      console.log("in set id card wali if");
       setidCard({ ...idCard, error: "This CNIC is already registered." });
       return;
     }
@@ -125,6 +129,11 @@ export default function RegisterScreenDonor({ navigation }) {
               password: hashedPassword, // Hash password before saving
               approved:approved.value
             });
+            
+
+
+          console.log("in navigation say oper if");
+
 
           navigation.navigate("WaitForApprovalScreen", { uid: user.uid });
         } catch (error) {

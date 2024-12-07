@@ -14,7 +14,10 @@ const Food = () => {
     const [foodItems2, setFoodItems] = useState([]);
     const fetchFoodDonations = async () => {
         try {
-            const response = await axios.get('http://10.0.2.2:3000/api/food-donations');
+            const BASE_URL = await getBaseUrl();
+            console.log("this is the base url is", BASE_URL)
+            const response = await axios.post(`${BASE_URL}/api/food-donations`);
+            // const response = await axios.get('http://10.0.2.2:3000/api/food-donations');
             const data = response.data.map(item => {
                 const parsedImages = item.images ? JSON.parse(item.images) : [];
                 const validImages = parsedImages.map(imagePath => ({ uri: imagePath }));

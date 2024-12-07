@@ -12,6 +12,14 @@ export { default as UploadEdu} from "./UploadEdu";
 export { default as ChooseRole } from "./ChooseRole";
 export { default as WaitForApprovalScreen } from "./WaitForApprovalScreen";
 export { default as RChoose } from "./RChoose";
+export { default as ViewNgoPostsScreen} from "./ViewNgoPostsScreen";
+export{default as DonorProfileForm} from "./DonorProfileForm";
+export{default as NGOCampaignForm} from "./NGOCampaignForm";
+export{default as RecipientProfileForm} from "./RecipientProfileForm";
+
+
+
+
 
 
 export { default as StartScreen } from "./StartScreen";
@@ -39,6 +47,7 @@ export { default as Education } from './Education';
 export { default as Food } from './Food';
 export { default as Clothes } from './Clothes';
 export { default as RecepientStartScreen } from './RecepientStartScreen';
+export { default as NgoPostDetailsScreen} from "./NgoPostDetailsScreen";
 
 
 

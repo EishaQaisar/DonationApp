@@ -5,7 +5,7 @@ import { View, Text, Button, TouchableOpacity, StyleSheet, ScrollView, Image, Pr
 import { theme } from "../core/theme";
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
+import { ngoPostsData } from './ViewNgoPostsScreen';
 
 const HomeScreenRec = ({ navigation }) => {
   const tabBarHeight = useBottomTabBarHeight();
@@ -72,43 +72,43 @@ const HomeScreenRec = ({ navigation }) => {
           </View>
         </View>
 
-        <Text style={[Styles.headings, { marginTop: 20 }]}>Features</Text>
-
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 10, marginTop: 10 }}>
+          <Text style={[Styles.headings, { marginTop: 0 }]}>Campaigns</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("ViewNgoPostsScreen")}>
+            <Text style={[Styles.viewAllButton, { marginTop: 0 }]}>View All</Text>
+          </TouchableOpacity>
+        </View>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
         >
-          <TouchableOpacity onPress={() => navigation.navigate("ScheduleDelivery")} style={Styles.optionCards}>
-            <Image source={require('../../assets/items/poor.jpeg')} style={{ width: '100%', opacity: 0.8, height: '80%', borderColor: 'black', borderTopLeftRadius: 20, borderTopRightRadius: 20 }} />
-            <Text style={{ color: theme.colors.ivory }}>Delivery</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => navigation.navigate("Detail")} style={Styles.optionCards}>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => navigation.navigate("Detail")} style={Styles.optionCards}>
-          </TouchableOpacity>
+          {ngoPostsData.slice(0, 3).map((post) => (
+            <TouchableOpacity
+              key={post.id}
+              onPress={() => navigation.navigate('NgoPostDetailsScreen', {
+                title: post.title,
+                description: post.fullDescription,
+                image: post.source,
+                donateUrl: post.donateUrl,
+              })}
+              style={Styles.CampCards}
+            >
+              <Image source={post.source} style={{
+                width: '100%',
+                opacity: 0.8,
+                height: '80%',
+                borderColor: 'black',
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
+              }} />
+              <View style={Styles.campaignContent}>
+                <Text style={Styles.campaignTitle} numberOfLines={1}>{post.title}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
 
-        <Text style={[Styles.headings, { marginTop: 20 }]}>Campaigns</Text>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-        >
-          <TouchableOpacity onPress={() => navigation.navigate("ScheduleDelivery")} style={Styles.CampCards}>
-            <Image source={require('../../assets/items/poor.jpeg')} style={{ width: '100%', opacity: 0.8, height: '80%', borderColor: 'black', borderTopLeftRadius: 20, borderTopRightRadius: 20 }} />
-            <Text style={{ color: theme.colors.ivory }}>Delivery</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => navigation.navigate("Detail")} style={Styles.CampCards}>
-            <Image source={require('../../assets/items/poor.jpeg')} style={{ width: '100%', opacity: 0.8, height: '80%', borderColor: 'black', borderTopLeftRadius: 20, borderTopRightRadius: 20 }} />
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => navigation.navigate("Detail")} style={Styles.CampCards}>
-            <Image source={require('../../assets/items/poor.jpeg')} style={{ width: '100%', opacity: 0.8, height: '80%', borderColor: 'black', borderTopLeftRadius: 20, borderTopRightRadius: 20 }} />
-          </TouchableOpacity>
-        </ScrollView>
       </ScrollView>
     </View>
   );
@@ -222,6 +222,28 @@ const Styles = StyleSheet.create({
     marginHorizontal: 5,
     marginTop: 5,
   },
+  campaignContent: {
+    padding: 10,
+  },
+  campaignTitle: {
+    color: theme.colors.ivory,
+    fontSize: 16,
+    alignSelf: "center",
+  },
+  viewAllButton: {
+    color: theme.colors.ivory,
+    fontSize: 16,
+    paddingTop: 20,
+    marginLeft: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 10,
+  },
+  campaignDescription: {
+    color: theme.colors.ivory,
+    fontSize: 14,
+    marginTop: 5,
+  },
+
 });
 
 export default HomeScreenRec;

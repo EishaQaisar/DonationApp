@@ -1,21 +1,24 @@
 import axios from 'axios';
+import { getBaseUrl } from './deviceDetection';
 
 export async function addEduDonation(eduData) {
-  const { 
-    type, 
-    level, 
+  const {
+    type,
+    level,
     c_condition,
-    quantity, 
-    itemName, 
-    description, 
-    images, 
-    subject, 
-    donorUsername 
+    quantity,
+    itemName,
+    description,
+    images,
+    subject,
+    donorUsername
   } = eduData;
 
   try {
     // Send POST request to backend API
-    const response = await axios.post('http://10.0.2.2:3000/api/add-education-donation', {
+    const BASE_URL = await getBaseUrl();
+    console.log("this is the base url is", BASE_URL)
+    const response = await axios.post(`${BASE_URL}/api/add-education-donation`, {
       type,
       level,
       c_condition,

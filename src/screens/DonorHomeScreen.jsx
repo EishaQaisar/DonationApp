@@ -1,11 +1,10 @@
-// src/screens/donor/Home.js
-
 import React ,{useState, useContext}from 'react';
 import { View, Text, Button, TouchableOpacity, StyleSheet, ScrollView, Image, Pressable } from 'react-native';
 import { theme } from "../core/theme";
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { AuthContext } from "../context/AuthContext";
+import { ngoPostsData } from './ViewNgoPostsScreen';
 
 
 const DonorHomeScreen = ({ navigation }) => {
@@ -17,11 +16,11 @@ const DonorHomeScreen = ({ navigation }) => {
     <View style={[Styles.container, { marginBottom: tabBarHeight }]}>
       <ScrollView>
         <View style={Styles.banner}>
-        <Image source={require('../../assets/items/don1.jpg') } style={{opacity:0.3, width:'100%', height:'100%',              position: 'relative'
+        <Image source={require('../../assets/items/donorp1.jpg') } style={{opacity:0.3, width:'100%', height:'100%',              position: 'relative'
         }} >
 
         </Image>
-<Text style={Styles.heroText}>
+<Text style={Styles.heroText1}>
               Hi Donor  {user.username}
             </Text>
           <View style={{
@@ -69,7 +68,7 @@ const DonorHomeScreen = ({ navigation }) => {
 
         <View style={Styles.hero}>
           <View>
-            <Image source={require('../../assets/items/don1.jpg')} style={{
+            <Image source={require('../../assets/items/give.jpg')} style={{
               height: '100%',
               width: '100%',
               borderRadius: 20,
@@ -102,80 +101,88 @@ const DonorHomeScreen = ({ navigation }) => {
             onPress={() => navigation.navigate("ScheduleRDeliveryScreen")}
             style={Styles.optionCards}
           >
-            <Image source={require('../../assets/items/scheduleDelivery.jpg')} style={{
+            <Image source={require('../../assets/items/sch4.jpg')} style={{
               width: '100%',
               opacity: 0.8,
               height: '80%',
               borderColor: 'black',
-              borderTopLeftRadius: 20,
-              borderTopRightRadius: 20,
+              borderTopLeftRadius: 17.5,
+              borderTopRightRadius: 17.5,
             }} />
-            <Text style={{ color: theme.colors.ivory }}>Delivery</Text>
+            <Text style={{padding:5, color: theme.colors.ivory }}>Schedule Delivery</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => navigation.navigate("Detail")}
+            onPress={() => navigation.navigate("ScheduleRDeliveryScreen")}
             style={Styles.optionCards}
           >
+            <Image source={require('../../assets/items/moni.jpg')} style={{
+              width: '100%',
+              opacity: 0.8,
+              height: '80%',
+              borderColor: 'black',
+              borderTopLeftRadius: 17.5,
+              borderTopRightRadius: 17.5,
+            }} />
+            <Text style={{padding:5, color: theme.colors.ivory }}>Monitor Delivery</Text>
           </TouchableOpacity>
 
+
           <TouchableOpacity
-            onPress={() => navigation.navigate("Detail")}
+            onPress={() => navigation.navigate("ScheduleRDeliveryScreen")}
             style={Styles.optionCards}
           >
+            <Image source={require('../../assets/items/viewanalytics2.jpg')} style={{
+              width: '100%',
+              opacity: 0.8,
+              height: '80%',
+              borderColor: 'black',
+              borderTopLeftRadius: 17.5,
+              borderTopRightRadius: 17.5,
+            }} />
+            <Text style={{padding:5, color: theme.colors.ivory }}>View Analytics</Text>
           </TouchableOpacity>
+
+          
+
+        
         </ScrollView>
-        <Text style={[Styles.headings, {marginTop:20}]}>Campaigns</Text>
-
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 10, marginTop: 10 }}>
+          <Text style={[Styles.headings, { marginTop: 0 }]}>Campaigns</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("ViewNgoPostsScreen")}>
+            <Text style={[Styles.viewAllButton, { marginTop: 0 }]}>View All</Text>
+          </TouchableOpacity>
+        </View>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          
         >
-          <TouchableOpacity
-            onPress={() => navigation.navigate("ScheduleDelivery")}
-            style={Styles.CampCards}
-          >
-            <Image source={require('../../assets/items/ngo1.jpg')} style={{
-              width: '100%',
-              opacity: 0.8,
-              height: '80%',
-              borderColor: 'black',
-              borderTopLeftRadius: 20,
-              borderTopRightRadius: 20,
-            }} />
-            <Text style={{ color: theme.colors.ivory }}>Delivery</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => navigation.navigate("Detail")}
-            style={Styles.CampCards}
-          >
-          <Image source={require('../../assets/items/ngo3.jpg')} style={{
-              width: '100%',
-              opacity: 0.8,
-              height: '80%',
-              borderColor: 'black',
-              borderTopLeftRadius: 20,
-              borderTopRightRadius: 20,
-            }} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => navigation.navigate("Detail")}
-            style={Styles.CampCards}
-          >
-            <Image source={require('../../assets/items/ngo2.jpg')} style={{
-              width: '100%',
-              opacity: 0.8,
-              height: '80%',
-              borderColor: 'black',
-              borderTopLeftRadius: 20,
-              borderTopRightRadius: 20,
-            }} />
-          </TouchableOpacity>
+          {ngoPostsData.slice(0, 3).map((post) => (
+            <TouchableOpacity
+              key={post.id}
+              onPress={() => navigation.navigate('NgoPostDetailsScreen', {
+                title: post.title,
+                description: post.fullDescription,
+                image: post.source,
+                donateUrl: post.donateUrl,
+              })}
+              style={Styles.CampCards}
+            >
+              <Image source={post.source} style={{
+                width: '100%',
+                opacity: 0.8,
+                height: '80%',
+                borderColor: 'black',
+                borderTopLeftRadius: 20,
+                borderTopRightRadius: 20,
+              }} />
+              <View style={Styles.campaignContent}>
+                <Text style={Styles.campaignTitle} numberOfLines={1}>{post.title}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
-      </ScrollView>
+        </ScrollView>
     </View>
   );
 };
@@ -217,6 +224,14 @@ const Styles = StyleSheet.create({
     position: 'absolute',
     top: 60,
     left: 20,
+    color: 'white',
+    fontSize: 22,
+    fontWeight: 'bold',
+  },
+  heroText1: {
+    position: 'absolute',
+    top: 70,
+    left: 10,
     color: 'white',
     fontSize: 22,
     fontWeight: 'bold',
@@ -267,6 +282,27 @@ icon: {
     borderRadius: 25,
     marginHorizontal: 5,
     marginTop:5
+},
+campaignContent: {
+  padding: 10,
+},
+campaignTitle: {
+  color: theme.colors.ivory,
+  fontSize: 16,
+  alignSelf: "center",
+},
+viewAllButton: {
+  color: theme.colors.ivory,
+  fontSize: 16,
+  paddingTop: 20,
+  marginLeft: 10,
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  borderRadius: 10,
+},
+campaignDescription: {
+  color: theme.colors.ivory,
+  fontSize: 14,
+  marginTop: 5,
 },
 });
 

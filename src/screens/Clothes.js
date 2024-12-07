@@ -1,10 +1,11 @@
-import React, { useContext ,useState, useEffect} from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
 import { theme } from '../core/theme';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { CartContext } from '../CartContext';
 import axios from 'axios';
+import { getBaseUrl } from '../helpers/deviceDetection';
 
 
 const clothesItems = [
@@ -50,16 +51,19 @@ const clothesItems = [
     },
 ];
 
-const Clothes = ({route}) => {
+const Clothes = () => {
     const navigation = useNavigation();
     const route = useRoute();
     const { isInCart } = useContext(CartContext);
     const [clothesItems2, setClothesItems] = useState([]);
-    const {role}=route.params;
+    const { role } = route.params;
 
     const fetchClothesDonations = async () => {
         try {
-            const response = await axios.get('http://10.0.2.2:3000/api/clothes-donations');
+            const BASE_URL = await getBaseUrl();
+            console.log("this is the base url is", BASE_URL)
+            const response = await axios.post(`${BASE_URL}/api/clothes-donations`);
+            // const response = await axios.get('http://10.0.2.2:3000/api/clothes-donations');
             const data = response.data.map(item => {
                 const parsedImages = item.images ? JSON.parse(item.images) : [];
                 const validImages = parsedImages.map(imagePath => ({ uri: imagePath }));
@@ -82,10 +86,10 @@ const Clothes = ({route}) => {
     }, []);
     useEffect(() => {
         console.log("clothes items updated:", clothesItems2);
-      }, [clothesItems2]);  // Runs whenever foodItems state is updated
-    
-    
-    
+    }, [clothesItems2]);  // Runs whenever foodItems state is updated
+
+
+
 
     // Filter out items that are already in the cart
     const visibleItems = clothesItems2.filter(item => !isInCart(item));
@@ -97,7 +101,7 @@ const Clothes = ({route}) => {
             <Text style={styles.item}>{item.itemName}</Text>
             <TouchableOpacity
                 style={styles.claimButton}
-                onPress={() => navigation.navigate('ItemDetail', { item, category:'Clothing' })}
+                onPress={() => navigation.navigate('ItemDetail', { item, category: 'Clothing' })}
             >
                 <Text style={styles.claimButtonText}>Claim</Text>
             </TouchableOpacity>
@@ -175,7 +179,7 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     donationItem: {
-        backgroundColor:'#2E2E2E',
+        backgroundColor: '#2E2E2E',
         padding: 15,
         borderRadius: 10,
         marginBottom: 20,
