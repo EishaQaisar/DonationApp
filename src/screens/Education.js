@@ -1,9 +1,11 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
 import { theme } from '../core/theme';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { CartContext } from '../CartContext'; // Correct import
+import axios from 'axios';
+
 
 const educationItems = [
     {
@@ -42,18 +44,50 @@ const Education = () => {
     const navigation = useNavigation();
     const route = useRoute();
     const { isInCart } = useContext(CartContext);
+    const [eduItems, setEducationItems] = useState([]);
+
+    const fetchClothesDonations = async () => {
+        try {
+            const response = await axios.get('http://10.0.2.2:3000/api/education-donations');
+            const data = response.data.map(item => {
+                const parsedImages = item.images ? JSON.parse(item.images) : [];
+                const validImages = parsedImages.map(imagePath => ({ uri: imagePath }));
+                return {
+                    ...item,
+                    images: validImages,
+                };
+            });
+            console.log('Fetched data:', data);
+            setEducationItems(data);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+    useEffect(() => {
+        const fetchData = async () => {
+            await fetchClothesDonations();
+        };
+        fetchData();
+    }, []);
+    useEffect(() => {
+        console.log("clothes items updated:", eduItems);
+      }, [eduItems]);  // Runs whenever foodItems state is updated
+    
+    
+    
+
 
     // Filter out items that are already in the cart
-    const visibleItems = educationItems.filter(item => !isInCart(item));
+    const visibleItems = eduItems.filter(item => !isInCart(item));
 
     const renderItem = ({ item }) => (
         <View style={styles.donationItem}>
             {/* Display only the first image */}
             <Image source={item.images[0]} style={styles.itemImage} />
-            <Text style={styles.item}>{item.title}</Text>
+            <Text style={styles.item}>{item.itemName}</Text>
             <TouchableOpacity
                 style={styles.claimButton}
-                onPress={() => navigation.navigate('ItemDetail', { item })}
+                onPress={() => navigation.navigate('ItemDetail', { item, category:'Education' })}
             >
                 <Text style={styles.claimButtonText}>Claim</Text>
             </TouchableOpacity>

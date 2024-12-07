@@ -58,6 +58,7 @@ const createTables = () => {
       CREATE TABLE IF NOT EXISTS ClothesDonations (
     id INT AUTO_INCREMENT PRIMARY KEY,
     fabric VARCHAR(255) NOT NULL,
+    itemName VARCHAR(255) NOT NULL,
     size VARCHAR(10) NOT NULL,
     c_condition VARCHAR(50) NOT NULL,
     gender VARCHAR(50) NOT NULL,
@@ -72,6 +73,24 @@ const createTables = () => {
 );
 
     `;
+
+    const educationDonationsTable = `
+  CREATE TABLE IF NOT EXISTS EducationDonations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    type VARCHAR(255) NOT NULL,
+    level VARCHAR(255) NOT NULL,
+    c_condition VARCHAR(255) NOT NULL,
+    quantity INT NOT NULL,
+    itemName VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    images TEXT,
+    subject VARCHAR(255)  DEFAULT '-',
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    claimStatus VARCHAR(255) DEFAULT 'Unclaimed',
+    donorUsername VARCHAR(255) NOT NULL
+  );
+`;
+
   
     db.query(donationsTable, (err, result) => {
       if (err) {
@@ -94,6 +113,13 @@ const createTables = () => {
         console.log('Error creating ClothesDonations table:', err);
       } else {
         console.log('ClothesDonations table created successfully');
+      }
+    });
+    db.query(educationDonationsTable, (err, result) => {
+      if (err) {
+        console.log('Error creating EducationDonations table:', err);
+      } else {
+        console.log('EducationDonations table created successfully');
       }
     });
   };
@@ -139,19 +165,19 @@ const createTables = () => {
   app.post('/api/add-clothes-donation', (req, res) => {
     console.log("hjeree");
     console.log(req.body);
-    const { season, gender, ageCategory, size, c_condition, quantity, fabric, description, images, donorUsername } = req.body;
+    const { season, gender,itemName, ageCategory, size, c_condition, quantity, fabric, description, images, donorUsername } = req.body;
   
-    console.log("Received data:", { season, gender, ageCategory, size, c_condition, quantity, fabric, description, images, donorUsername });
+    console.log("Received data:", { season, gender, itemName, ageCategory, size, c_condition, quantity, fabric, description, images, donorUsername });
   
     const query = `
-      INSERT INTO clothesdonations (season, gender, age_category, size, c_condition, quantity, fabric, description, images, donorUsername)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO clothesdonations (season,itemName, gender,  age_category, size, c_condition, quantity, fabric, description, images, donorUsername)
+      VALUES (?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?)
     `;
   
     // Log the data being passed to the query
     console.log('Executing query with:', [season, gender, ageCategory, size, c_condition, quantity, fabric, description, JSON.stringify(images), donorUsername]);
   
-    db.query(query, [season, gender, ageCategory, size, c_condition, quantity, fabric, description, JSON.stringify(images), donorUsername], (err, results) => {
+    db.query(query, [season,itemName, gender, ageCategory, size, c_condition, quantity, fabric, description, JSON.stringify(images), donorUsername], (err, results) => {
       if (err) {
         console.error('Error inserting clothes donation:', err);
         return res.status(500).send('Error inserting clothes donation');
@@ -171,6 +197,46 @@ app.get('/api/food-donations', (req, res) => {
       res.json(results);
     });
   });
+  app.get('/api/clothes-donations', (req, res) => {
+    const query = 'SELECT * FROM clothesdonations WHERE claimStatus = ?';
+    db.query(query, ['Unclaimed'], (err, results) => {
+      if (err) {
+        console.error('Error fetching data:', err);
+        return res.status(500).send('Error fetching data');
+      }
+      res.json(results);
+    });
+  });
+
+  app.post('/api/add-education-donation', (req, res) => {
+    const { type, level, c_condition, quantity, itemName, description, images, subject, donorUsername } = req.body;
+  
+    const query = `
+      INSERT INTO EducationDonations (type, level, c_condition, quantity, itemName, description, images, subject, donorUsername)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+  
+    db.query(query, [type, level, c_condition, quantity, itemName, description, JSON.stringify(images), subject, donorUsername], (err, results) => {
+      if (err) {
+        console.error('Error inserting education donation:', err);
+        return res.status(500).send('Error inserting education donation');
+      }
+      res.status(200).send('Education donation added successfully');
+    });
+  });
+
+  
+  app.get('/api/education-donations', (req, res) => {
+    const query = 'SELECT * FROM EducationDonations WHERE claimStatus = ?';
+    db.query(query, ['Unclaimed'], (err, results) => {
+      if (err) {
+        console.error('Error fetching education donations:', err);
+        return res.status(500).send('Error fetching data');
+      }
+      res.json(results);
+    });
+  });
+  
   
   
   

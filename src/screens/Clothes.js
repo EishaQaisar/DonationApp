@@ -1,9 +1,11 @@
-import React, { useContext } from 'react';
+import React, { useContext ,useState, useEffect} from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
 import { theme } from '../core/theme';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { CartContext } from '../CartContext';
+import axios from 'axios';
+
 
 const clothesItems = [
     {
@@ -48,22 +50,54 @@ const clothesItems = [
     },
 ];
 
-const Clothes = () => {
+const Clothes = ({route}) => {
     const navigation = useNavigation();
     const route = useRoute();
     const { isInCart } = useContext(CartContext);
+    const [clothesItems2, setClothesItems] = useState([]);
+    const {role}=route.params;
+
+    const fetchClothesDonations = async () => {
+        try {
+            const response = await axios.get('http://10.0.2.2:3000/api/clothes-donations');
+            const data = response.data.map(item => {
+                const parsedImages = item.images ? JSON.parse(item.images) : [];
+                const validImages = parsedImages.map(imagePath => ({ uri: imagePath }));
+                return {
+                    ...item,
+                    images: validImages,
+                };
+            });
+            console.log('Fetched data:', data);
+            setClothesItems(data);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    };
+    useEffect(() => {
+        const fetchData = async () => {
+            await fetchClothesDonations();
+        };
+        fetchData();
+    }, []);
+    useEffect(() => {
+        console.log("clothes items updated:", clothesItems2);
+      }, [clothesItems2]);  // Runs whenever foodItems state is updated
+    
+    
+    
 
     // Filter out items that are already in the cart
-    const visibleItems = clothesItems.filter(item => !isInCart(item));
+    const visibleItems = clothesItems2.filter(item => !isInCart(item));
 
     const renderItem = ({ item }) => (
         <View style={styles.donationItem}>
             {/* Display the first image */}
             <Image source={item.images[0]} style={styles.itemImage} />
-            <Text style={styles.item}>{item.title}</Text>
+            <Text style={styles.item}>{item.itemName}</Text>
             <TouchableOpacity
                 style={styles.claimButton}
-                onPress={() => navigation.navigate('ItemDetail', { item })}
+                onPress={() => navigation.navigate('ItemDetail', { item, category:'Clothing' })}
             >
                 <Text style={styles.claimButtonText}>Claim</Text>
             </TouchableOpacity>

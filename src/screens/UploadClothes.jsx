@@ -32,10 +32,12 @@ const UploadClothes = ({ navigation }) => {
   const [ageCategory, setAgeCategory] = useState({ value: '', error: '' });
   const [size, setSize] = useState({ value: '', error: '' });
   const [condition, setCondition] = useState({ value: '', error: '' });
-  const [quantity, setQuantity] = useState({ value: 1, error: '' });
+  const [quantity, setQuantity] = useState({ value: '1', error: '' });
   const [fabric, setFabric] = useState({ value: '', error: '' });
   const [description, setDescription] = useState({ value: '', error: '' });
   const [images, setImages] = useState([]);
+  const [itemName, setItemName] = useState({ value: '', error: '' });
+
 
   const [imageErrors, setImageErrors] = useState('');
 
@@ -48,7 +50,18 @@ const UploadClothes = ({ navigation }) => {
 
       isValid = false;
     }
-    
+    if (!itemName.value) {
+      setItemName((prev) => ({ ...prev, error: 'Item name is required' }));
+      isValid = false;
+    }
+    if (itemName.value.length>30) {
+      setItemName((prev) => ({ ...prev, error: 'Too long' }));
+      isValid = false;
+    }
+    if (itemName.value.length<3 && itemName.value.length>0) {
+      setItemName((prev) => ({ ...prev, error: 'Too short' }));
+      isValid = false;
+    }
     if (!gender.value) {
       setGender((prev) => ({ ...prev, error: 'Gender is required' }));
 
@@ -66,16 +79,40 @@ const UploadClothes = ({ navigation }) => {
       setCondition((prev) => ({ ...prev, error: 'Condition is required' }));
       isValid = false;
     }
-    if (quantity.value <= 0) {
+    if (parseInt(quantity.value) <= 0) {
       setQuantity((prev) => ({ ...prev, error: 'Quantity must be greater than 0' }));
+      isValid = false;
+    }
+    if (parseInt(quantity.value) >1000) {
+      setQuantity((prev) => ({ ...prev, error: 'Max limit exceeded' }));
+      isValid = false;
+    }
+    if (!/^\d+$/.test(quantity.value)) {
+      setQuantity((prev) => ({ ...prev, error: 'Quantity must be a numeric value' }));
       isValid = false;
     }
     if (!fabric.value) {
       setFabric((prev) => ({ ...prev, error: 'Fabric is required' }));
       isValid = false;
     }
+    if (fabric.value.length>20) {
+      setFabric((prev) => ({ ...prev, error: 'Too long' }));
+      isValid = false;
+    }
+    if (fabric.value.length<3 && fabric.value.length>0) {
+      setFabric((prev) => ({ ...prev, error: 'Too short' }));
+      isValid = false;
+    }
     if (!description.value) {
       setDescription((prev) => ({ ...prev, error: 'Description is required' }));
+      isValid = false;
+    }
+    if (description.value.length>40) {
+      setDescription((prev) => ({ ...prev, error: 'Too long' }));
+      isValid = false;
+    }
+    if (description.value.length<3 && description.value.length>0) {
+      setDescription((prev) => ({ ...prev, error: 'Too short' }));
       isValid = false;
     }
     if (images.length === 0) {
@@ -98,6 +135,7 @@ const UploadClothes = ({ navigation }) => {
     const clothesData = {
      
       season: season.value,
+      itemName:itemName.value,
       gender: gender.value,
       ageCategory: ageCategory.value,
       size: size.value,
@@ -113,6 +151,7 @@ const UploadClothes = ({ navigation }) => {
     try {
       await addClothesDonation(clothesData)
       console.log('Clothes donation successfully submitted:', clothesData);
+      navigation.navigate("DonationSuccessScreen");
     } catch (error) {
       console.error('Error submitting clothes donation:', error);
     }
@@ -144,7 +183,21 @@ const UploadClothes = ({ navigation }) => {
         />
         {season.error && <Text style={Styles.errorText}>{season.error}</Text>}
 
+    {/* Item Name */}
+    <View style={{ marginTop: 30 }}>
+          <Text style={Styles.headings}>Item Name</Text>
+          <TextInput
+            placeholder="e.g pants"
+            value={itemName.value}
+            onChangeText={(text) => setItemName({ value: text, error: '' })}
 
+            style={Styles.name}
+            placeholderTextColor={theme.colors.ivory}
+            selectionColor={theme.colors.sageGreen}
+          />
+                    {itemName.error && <Text style={Styles.errorText}>{itemName.error}</Text>}
+
+        </View>
          {/* Food Type */}
          <View style={{ marginTop: 30 }}>
                 <Text style={Styles.headings}>Gender</Text>
@@ -239,15 +292,20 @@ const UploadClothes = ({ navigation }) => {
           <Text style={Styles.quantityLabel}>Number of Items:</Text>
 
             <TouchableOpacity
-              onPress={() => setQuantity({ value: Math.max(quantity.value - 1, 1), error: '' })}
+              onPress={() => setQuantity({ value: Math.max(parseInt(quantity.value) - 1, 1).toString(), error:""})}
 
               style={Styles.quantityButton}
             >
               <Text style={Styles.quantityButtonText}>-</Text>
             </TouchableOpacity>
-            <Text style={Styles.quantityText}>{quantity.value}</Text>
+            <TextInput
+                    style={Styles.quantityInput}
+                    value={quantity.value}
+                    keyboardType="numeric"
+                    onChangeText={(text) => setQuantity({ value: text, error: '' })}
+                  />
             <TouchableOpacity
-              onPress={() => setQuantity({ value: quantity.value + 1, error: '' })}
+              onPress={() => setQuantity({ value: (parseInt(quantity.value) + 1).toString(), error: '' })}
 
               style={Styles.quantityButton}
             >
@@ -257,12 +315,11 @@ const UploadClothes = ({ navigation }) => {
           {quantity.error && <Text style={Styles.errorText}>{quantity.error}</Text>}
 
         </View>
-
         {/* Fabric Name */}
         <View style={{ marginTop: 30 }}>
           <Text style={Styles.headings}>Fabric</Text>
           <TextInput
-            placeholder="Lawn"
+            placeholder="e.g Lawn"
             value={fabric.value}
             onChangeText={(text) => setFabric({ value: text, error: '' })}
 
@@ -285,6 +342,7 @@ const UploadClothes = ({ navigation }) => {
             style={Styles.descri}
             placeholderTextColor={theme.colors.ivory}
             selectionColor={theme.colors.sageGreen}
+            multiline={true}
           />
           {description.error && <Text style={Styles.errorText}>{description.error}</Text>}
 
@@ -437,6 +495,13 @@ const Styles = StyleSheet.create({
     color: theme.colors.ivory,
     fontSize: 15,
   },
+  quantityInput: {
+    color: theme.colors.ivory,
+    fontSize: 18,
+    textAlign: 'center',
+    width: 50,
+  },
+
   errorText: {
     color: 'red',
     fontSize: 12,

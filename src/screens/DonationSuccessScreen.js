@@ -32,7 +32,7 @@ export default function DonationSuccessScreen({ navigation }) {
         </Text>
 
         {/* Continue button */}
-        <TouchableOpacity style={styles.button} onPress={() => navigation.replace("TabNavigator")}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.replace("TabNavigator",{role:"donor"})}>
           <Text style={styles.buttonText}>Continue</Text>
         </TouchableOpacity>
       </View>

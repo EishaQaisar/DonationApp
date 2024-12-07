@@ -54,7 +54,7 @@ const Food = () => {
             <Text style={styles.item}>{item.foodName}</Text>
             <TouchableOpacity
                 style={styles.claimButton}
-                onPress={() => navigation.navigate('ItemDetail', { item })}
+                onPress={() => navigation.navigate('ItemDetail', { item , category:'food'})}
             >
                 <Text style={styles.claimButtonText}>Claim</Text>
             </TouchableOpacity>

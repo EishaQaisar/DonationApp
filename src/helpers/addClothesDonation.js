@@ -2,12 +2,13 @@
 import axios from 'axios';
 
 export async function addClothesDonation(clothesData) {
-  const { season, gender, ageCategory, size, c_condition, quantity, fabric, description, images, donorUsername } = clothesData;
+  const { season,itemName, gender, ageCategory, size, c_condition, quantity, fabric, description, images, donorUsername } = clothesData;
 
   try {
     // Send POST request to backend API
     const response = await axios.post('http://10.0.2.2:3000/api/add-clothes-donation', {
       season,
+      itemName,
       gender,
       ageCategory,
       size,

@@ -48,7 +48,7 @@ function TabNavigator({navigation, route}) {
 
       <Tab.Screen name="History" component={History} options={{headerShown:false,
         tabBarIcon:({color})=> <MaterialCommunityIcons name="account" size={24} color={color} />
-      } }/>
+      } } initialParams={{ ...route.params }}/>
 
     </Tab.Navigator>
     </CartProvider>

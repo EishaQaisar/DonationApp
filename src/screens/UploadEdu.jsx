@@ -1,215 +1,335 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput } from 'react-native';
+import React, { useState , useContext} from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Image } from 'react-native';
 import { theme } from "../core/theme";
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { Formik } from 'formik';
 import CircleLogoStepper2 from '../components/CircleLogoStepper2';
 import { Picker } from "@react-native-picker/picker";
 import ImagePickerComponent from '../components/ImagePickerComponent'; // Import the new component
 import RowOptionButtons from '../components/RowOptionButtons';
+import { Formik } from 'formik';
 
-const UploadEdu = () => {
+import { AuthContext } from "../context/AuthContext";
+import { addClothesDonation } from '../helpers/addClothesDonation';
+import { addEduDonation } from '../helpers/addEduDonations';
+
+const UploadEdu = ({ navigation }) => {
+  const { user } = useContext(AuthContext);
+
   const tabBarHeight = useBottomTabBarHeight();
-  const ageCategories = [
-    "0-6 months", "6-9 months", "9-12 months", "1 year", "2 year",
-    "3 year", "4 year", "5 year", "6-8 year", "8-12 year",
-    "12-18 year", "18-25 year", "25 year onwards"
+  const subjectOptions = [
+    "English", "Urdu", "Mathematics", "Science", "Islamiyat",
+    "History","Physics", "Chemistry","Business Studies","Economics","Accounting", "Other"
   ];
-  const gender = ['Male', 'Female', 'Unisex'];
-  const [images, setImages] = useState([]);
-  const season = ['Summers', 'Spring', 'Autumn', 'Winter'];
-  const condition = ['New', 'Used Once/Twice', 'Heavily Used'];
-  const size=['XS','S','M','L','XL','XXL']
+  const eduTypeOptions = ['Books', 'Stationary', 'Other'];
+  const conditionOptions = ['New', 'Gently Used', 'Well Used'];
+  const eduLevelOptions = ['Primary', 'Secondary', 'Higher Education', 'Special Education'];
 
-  const onSubmitMethod = (value) => {
-    value.image = images;
-    console.log(value);
+  // State for form fields
+  // State for form field values and errors
+  const [educType, setEducType] = useState({ value: '', error: '' });
+  const [eduLevel, setLevel] = useState({ value: '', error: '' });
+  const [subject, setSubject] = useState({ value: '', error: '' });
+
+  const [condition, setCondition] = useState({ value: '', error: '' });
+  const [quantity, setQuantity] = useState({ value: '1', error: '' });
+  const [itemName, setItemName] = useState({ value: '', error: '' });
+  const [description, setDescription] = useState({ value: '', error: '' });
+  const [images, setImages] = useState([]);
+
+  const [imageErrors, setImageErrors] = useState('');
+
+
+  const validate = () => {
+    let isValid = true;
+
+    if (!educType.value) {
+      setEducType((prev) => ({ ...prev, error: 'Type is required' }));
+
+      isValid = false;
+    }
+    
+   
+    if (!eduLevel.value) {
+      setLevel((prev) => ({ ...prev, error: 'Level is required' }));
+      isValid = false;
+    }
+    if (!condition.value) {
+      setCondition((prev) => ({ ...prev, error: 'Condition is required' }));
+      isValid = false;
+    }
+    if (parseInt(quantity.value) <= 0) {
+      setQuantity((prev) => ({ ...prev, error: 'Quantity must be greater than 0' }));
+      isValid = false;
+    }
+    if (parseInt(quantity.value) > 1000) {
+      setQuantity((prev) => ({ ...prev, error: 'Max limit exceeded' }));
+      isValid = false;
+    }
+    if (!/^\d+$/.test(quantity.value)) {
+      setQuantity((prev) => ({ ...prev, error: 'Quantity must be a numeric value' }));
+      isValid = false;
+    }
+    
+    if (!itemName.value) {
+      setItemName((prev) => ({ ...prev, error: 'Item name is required' }));
+      isValid = false;
+    }
+    if (itemName.value.length>30) {
+      setItemName((prev) => ({ ...prev, error: 'Too long' }));
+      isValid = false;
+    }
+    if (itemName.value.length<3 && itemName.value.length>0) {
+      setItemName((prev) => ({ ...prev, error: 'Too short' }));
+      isValid = false;
+    }
+    if (!description.value) {
+      setDescription((prev) => ({ ...prev, error: 'Description is required' }));
+      isValid = false;
+    }
+    if (description.value.length>40) {
+      setDescription((prev) => ({ ...prev, error: 'Too long' }));
+      isValid = false;
+    }
+    if (description.value.length<3 && description.value.length>0) {
+      setDescription((prev) => ({ ...prev, error: 'Too short' }));
+      isValid = false;
+    }
+    if (images.length === 0) {
+      setImageErrors('At least one image is required');
+      isValid = false;
+    } else {
+      setImageErrors('');
+    }
+
+
+    return isValid;
   };
 
+  const onSubmitMethod = async () => {
+
+    const isValid = validate();
+
+
+    if (!isValid) return;
+    const eduData = {
+     
+      type: educType.value,
+      level: eduLevel.value,
+      c_condition: condition.value,
+      quantity: quantity.value,
+      itemName: itemName.value,
+      description:  description.value,
+      images:images,
+      subject:subject.value,
+      donorUsername: user.username,
+
+    };
+
+    try {
+      await addEduDonation(eduData);
+      console.log('Education donation successfully submitted:', eduData);
+      navigation.navigate("DonationSuccessScreen")
+    } catch (error) {
+      console.error('Error submitting clothes donation:', error);
+    }
+
+  };
+
+  
   return (
     <View style={[Styles.container, { marginBottom: tabBarHeight }]}>
       <ScrollView>
-        <CircleLogoStepper2/>
+        <CircleLogoStepper2 />
         <View style={Styles.line} />
 
-        {/* Form */}
         <Formik
-          initialValues={{
-            fabric: "",
-            size: "",
-            condition: "",
-            gender: "",
-            quantity: 1,
-            season: "",
-            descri: "",
-            ageCategory: "",
-          }}
-          onSubmit={value => onSubmitMethod(value)}
-          style={{ height: '100%' }}
+          initialValues={{}}
+          onSubmit={onSubmitMethod}
         >
-          {({ handleChange, handleBlur, handleSubmit, values, setFieldValue }) => (
+          {({ handleSubmit }) => (
             <>
-              {/* Season Selection */}
-              <RowOptionButtons
-                heading="Season"
-                options={season}
-                selectedValue={values.season}
-                onSelect={(selectedSeason) => setFieldValue('season', selectedSeason)}
-              />
+        
 
-              {/* Gender Selection */}
-              <View style={{ marginTop: 30 }}>
-                <Text style={Styles.headings}>Gender</Text>
+
+         {/* Food Type */}
+         <View style={{ marginTop: 30 }}>
+                <Text style={Styles.headings}>Type</Text>
                 <View style={Styles.radioContainer}>
-                  {gender.map((option) => (
+                  {eduTypeOptions.map((option) => (
                     <TouchableOpacity
                       key={option}
                       style={Styles.radioOption}
-                      onPress={() => setFieldValue('gender', option)}
+                      onPress={() => setEducType({ value: option, error: '' })} 
                     >
                       <View
                         style={[
                           Styles.radioCircle,
-                          values.gender === option && Styles.radioSelected,
+                          educType.value === option && Styles.radioSelected,
                         ]}
                       />
                       <Text style={Styles.radioLabel}>{option}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
+                {educType.error && <Text style={Styles.errorText}>{educType.error}</Text>}
               </View>
 
-              {/* Age Selection */}
-              <View style={{ marginTop: 30 }}>
-                <Text style={Styles.headings}>Age </Text>
-                <View style={Styles.dropdownContainer}>
-                  <Picker
-                    selectedValue={values.ageCategory}
-                    onValueChange={(itemValue) => setFieldValue("ageCategory", itemValue)}
-                    style={Styles.picker}
-                    dropdownStyle={Styles.dropdownBox}
-                    itemStyle={Styles.itemStyle}
-                  >
-                    <Picker.Item label="Select an age category" value="" />
-                    {ageCategories.map((category) => (
-                      <Picker.Item key={category} label={category} value={category} />
-                    ))}
-                  </Picker>
-                </View>
-              </View>
+      
+        {/* Level Selection */}
+        <View style={{ marginTop: 30 }}>
+          <Text style={Styles.headings}>Level</Text>
+          <View style={Styles.dropdownContainer}>
+            <Picker
+              selectedValue={eduLevel.value}
+              onValueChange={(itemValue) => setLevel({ value: itemValue, error: '' })}
 
-              {/* Size Selection */}
-              <View style={{ marginTop: 30 }}>
-                <Text style={Styles.headings}>Size</Text>
-                <View style={Styles.dropdownContainer}>
-                  <Picker
-                    selectedValue={values.size}
-                    onValueChange={(itemValue) => setFieldValue("size", itemValue)}
-                    style={Styles.picker}
-                    dropdownStyle={Styles.dropdownBox}
-                    itemStyle={Styles.itemStyle}
-                  >
-                    <Picker.Item label="Select Size" value="" />
-                    {size.map((size) => (
-                      <Picker.Item key={size} label={size} value={size} />
-                    ))}
-                  </Picker>
-                </View>
-              </View>
+              style={Styles.picker}
+            >
+              <Picker.Item label="Select Education Level" value="" />
+              {eduLevelOptions.map((eduLevel) => (
+                <Picker.Item key={eduLevel} label={eduLevel} value={eduLevel} />
+              ))}
+            </Picker>
+          </View>
+          {eduLevel.error && <Text style={Styles.errorText}>{eduLevel.error}</Text>}
 
+        </View>
 
-              {/* Condition Selection */}
-              <View style={{ marginTop: 30 }}>
-                <Text style={Styles.headings}>Condition</Text>
+         {/* Subject */}
+         <View style={{ marginTop: 30 }}>
+          <Text style={Styles.headings}>Subject</Text>
+          <View style={Styles.dropdownContainer}>
+            <Picker
+              selectedValue={subject.value}
+              onValueChange={(itemValue) => setSubject({ value: itemValue, error: '' })}
+
+              style={Styles.picker}
+            >
+              <Picker.Item label="Select Subject" value="" />
+              {subjectOptions.map((subject) => (
+                <Picker.Item key={subject} label={subject} value={subject} />
+              ))}
+            </Picker>
+          </View>
+          {subject.error && <Text style={Styles.errorText}>{subject.error}</Text>}
+
+        </View>
+
+          
+         {/* Condtion */}
+         <View style={{ marginTop: 30 }}>
+                <Text style={Styles.headings}>Condtion</Text>
                 <View style={Styles.radioContainer}>
-                  {condition.map((option) => (
+                  {conditionOptions.map((option) => (
                     <TouchableOpacity
                       key={option}
                       style={Styles.radioOption}
-                      onPress={() => setFieldValue('condition', option)}
+                      onPress={() => setCondition({ value: option, error: '' })} 
                     >
                       <View
                         style={[
                           Styles.radioCircle,
-                          values.condition === option && Styles.radioSelected,
+                          condition.value === option && Styles.radioSelected,
                         ]}
                       />
                       <Text style={Styles.radioLabel}>{option}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
-              </View>
-              {/* Quantity Selector */}
-              <View style={{ marginTop: 30 }}>
-                <Text style={Styles.headings}>Quantity</Text>
-                <View style={Styles.quantityContainer}>
-                  <Text style={Styles.quantityLabel}>Number of Items:</Text>
-                  <TouchableOpacity
-                    onPress={() => setFieldValue('quantity', Math.max(values.quantity - 1, 1))}
-                    style={Styles.quantityButton}
-                  >
-                    <Text style={Styles.quantityButtonText}>-</Text>
-                  </TouchableOpacity>
-                  <Text style={Styles.quantityText}>{values.quantity}</Text>
-                  <TouchableOpacity
-                    onPress={() => setFieldValue('quantity', values.quantity + 1)}
-                    style={Styles.quantityButton}
-                  >
-                    <Text style={Styles.quantityButtonText}>+</Text>
-                  </TouchableOpacity>
-                </View>
+                {condition.error && <Text style={Styles.errorText}>{condition.error}</Text>}
               </View>
 
+        {/* Quantity Selector */}
+        <View style={{ marginTop: 30 }}>
+          <Text style={Styles.headings}>Quantity</Text>
+          <View style={Styles.quantityContainer}>
+          <Text style={Styles.quantityLabel}>Number of Items:</Text>
 
-              {/* Fabric Name */}
-              <View style={{ marginTop: 30 }}>
-                <Text style={Styles.headings}>Fabric</Text>
-                <TextInput
-                  placeholder="Lawn"
-                  onChangeText={handleChange('fabric')}
-                  value={values.name}
-                  style={Styles.name}
-                  placeholderTextColor={theme.colors.ivory}
-                  selectionColor={theme.colors.sageGreen}
-                />
-              </View>
-              
-              {/* Description */}
-              <View style={{ marginTop: 30 }}>
-                <Text style={Styles.headings}>Description</Text>
-                <TextInput
-                  placeholder="Enter description here.."
-                  value={values.desc}
-                  style={Styles.descri}
-                  onChangeText={handleChange('desc')}
-                  placeholderTextColor={theme.colors.ivory}
-                  selectionColor={theme.colors.sageGreen}
-                  keyboardType="default" 
-                  editable={true}
-                  
-                />
-              </View>
+            <TouchableOpacity
+              onPress={() => setQuantity({ value: Math.max(parseInt(quantity.value) - 1, 1).toString(), error:""})}
 
-              {/* Image Selection */}
-              <ImagePickerComponent
+              style={Styles.quantityButton}
+            >
+              <Text style={Styles.quantityButtonText}>-</Text>
+            </TouchableOpacity>
+            <TextInput
+                    style={Styles.quantityInput}
+                    value={quantity.value}
+                    keyboardType="numeric"
+                    onChangeText={(text) => setQuantity({ value: text, error: '' })}
+                  />
+            <TouchableOpacity
+              onPress={() => setQuantity({ value: (parseInt(quantity.value) + 1).toString(), error: '' })}
+
+              style={Styles.quantityButton}
+            >
+              <Text style={Styles.quantityButtonText}>+</Text>
+            </TouchableOpacity>
+          </View>
+          {quantity.error && <Text style={Styles.errorText}>{quantity.error}</Text>}
+
+        </View>
+         
+       
+        {/* Item Name */}
+        <View style={{ marginTop: 30 }}>
+          <Text style={Styles.headings}>Item Name</Text>
+          <TextInput
+            placeholder="e.g Punjab Textbook"
+            value={itemName.value}
+            onChangeText={(text) => setItemName({ value: text, error: '' })}
+
+            style={Styles.name}
+            placeholderTextColor={theme.colors.ivory}
+            selectionColor={theme.colors.sageGreen}
+          />
+                    {itemName.error && <Text style={Styles.errorText}>{itemName.error}</Text>}
+
+        </View>
+
+        {/* Description */}
+        <View style={{ marginTop: 30 }}>
+          <Text style={Styles.headings}>Description</Text>
+          <TextInput
+            placeholder="Enter description here.."
+            value={description.value}
+            onChangeText={(text) => setDescription({ value: text, error: '' })}
+
+            style={Styles.descri}
+            placeholderTextColor={theme.colors.ivory}
+            selectionColor={theme.colors.sageGreen}
+            multiline={true}
+          />
+          {description.error && <Text style={Styles.errorText}>{description.error}</Text>}
+
+        </View>
+
+        {/* Image Selection */}
+        <ImagePickerComponent
                 maxImages={3}
-                selectedImages={values.images}
-                onImagesChange={(updatedImages) => setFieldValue('images', updatedImages)}
+                selectedImages={images}
+                onImagesChange={(updatedImages) => {
+                  setImageErrors("");
+                  setImages(updatedImages)}}
               />
-
-              {/* Submit Button */}
-              <View style={{ alignItems: 'center' }}>
+              {imageErrors && <Text style={Styles.errorText}>{imageErrors}</Text>}
+        {/* Submit Button */}
+        {/* Submit Button */}
+        <View style={{ alignItems: 'center' }}>
                 <TouchableOpacity onPress={handleSubmit} style={Styles.submitButton}>
                   <Text style={Styles.submitButtonText}>Submit</Text>
                 </TouchableOpacity>
               </View>
-            </>
+        </>
           )}
         </Formik>
       </ScrollView>
     </View>
   );
 };
+
+
+
 
 const Styles = StyleSheet.create({
   container: {
@@ -294,7 +414,7 @@ const Styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.sageGreen,
     borderRadius: 5,
-    backgroundColor: theme.colors.charcoalBlack,
+    backgroundColor: theme.colors.TaupeBlack,
     marginTop: 10,
   },
   picker: {
@@ -330,6 +450,17 @@ const Styles = StyleSheet.create({
   quantityText: {
     color: theme.colors.ivory,
     fontSize: 15,
+  },
+  quantityInput: {
+    color: theme.colors.ivory,
+    fontSize: 18,
+    textAlign: 'center',
+    width: 50,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginTop: 5,
   },
 });
 

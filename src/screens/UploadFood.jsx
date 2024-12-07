@@ -21,7 +21,7 @@ const UploadFood = ({navigation}) => {
   const [desc, setDesc] = useState({ value: '', error: '' });
   const [selectedMeal, setSelectedMeal] = useState({ value: '', error: '' });
   const [foodType, setFoodType] = useState({ value: '', error: '' });
-  const [quantity, setQuantity] = useState({ value: 1, error: '' });
+  const [quantity, setQuantity] = useState({ value: '1', error: '' });
   const [imageErrors, setImageErrors] = useState('');
   
   const foodOptions = ['Raw', 'Cooked', 'Packaged'];
@@ -33,9 +33,25 @@ const UploadFood = ({navigation}) => {
       setName((prev) => ({ ...prev, error: 'Food Name is required' }));
       isValid = false;
     }
+    if (name.value.length<3 && name.value.length>0) {
+      setName((prev) => ({ ...prev, error: 'Too short' }));
+      isValid = false;
+    }
+    if (name.value.length>15) {
+      setName((prev) => ({ ...prev, error: 'Too long' }));
+      isValid = false;
+    }
 
     if (!desc.value) {
       setDesc((prev) => ({ ...prev, error: 'Description is required' }));
+      isValid = false;
+    }
+    if (desc.value.length>40) {
+      setDesc((prev) => ({ ...prev, error: 'Too long' }));
+      isValid = false;
+    }
+    if (desc.value.length<3 && desc.value.length>0) {
+      setDesc((prev) => ({ ...prev, error: 'Too short' }));
       isValid = false;
     }
 
@@ -49,8 +65,16 @@ const UploadFood = ({navigation}) => {
       isValid = false;
     }
 
-    if (!quantity.value || quantity.value <= 0) {
+    if (parseInt(quantity.value) <= 0) {
       setQuantity((prev) => ({ ...prev, error: 'Quantity must be greater than 0' }));
+      isValid = false;
+    }
+    if (parseInt(quantity.value) > 1000) {
+      setQuantity((prev) => ({ ...prev, error: 'Max limit exceeded' }));
+      isValid = false;
+    }
+    if (!/^\d+$/.test(quantity.value)) {
+      setQuantity((prev) => ({ ...prev, error: 'Quantity must be a numeric value' }));
       isValid = false;
     }
 
@@ -148,26 +172,34 @@ const UploadFood = ({navigation}) => {
 
               {/* Quantity Selector */}
               <View style={{ marginTop: 30 }}>
-                <Text style={Styles.headings}>Servings</Text>
-                <View style={Styles.quantityContainer}>
-                  <Text style={Styles.quantityLabel}>Number of People:</Text>
-                  <TouchableOpacity
-                    onPress={() => setQuantity((prev) => ({ value: Math.max(prev.value - 1, 1), error: '' }))}
-                    style={Styles.quantityButton}
-                  >
-                    <Text style={Styles.quantityButtonText}>-</Text>
-                  </TouchableOpacity>
-                  <Text style={Styles.quantityText}>{quantity.value}</Text>
-                  <TouchableOpacity
-                    onPress={() => setQuantity((prev) => ({ value: prev.value + 1, error: '' }))}
-                    style={Styles.quantityButton}
-                  >
-                    <Text style={Styles.quantityButtonText}>+</Text>
-                  </TouchableOpacity>
-                </View>
-                {quantity.error && <Text style={Styles.errorText}>{quantity.error}</Text>}
-              </View>
+          <Text style={Styles.headings}>Servings</Text>
+          <View style={Styles.quantityContainer}>
+          <Text style={Styles.quantityLabel}>Number of People:</Text>
 
+            <TouchableOpacity
+              onPress={() => setQuantity({ value: Math.max(parseInt(quantity.value) - 1, 1).toString(), error:""})}
+
+              style={Styles.quantityButton}
+            >
+              <Text style={Styles.quantityButtonText}>-</Text>
+            </TouchableOpacity>
+            <TextInput
+                    style={Styles.quantityInput}
+                    value={quantity.value}
+                    keyboardType="numeric"
+                    onChangeText={(text) => setQuantity({ value: text, error: '' })}
+                  />
+            <TouchableOpacity
+              onPress={() => setQuantity({ value: (parseInt(quantity.value) + 1).toString(), error: '' })}
+
+              style={Styles.quantityButton}
+            >
+              <Text style={Styles.quantityButtonText}>+</Text>
+            </TouchableOpacity>
+          </View>
+          {quantity.error && <Text style={Styles.errorText}>{quantity.error}</Text>}
+
+        </View>
               {/* Description */}
               <View style={{ marginTop: 30 }}>
                 <Text style={Styles.headings}>Description</Text>
@@ -178,6 +210,7 @@ const UploadFood = ({navigation}) => {
                   style={Styles.descri}
                   placeholderTextColor={theme.colors.ivory}
                   selectionColor={theme.colors.sageGreen}
+                  multiline={true}
                 />
                 {desc.error && <Text style={Styles.errorText}>{desc.error}</Text>}
               </View>
@@ -246,6 +279,12 @@ const Styles = StyleSheet.create({
   quantityText: {
     color: theme.colors.ivory,
     fontSize: 15,
+  },
+  quantityInput: {
+    color: theme.colors.ivory,
+    fontSize: 18,
+    textAlign: 'center',
+    width: 50,
   },
   submitButton: {
     backgroundColor: theme.colors.sageGreen,
