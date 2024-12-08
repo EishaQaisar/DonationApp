@@ -91,6 +91,9 @@ export default function LoginScreen({ navigation, route }) {
         if (role === 'donor') {
           navigation.navigate("TabNavigator", { role: "donor" });
           navigation.navigate("ItemDetail", { role: "donor", item: itemData });
+          navigation.navigate("Clothes", { role: "donor" });
+          navigation.navigate("Food", { role: "donor" });
+          navigation.navigate("Education", { role: "donor" });
 
         } else if (role === 'recipient') {
           // Handle recipient's navigation after checking NGO status
