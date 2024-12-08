@@ -2,7 +2,7 @@ import { View, Text } from 'react-native'
 import React from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
 import { theme } from '../core/theme'
-import { ChooseCategory, DonorHomeScreen, ScheduleRDeliveryScreen, UploadClothes, UploadEdu, UploadFood, HomeScreenRec, Education, Clothes, Food, ClaimsHistory, ItemDetail, RecepientStartScreen, DonationSuccessScreen, NgoPostDetailsScreen, ViewNgoPostsScreen, RecipientProfileForm, DonorProfileForm, NGOCampaignForm } from '../screens';
+import { ChooseCategory, DonorHomeScreen, ScheduleRDeliveryScreen, UploadClothes, UploadEdu, UploadFood, HomeScreenRec, Education, Clothes, Food, ClaimsHistory, ItemDetail, RecepientStartScreen, DonationSuccessScreen, NgoPostDetailsScreen, ViewNgoPostsScreen, NGOCampaignForm } from '../screens';
 const Stack = createStackNavigator();
 const HomeStackNav = ({ navigation, route }) => {
   const { role } = route.params;
@@ -113,8 +113,7 @@ const HomeStackNav = ({ navigation, route }) => {
 
       <Stack.Screen name='ViewNgoPostsScreen' component={ViewNgoPostsScreen} options={{ headerShown: false }} />
       <Stack.Screen name='NgoPostDetailsScreen' component={NgoPostDetailsScreen} options={{ headerShown: false }} />
-      <Stack.Screen name='RecipientProfileForm' component={RecipientProfileForm} options={{headerShown:false}}/>
-      <Stack.Screen name='DonorProfileForm' component={DonorProfileForm} options={{headerShown:false}}/>
+     
       <Stack.Screen name='NGOCampaignForm' component={NGOCampaignForm} options={{headerShown:false}}/>
 
 

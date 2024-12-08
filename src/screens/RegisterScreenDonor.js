@@ -135,7 +135,12 @@ export default function RegisterScreenDonor({ navigation }) {
           console.log("in navigation say oper if");
 
 
-          navigation.navigate("WaitForApprovalScreen", { uid: user.uid });
+          navigation.navigate("DonorProfileForm");
+
+          
+
+
+          // navigation.navigate("WaitForApprovalScreen", { uid: user.uid });
         } catch (error) {
           console.log("Error saving details", error);
         }

@@ -8,8 +8,10 @@ import { Provider } from "react-native-paper";
 import { theme } from "./src/core/theme";
 import {
   ChooseRole,
+  DonorProfileForm,
   LoginScreen,
   RChoose,
+  RecipientProfileForm,
   RegisterIndividualScreen,
   RegisterNGOScreen,
   RegisterScreenDonor,
@@ -64,6 +66,8 @@ export default function App(){
 <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} /> 
 <Stack.Screen name="WaitForApprovalScreen" component={WaitForApprovalScreen} /> 
 <Stack.Screen name="ScheduleDelivery" component={ScheduleDelivery} /> 
+<Stack.Screen name="DonorProfileForm" component={DonorProfileForm}/>
+<Stack.Screen name="RecipientProfileForm" component={RecipientProfileForm}/>
             <Stack.Screen name="TabNavigator" component={TabNavigator} />
 
 

@@ -6,6 +6,9 @@ export function passwordValidator(password) {
   if (password.length < 8) {
     return "Password should contain at least 8 characters.";
   }
+  if (password.trim() === "") {
+    return "Password cannot contain only spaces.";
+  }
 
   // Check for at least one special character
   const specialCharacterRegex = /[!@#$%^&*(),.?":{}|<>]/;

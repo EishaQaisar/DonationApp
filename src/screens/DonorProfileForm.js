@@ -3,22 +3,33 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput } from 
 import { Formik } from 'formik';
 import { Picker } from "@react-native-picker/picker";
 import { theme } from "../core/theme";
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import ImagePickerComponent from '../components/ImagePickerComponent';
+import { nameValidator } from '../helpers/nameValidator';
+import { validateAge } from '../helpers/ageValidator';
+import {occupationValidator} from '../helpers/occupationValidator';
+import{addressValidator} from '../helpers/addressValidator';
 
 const DonorProfileForm = ({ navigation }) => {
-  const tabBarHeight = useBottomTabBarHeight();
   const [image, setImage] = useState(null);
   const genderOptions = ['Male', 'Female', 'Other'];
   const provinceOptions = ['Punjab', 'Kashmir', 'Sindh', 'KPK', 'Blochistan'];
 
   const validate = (values) => {
     const errors = {};
+    const nameError = nameValidator(values.name); // Use the nameValidator
+    if (nameError) errors.name = nameError;
     if (!values.name) errors.name = 'Name is required';
-    if (!values.age) errors.age = 'Age is required';
-    if (isNaN(values.age)) errors.age = 'Age must be a number';
+
+    const ageError = validateAge(values.age);
+    if (ageError) errors.age = ageError;
     if (!values.gender) errors.gender = 'Gender is required';
-    if (!values.occupation) errors.occupation = 'Occupation is required';
+
+    const occupationError = occupationValidator(values.occupation);
+    if (occupationError) errors.occupation = occupationError;
+
+    const addressError = addressValidator(values.address);
+    if (addressError) errors.address = addressError;
+   
     if (!values.address) errors.address = 'Address is required';
     if (!values.province) errors.province = 'Province is required';
     if (!image) errors.image = 'Profile picture is required';
@@ -28,10 +39,11 @@ const DonorProfileForm = ({ navigation }) => {
   const onSubmit = (values, { setSubmitting }) => {
     console.log(values);
     setSubmitting(false);
+    navigation.navigate('WaitForApprovalScreen');
   };
 
   return (
-    <View style={[styles.container, { marginBottom: tabBarHeight }]}>
+    <View style={[styles.container, { marginBottom: 20 }]}>
       <ScrollView>
         <Text style={styles.title}>Donor Profile</Text>
         <View style={styles.line} />
@@ -131,24 +143,7 @@ const DonorProfileForm = ({ navigation }) => {
                 />
                 {errors.address && touched.address && <Text style={styles.errorText}>{errors.address}</Text>}
               </View>
-              
-              {/* Province Input */}
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Province</Text>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={values.province}
-                    onValueChange={(itemValue) => setFieldValue('province', itemValue)}
-                    style={styles.picker}
-                  >
-                    <Picker.Item label="Select your province" value="" />
-                    {provinceOptions.map((province) => (
-                      <Picker.Item key={province} label={province} value={province} />
-                    ))}
-                  </Picker>
-                </View>
-                {errors.province && touched.province && <Text style={styles.errorText}>{errors.province}</Text>}
-              </View>
+            
 
               {/* Profile Picture Upload */}
               <View style={styles.inputContainer}>
@@ -162,9 +157,11 @@ const DonorProfileForm = ({ navigation }) => {
               </View>
 
               {/* Submit Button */}
+              <View style={styles.centerContainer}>
               <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
                 <Text style={styles.submitButtonText}>Save Profile</Text>
               </TouchableOpacity>
+              </View>
             </>
           )}
         </Formik>
@@ -261,9 +258,10 @@ const styles = StyleSheet.create({
   submitButton: {
     backgroundColor: theme.colors.sageGreen,
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 20,
     alignItems: 'center',
     marginTop: 20, 
+    width:"80%",
   },
   submitButtonText: {
     color: theme.colors.ivory,
@@ -274,6 +272,11 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 12,
     marginTop: 5,
+  },
+  centerContainer: {
+    flex: 1,                   
+    justifyContent: 'center',  
+    alignItems: 'center',      
   },
 });
 

@@ -124,7 +124,7 @@ export default function RegisterIndividualScreen({ navigation }) {
               approved:approved.value
             });
 
-          navigation.navigate("WaitForApprovalScreen", { uid: user.uid });
+          navigation.navigate("RecipientProfileForm");
         } catch (error) {
           console.log("Error saving details", error);
         }

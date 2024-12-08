@@ -4,10 +4,11 @@ import { Formik } from 'formik';
 import { Picker } from "@react-native-picker/picker";
 import { theme } from "../core/theme";
 import ImagePickerComponent from '../components/ImagePickerComponent';
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { nameValidator } from '../helpers/nameValidator';
+import { validateAge } from '../helpers/ageValidator';
+import { addressValidator } from '../helpers/addressValidator';
 
-const RecipientProfileForm = () => {
-  const tabBarHeight = useBottomTabBarHeight();
+const RecipientProfileForm = ({ navigation }) => {
   const [image, setImage] = useState(null);
 
   const genderOptions = ['Male', 'Female', 'Other'];
@@ -20,7 +21,16 @@ const RecipientProfileForm = () => {
 
   const validate = (values) => {
     const errors = {};
-    if (!values.name) errors.name = 'Name is required';
+    const nameError = nameValidator(values.name);
+    if (nameError) errors.name = nameError;
+
+
+
+    const ageError = validateAge(values.age);
+    if (ageError) errors.age = ageError;
+
+
+
     if (!values.age) errors.age = 'Age is required';
     if (isNaN(values.age)) errors.age = 'Age must be a number';
     if (!values.gender) errors.gender = 'Gender is required';
@@ -29,14 +39,20 @@ const RecipientProfileForm = () => {
       errors.occupation = 'Occupation is required';
     }
     if (!values.income) errors.income = 'Income is required';
+    if (values.income.trim() === "") {
+      return "Income cannot contain only spaces.";
+    }
     if (isNaN(values.income)) errors.income = 'Income must be a number';
+
+    const addressError = addressValidator(values.address);
+    if (addressError) errors.address = addressError;
     if (!values.address) errors.address = 'Address is required';
     if (!image) errors.image = 'Profile picture is required';
 
     if (!values.educationLevel) errors.educationLevel = 'Education level is required';
     if (!values.institution) errors.institution = 'Institution is required';
     if (!values.class) errors.class = 'Class/Year is required';
-    if (!values.shoeSize) errors.shoeSize = 'Shoe size is required';
+    if (!values.shoeSize) errors.shoeSize = 'Shoe size is required';////
     if (!values.clothingSize) errors.clothingSize = 'Clothing size is required';
     if (!values.shirtSize) errors.shirtSize = 'Shirt size is required';
     if (!values.trouserSize) errors.trouserSize = 'Trouser size is required';
@@ -48,10 +64,15 @@ const RecipientProfileForm = () => {
     console.log(values);
     // Handle form submission
     setSubmitting(false);
+    navigation.navigate('WaitForApprovalScreen');
+
   };
 
+  const [selectedOption, setSelectedOption] = useState('option1');
+  const [inputValue, setInputValue] = useState('');
+
   return (
-    <View style={[styles.container, { marginBottom: tabBarHeight }]}>
+    <View style={[styles.container, { marginBottom: 20 }]}>
       <ScrollView>
         <Text style={styles.title}>Recipient Profile</Text>
         <View style={styles.line} />
@@ -154,7 +175,7 @@ const RecipientProfileForm = () => {
                   <Picker
                     selectedValue={values.maritalStatus}
                     onValueChange={(itemValue) => setFieldValue('maritalStatus', itemValue)}
-                    style={styles.picker}
+                    style={styles.picker1}
                   >
                     <Picker.Item label="Select marital status" value="" />
                     {maritalStatusOptions.map((status) => (
@@ -190,7 +211,7 @@ const RecipientProfileForm = () => {
                   <Picker
                     selectedValue={values.occupation}
                     onValueChange={(itemValue) => setFieldValue('occupation', itemValue)}
-                    style={styles.picker}
+                    style={styles.picker1}
                   >
                     <Picker.Item label="Select Occupation status" value="" />
                     {occupationStatusOptions.map((status) => (
@@ -238,7 +259,7 @@ const RecipientProfileForm = () => {
                       </Picker>
                     </View>
                     {errors.educationLevel && touched.educationLevel && <Text style={styles.errorText}>{errors.educationLevel}</Text>}
-                    
+
                   </View>
 
                   <View style={styles.inputContainer}>
@@ -265,7 +286,7 @@ const RecipientProfileForm = () => {
                         placeholder="Enter your class or standard"
                         placeholderTextColor={theme.colors.ivory}
                       />
-                       {errors.class && touched.class && <Text style={styles.errorText}>{errors.class}</Text>}
+                      {errors.class && touched.class && <Text style={styles.errorText}>{errors.class}</Text>}
                     </View>
                   )}
 
@@ -308,7 +329,7 @@ const RecipientProfileForm = () => {
                   <Picker
                     selectedValue={values.clothingSize}
                     onValueChange={(itemValue) => setFieldValue('clothingSize', itemValue)}
-                    style={styles.picker}
+                    style={styles.picker1}
                   >
                     <Picker.Item label="Select clothing size" value="" />
                     {clothingSizes.map((size) => (
@@ -326,7 +347,7 @@ const RecipientProfileForm = () => {
                   <Picker
                     selectedValue={values.shirtSize}
                     onValueChange={(itemValue) => setFieldValue('shirtSize', itemValue)}
-                    style={styles.picker}
+                    style={styles.picker1}
                   >
                     <Picker.Item label="Select shirt size" value="" />
                     {shirtSizes.map((size) => (
@@ -344,7 +365,7 @@ const RecipientProfileForm = () => {
                   <Picker
                     selectedValue={values.trouserSize}
                     onValueChange={(itemValue) => setFieldValue('trouserSize', itemValue)}
-                    style={styles.picker}
+                    style={styles.picker1}
                   >
                     <Picker.Item label="Select trouser size" value="" />
                     {trouserSizes.map((size) => (
@@ -365,6 +386,9 @@ const RecipientProfileForm = () => {
                 />
                 {errors.image && <Text style={styles.errorText}>{errors.image}</Text>}
               </View>
+
+
+
 
               {/* Submit Button */}
               <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
@@ -460,6 +484,11 @@ const styles = StyleSheet.create({
   },
   picker: {
     height: 40,
+    color: theme.colors.ivory,
+    backgroundColor: theme.colors.TaupeBlack,
+  },
+  picker1: {
+    height: 50,
     color: theme.colors.ivory,
     backgroundColor: theme.colors.TaupeBlack,
   },
