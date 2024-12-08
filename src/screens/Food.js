@@ -7,12 +7,14 @@ import { CartContext } from '../CartContext';
 import axios from 'axios';
 import { getBaseUrl } from '../helpers/deviceDetection';
 
-const Food = () => {
+const Food = ({route}) => {
     const navigation = useNavigation();
-    const route = useRoute();
+    const { role } = route.params;  // Get the 'role' passed from the previous screen
+
+    // const route = useRoute();
     const { isInCart } = useContext(CartContext);
     const [foodItems, setFoodItems] = useState([]);
-    const userRole = "donor"; // Replace this with actual role logic
+    // const userRole = "donor"; // Replace this with actual role logic
 
     const fetchFoodDonations = async () => {
         try {
@@ -49,7 +51,7 @@ const Food = () => {
                 style={styles.claimButton}
                 onPress={() => navigation.navigate('ItemDetail', { item, category: 'Food' })}
             >
-                <Text style={styles.claimButtonText}>{userRole === 'donor' ? 'View' : 'Claim'}</Text>
+                <Text style={styles.claimButtonText}>{role === 'donor' ? 'View' : 'Claim'}</Text>
             </TouchableOpacity>
         </TouchableOpacity>
     );
