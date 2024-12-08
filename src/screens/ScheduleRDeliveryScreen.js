@@ -9,12 +9,14 @@ import MapPicker from "../components/MapPicker";
 import TextInput from "../components/TextInput";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import axios from 'axios';
-
+import { Alert } from 'react-native';
 
 
 
 
 export default function ScheduleRDeliveryScreen({ navigation }) {
+
+
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [pickupLocation, setPickupLocation] = useState("");
   const [dropOffLocation, setDropOffLocation] = useState("");
@@ -93,6 +95,26 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
     setIsPickupMapVisible(false);
     setIsDropoffMapVisible(false);
   };
+  const handleSaveDelivery = () => {
+
+    // Show an alert
+  Alert.alert(
+    'Delivery Scheduled',
+    'Your delivery has been successfully scheduled!',
+    [
+      {
+        text: 'OK',
+        onPress: () => {
+          // Just display "Okay" message after pressing OK
+          console.log('Okay');
+        },
+      },
+    ],
+    { cancelable: false }
+  );
+ 
+  };
+
 
   return (
     <Background>
@@ -172,6 +194,15 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
             style={styles.Button}
           >
             Select a drop off Location on Map
+          </Button>
+
+          <Button
+            mode="contained"
+            onPress={handleSaveDelivery}
+            style={styles.Button}
+          
+          >
+            Save Delivery
           </Button>
 
 
@@ -289,4 +320,3 @@ const styles = StyleSheet.create({
     left: 0, 
   },
 });
-

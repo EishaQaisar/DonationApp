@@ -28,11 +28,11 @@ export default function DonationSuccessScreen({ navigation }) {
 
         {/* Success message */}
         <Text style={styles.successMessage}>
-          You have uploaded the Campaign successfully!
+          You have uploaded the donation successfully!
         </Text>
 
         {/* Continue button */}
-        <TouchableOpacity style={styles.button} onPress={() => navigation.replace("TabNavigator",{role:"Recipient"})}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.replace("TabNavigator",{role:"donor"})}>
           <Text style={styles.buttonText}>Continue</Text>
         </TouchableOpacity>
       </View>

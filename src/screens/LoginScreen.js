@@ -85,6 +85,7 @@ export default function LoginScreen({ navigation, route }) {
       if (!password.value) setPassword({ ...password, error: "This field is required." });
       return;
     }
+    
 
     validateUser(input.value, password.value).then((result) => {
       if (result.success) {

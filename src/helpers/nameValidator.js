@@ -12,6 +12,7 @@ export function nameValidator(name) {
   if (name.length > 50) {
     return "The name must be less than 50 characters.";
   }
+  
 
   if (name.trim() === "") {
     return "name cannot contain only spaces.";

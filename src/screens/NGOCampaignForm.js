@@ -19,7 +19,7 @@ const NGOCampaignForm = ({ navigation }) => {
         }
         if (!values.phoneNumber) {
             errors.phoneNumber = 'Phone number is required';
-        } else if (!/^\+92\d{9}$/.test(values.phoneNumber)) {
+        } else if (!/^\+92\d{10}$/.test(values.phoneNumber)) {
             errors.phoneNumber = 'Invalid phone number format. Use "+92485255947"';
         }
         if (!values.bankAccount) {
