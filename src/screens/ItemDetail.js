@@ -30,7 +30,7 @@ const ItemDetail = ({ route }) => {
 
     const renderCategoryDetails = () => {
         switch (category) {
-            case 'food':
+            case 'Food':
                 return (
                     <View>
                         <Text style={styles.title}>{item.foodName}</Text>
@@ -42,7 +42,7 @@ const ItemDetail = ({ route }) => {
                         </View>
                     </View>
                 );
-            case 'Clothing':
+            case 'Clothes':
                 return (
                     <View>
                         <Text style={styles.title}>{item.itemName}</Text>

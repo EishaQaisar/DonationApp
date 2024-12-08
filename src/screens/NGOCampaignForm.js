@@ -49,6 +49,8 @@ const NGOCampaignForm = ({ navigation }) => {
     const onSubmit = (values, { setSubmitting }) => {
         console.log({ ...values, image });
         setSubmitting(false);
+        navigation.navigate("DonationSuccessScreen");
+        
     };
 
     const formatPhoneNumber = (value) => {
