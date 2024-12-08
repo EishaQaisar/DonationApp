@@ -16,8 +16,7 @@ const screenWidth = Dimensions.get('window').width;
 export default function LoginScreen({ navigation, route }) {
   const [input, setInput] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
-  const [code, setCode] = useState("");
-  const { role } = route.params;
+  const { role } = route.params;  // Capture the role passed from previous screen
   const { setUser } = useContext(AuthContext); // Access setUser from AuthContext
   const [isNGOFound, setIsNGOFound] = useState(false);
   let collectionFound="";
@@ -91,15 +90,16 @@ export default function LoginScreen({ navigation, route }) {
       if (result.success) {
         if (role === 'donor') {
           navigation.navigate("TabNavigator", { role: "donor" });
+          navigation.navigate("ItemDetail", { role: "donor", item: itemData });
+
         } else if (role === 'recipient') {
           // Handle recipient's navigation after checking NGO status
           if (collectionFound==="ngos") {
-            console.log("ngo");
-            navigation.navigate("TabNavigator", { role: "recipient" });
-          } else if (collectionFound==='recipients') {
-            console.log("indi");
+            navigation.navigate("TabNavigator", { role: "recipient", type: "ngo" });
+            // navigation.navigate("HomeScreenRec", { role: "recipient", type: "ngo" });
 
-            navigation.navigate("TabNavigator", { role: "recipient" });
+          } else if (collectionFound==='recipients') {
+            navigation.navigate("TabNavigator", { role: "recipient", type: "individual" });
           }
         } else if (role === 'rider') {
           navigation.navigate("TabNavigator", { role: "rider" });

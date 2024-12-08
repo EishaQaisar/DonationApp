@@ -11,6 +11,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Cart from "../screens/Cart";
 import History from "./History";
+import ForCart from './ForCart';
 
 import { CartProvider } from '../CartContext'; // Import CartProvider
 
@@ -39,13 +40,12 @@ function TabNavigator({navigation, route}) {
       } }/>
 
      
-          {role=="recipient" && (
-            <Tab.Screen name="Cart" component={Cart} options={{headerShown:false,
+{role=="recipient" && (
+            <Tab.Screen name="ForCart" component={ForCart} options={{headerShown:false,
               tabBarIcon:({color})=> <Ionicons name="cart" size={24} color={color} />
             } }/>
 
           )}
-
       <Tab.Screen name="History" component={History} options={{headerShown:false,
         tabBarIcon:({color})=> <MaterialCommunityIcons name="account" size={24} color={color} />
       } } initialParams={{ ...route.params }}/>

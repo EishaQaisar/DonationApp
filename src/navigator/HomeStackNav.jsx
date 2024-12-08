@@ -22,7 +22,7 @@ const HomeStackNav = ({ navigation, route }) => {
           name="Start"
           component={HomeScreenRec}
           options={{ headerShown: false }}
-        />
+          initialParams={{ ...route.params }}/>
       )}
       <Stack.Screen name='ChooseCategory' component={ChooseCategory} options={{ headerShown: false }} />
 
@@ -71,7 +71,7 @@ const HomeStackNav = ({ navigation, route }) => {
           title: 'Clothes Donations', headerTitleStyle: { textAlign: 'center' },
           headerTitleAlign: 'center', headerStyle: { backgroundColor: theme.colors.charcoalBlack, height: 70 },
           headerTintColor: theme.colors.ivory
-        }} // Optional: Customize header title
+        }} initialParams={{ ...route.params }}// Optional: Customize header title
       />
       <Stack.Screen
         name="Education"
@@ -80,7 +80,7 @@ const HomeStackNav = ({ navigation, route }) => {
           title: 'Education Donations', headerTitleStyle: { textAlign: 'center' },
           headerTitleAlign: 'center', headerStyle: { backgroundColor: theme.colors.charcoalBlack, height: 70 },
           headerTintColor: theme.colors.ivory
-        }} // Optional: Customize header title
+        }} initialParams={{ ...route.params }}// Optional: Customize header title
       />
 
       <Stack.Screen
@@ -90,7 +90,7 @@ const HomeStackNav = ({ navigation, route }) => {
           title: 'Food Donations', headerTitleStyle: { textAlign: 'center' },
           headerTitleAlign: 'center', headerStyle: { backgroundColor: theme.colors.charcoalBlack, height: 70 },
           headerTintColor: theme.colors.ivory
-        }} // Optional: Customize header title
+        }} initialParams={{ ...route.params }}// Optional: Customize header title
       />
       <Stack.Screen
         name="ItemDetail"
@@ -99,7 +99,7 @@ const HomeStackNav = ({ navigation, route }) => {
           title: 'Item Details', headerTitleStyle: { textAlign: 'center' },
           headerTitleAlign: 'center', headerStyle: { backgroundColor: theme.colors.charcoalBlack, height: 70 },
           headerTintColor: theme.colors.ivory
-        }} // Optional: Customize header title
+        }} initialParams={{ ...route.params }}// Optional: Customize header title
       />
       <Stack.Screen
         name="RecepientStartScreen"

@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TouchableWithoutFeedback } from 'react-native';
 import { theme } from '../core/theme';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useCart } from '../CartContext';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
-
-const ItemDetail = ({ route, navigation }) => {
-    const { item, category} = route.params;
+const ItemDetail = ({ route }) => {
+    const { item, category, role } = route.params; // Assuming userRole is passed in route params
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const { addToCart, isInCart } = useCart();
+    const [isModalVisible, setIsModalVisible] = useState(false);
     const tabBarHeight = useBottomTabBarHeight();
 
-
     const isClaimed = isInCart(item);
+
+    // Normalize userRole to handle case variations
+    const isDonor = role && role.toLowerCase() === 'donor';  // Checks if user is a donor
 
     const handleNextImage = () => {
         setCurrentImageIndex((prevIndex) => (prevIndex + 1) % item.images.length);
@@ -31,31 +33,29 @@ const ItemDetail = ({ route, navigation }) => {
             case 'food':
                 return (
                     <View>
-                    <Text style={styles.title}> {item.foodName}</Text>
-
-                    <View style={styles.detailsCard}>
-                        <DetailItem icon="food" label="Meal" value={item.mealType} />
-                        <DetailItem icon="silverware-fork-knife" label="Food Type" value={item.foodType} />
-                        <DetailItem icon="numeric" label="Quantity" value={item.quantity.toString()} />
-                        <DetailItem icon="text-short" label="Description" value={item.description} />
-                    </View>
+                        <Text style={styles.title}>{item.foodName}</Text>
+                        <View style={styles.detailsCard}>
+                            <DetailItem icon="food" label="Meal" value={item.mealType} />
+                            <DetailItem icon="silverware-fork-knife" label="Food Type" value={item.foodType} />
+                            <DetailItem icon="numeric" label="Quantity" value={item.quantity.toString()} />
+                            <DetailItem icon="text-short" label="Description" value={item.description} />
+                        </View>
                     </View>
                 );
             case 'Clothing':
                 return (
                     <View>
-                    <Text style={styles.title}>{item.itemName}</Text>
-                    <View style={styles.detailsCard}>
-                        <DetailItem icon="tshirt-crew" label="Size" value={item.size} />
-                        <DetailItem icon="texture-box" label="Fabric" value={item.fabric} />
-                        <DetailItem icon="weather-sunny" label="Season" value={item.season} />
-                        <DetailItem icon="human-male-child" label="Age" value={item.age_category} />
-                        <DetailItem icon="gender-male-female" label="Gender" value={item.gender} />
-                        <DetailItem icon="star-outline" label="Condition" value={item.c_condition} />
-                        <DetailItem icon="numeric" label="Quantity" value={item.quantity.toString()} />
+                        <Text style={styles.title}>{item.itemName}</Text>
+                        <View style={styles.detailsCard}>
+                            <DetailItem icon="tshirt-crew" label="Size" value={item.size} />
+                            <DetailItem icon="texture-box" label="Fabric" value={item.fabric} />
+                            <DetailItem icon="weather-sunny" label="Season" value={item.season} />
+                            <DetailItem icon="human-male-child" label="Age" value={item.age_category} />
+                            <DetailItem icon="gender-male-female" label="Gender" value={item.gender} />
+                            <DetailItem icon="star-outline" label="Condition" value={item.c_condition} />
+                            <DetailItem icon="numeric" label="Quantity" value={item.quantity.toString()} />
+                        </View>
                     </View>
-                </View>
-
                 );
             case 'Education':
                 return (
@@ -81,8 +81,21 @@ const ItemDetail = ({ route, navigation }) => {
         }
     };
 
+    const showConfirmationModal = () => {
+        setIsModalVisible(true);
+    };
+
+    const hideConfirmationModal = () => {
+        setIsModalVisible(false);
+    };
+
+    const confirmClaimItem = () => {
+        addToCart(item); // Add to cart if confirmed
+        setIsModalVisible(false);
+    };
+
     return (
-        <ScrollView style={[styles.container, {marginBottom:tabBarHeight}]}>
+        <ScrollView style={[styles.container, { marginBottom: tabBarHeight }]}>
             <View style={styles.imageContainer}>
                 <TouchableOpacity onPress={handlePreviousImage} style={styles.navButton}>
                     <Icon name="chevron-left" size={20} color={theme.colors.ivory} />
@@ -93,18 +106,56 @@ const ItemDetail = ({ route, navigation }) => {
                 </TouchableOpacity>
             </View>
 
-
             {renderCategoryDetails()}
 
-            <TouchableOpacity
-                style={[styles.claimButton, isClaimed && styles.disabledClaimButton]}
-                onPress={() => !isClaimed && addToCart(item)}
-                disabled={isClaimed}
+            {/* Only show claim button if user is NOT a donor */}
+            {!isDonor && (
+                <TouchableOpacity
+                    style={[styles.claimButton, isClaimed && styles.disabledClaimButton]}
+                    onPress={() => !isClaimed && showConfirmationModal()}
+                    disabled={isClaimed}
+                >
+                    <Text style={styles.claimButtonText}>
+                        {isClaimed ? 'Claimed' : 'Claim Item'}
+                    </Text>
+                </TouchableOpacity>
+            )}
+
+            {/* Custom Confirmation Modal */}
+            <Modal
+                transparent={true}
+                visible={isModalVisible}
+                animationType="fade"
+                onRequestClose={hideConfirmationModal}
             >
-                <Text style={styles.claimButtonText}>
-                    {isClaimed ? 'Claimed' : 'Claim Item'}
-                </Text>
-            </TouchableOpacity>
+                <TouchableWithoutFeedback onPress={hideConfirmationModal}>
+                    <View style={styles.modalOverlay}>
+                        <TouchableWithoutFeedback>
+                            <View style={styles.modalContent}>
+                                <Text style={styles.modalTitle}>Confirm Claim</Text>
+                                <Text style={styles.modalMessage}>
+                                    Are you sure you want to claim this item?
+                                </Text>
+
+                                <View style={styles.modalButtons}>
+                                    <TouchableOpacity
+                                        style={[styles.modalButton, styles.cancelButton]}
+                                        onPress={hideConfirmationModal}
+                                    >
+                                        <Text style={styles.modalButtonText}>No</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={[styles.modalButton, styles.confirmButton]}
+                                        onPress={confirmClaimItem}
+                                    >
+                                        <Text style={styles.modalButtonText}>Yes</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </TouchableWithoutFeedback>
+                    </View>
+                </TouchableWithoutFeedback>
+            </Modal>
         </ScrollView>
     );
 };
@@ -196,7 +247,55 @@ const styles = StyleSheet.create({
         color: theme.colors.ivory,
         fontWeight: 'bold',
     },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    },
+    modalContent: {
+        width: 300,
+        backgroundColor: theme.colors.charcoalBlack,
+        padding: 20,
+        borderRadius: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    modalTitle: {
+        fontSize: 24,
+        color: theme.colors.pearlWhite,
+        fontWeight: 'bold',
+        marginBottom: 15,
+    },
+    modalMessage: {
+        fontSize: 18,
+        color: theme.colors.ivory,
+        textAlign: 'center',
+        marginBottom: 25,
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+    },
+    modalButton: {
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 8,
+        width: '45%',
+        alignItems: 'center',
+    },
+    cancelButton: {
+        backgroundColor: theme.colors.outerSpace,
+    },
+    confirmButton: {
+        backgroundColor: theme.colors.sageGreen,
+    },
+    modalButtonText: {
+        fontSize: 18,
+        color: theme.colors.ivory,
+        fontWeight: 'bold',
+    },
 });
 
 export default ItemDetail;
-

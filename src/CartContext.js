@@ -4,7 +4,6 @@ import React, { createContext, useState, useContext } from 'react';
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  console.log("hereeeeeeeeeeeeeeeeeeeeecart");
   const [cartItems, setCartItems] = useState([]);
 
   const addToCart = (item) => {
@@ -15,8 +14,8 @@ export const CartProvider = ({ children }) => {
     return cartItems.some(cartItem => cartItem.id === item.id);
   };
 
-  const removeFromCart = (item) => {
-    setCartItems((prevItems) => prevItems.filter(cartItem => cartItem.id !== item.id));
+  const removeFromCart = (itemId) => {
+    setCartItems((prevItems) => prevItems.filter(cartItem => cartItem.id !== itemId));
   };
 
   return (

@@ -7,63 +7,17 @@ import { CartContext } from '../CartContext';
 import axios from 'axios';
 import { getBaseUrl } from '../helpers/deviceDetection';
 
-
-const clothesItems = [
-    {
-        id: '1',
-        images: [
-            require('../../assets/items/cloth1.jpg'),
-            require('../../assets/items/cloth2.jpg'),
-            require('../../assets/items/clothes.jpg'),
-        ],
-        title: 'T-Shirt',
-        description: 'Comfortable cotton t-shirts in different colors.',
-    },
-    {
-        id: '2',
-        images: [
-            require('../../assets/items/cloth1.jpg'),
-            require('../../assets/items/cloth2.jpg'),
-            require('../../assets/items/clothes.jpg'),
-        ],
-        title: 'Jeans',
-        description: 'Stylish and durable jeans in various sizes.',
-    },
-    {
-        id: '3',
-        images: [
-            require('../../assets/items/cloth1.jpg'),
-            require('../../assets/items/cloth2.jpg'),
-            require('../../assets/items/clothes.jpg'),
-        ],
-        title: 'Jacket',
-        description: 'Warm jackets for the winter season.',
-    },
-    {
-        id: '4',
-        images: [
-            require('../../assets/items/cloth1.jpg'),
-            require('../../assets/items/cloth2.jpg'),
-            require('../../assets/items/clothes.jpg'),
-        ],
-        title: 'Dress',
-        description: 'Elegant dresses for special occasions.',
-    },
-];
-
 const Clothes = () => {
     const navigation = useNavigation();
     const route = useRoute();
     const { isInCart } = useContext(CartContext);
-    const [clothesItems2, setClothesItems] = useState([]);
-    const { role } = route.params;
+    const [clothesItems, setClothesItems] = useState([]);
+    const userRole = "donor"; // Replace with actual role logic, such as from context or user authentication
 
     const fetchClothesDonations = async () => {
         try {
             const BASE_URL = await getBaseUrl();
-            console.log("this is the base url is", BASE_URL)
-            const response = await axios.post(`${BASE_URL}/api/clothes-donations`);
-            // const response = await axios.get('http://10.0.2.2:3000/api/clothes-donations');
+            const response = await axios.get(`${BASE_URL}/api/clothes-donations`);
             const data = response.data.map(item => {
                 const parsedImages = item.images ? JSON.parse(item.images) : [];
                 const validImages = parsedImages.map(imagePath => ({ uri: imagePath }));
@@ -72,43 +26,38 @@ const Clothes = () => {
                     images: validImages,
                 };
             });
-            console.log('Fetched data:', data);
             setClothesItems(data);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     };
+
     useEffect(() => {
-        const fetchData = async () => {
-            await fetchClothesDonations();
-        };
-        fetchData();
+        fetchClothesDonations();
     }, []);
+
     useEffect(() => {
-        console.log("clothes items updated:", clothesItems2);
-    }, [clothesItems2]);  // Runs whenever foodItems state is updated
+        console.log("clothes items updated:", clothesItems);
+    }, [clothesItems]);
 
-
-
-
-    // Filter out items that are already in the cart
-    const visibleItems = clothesItems2.filter(item => !isInCart(item));
+    const visibleItems = clothesItems.filter(item => !isInCart(item));
 
     const renderItem = ({ item }) => (
-        <View style={styles.donationItem}>
-            {/* Display the first image */}
+        <TouchableOpacity
+            style={styles.donationItem}
+            onPress={() => navigation.navigate('ItemDetail', { item, category: 'Clothes' })}
+        >
             <Image source={item.images[0]} style={styles.itemImage} />
-            <Text style={styles.item}>{item.itemName}</Text>
+            <Text style={styles.item}>{item.title}</Text>
             <TouchableOpacity
                 style={styles.claimButton}
-                onPress={() => navigation.navigate('ItemDetail', { item, category: 'Clothing' })}
+                onPress={() => navigation.navigate('ItemDetail', { item, category: 'Clothes' })}
             >
-                <Text style={styles.claimButtonText}>Claim</Text>
+                <Text style={styles.claimButtonText}>{userRole === 'donor' ? 'View' : 'Claim'}</Text>
             </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
     );
 
-    // Check if the current route name is "Clothes"
     const isClothesPage = route.name === 'Clothes';
 
     return (
@@ -179,7 +128,7 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     donationItem: {
-        backgroundColor: '#2E2E2E',
+        backgroundColor: theme.colors.TaupeBlack,
         padding: 15,
         borderRadius: 10,
         marginBottom: 20,

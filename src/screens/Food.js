@@ -1,23 +1,23 @@
-import React, { useContext, useState ,useEffect} from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
 import { theme } from '../core/theme';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { CartContext } from '../CartContext';
 import axios from 'axios';
-
+import { getBaseUrl } from '../helpers/deviceDetection';
 
 const Food = () => {
     const navigation = useNavigation();
     const route = useRoute();
     const { isInCart } = useContext(CartContext);
-    const [foodItems2, setFoodItems] = useState([]);
+    const [foodItems, setFoodItems] = useState([]);
+    const userRole = "donor"; // Replace this with actual role logic
+
     const fetchFoodDonations = async () => {
         try {
             const BASE_URL = await getBaseUrl();
-            console.log("this is the base url is", BASE_URL)
-            const response = await axios.post(`${BASE_URL}/api/food-donations`);
-            // const response = await axios.get('http://10.0.2.2:3000/api/food-donations');
+            const response = await axios.get(`${BASE_URL}/api/food-donations`);
             const data = response.data.map(item => {
                 const parsedImages = item.images ? JSON.parse(item.images) : [];
                 const validImages = parsedImages.map(imagePath => ({ uri: imagePath }));
@@ -26,45 +26,34 @@ const Food = () => {
                     images: validImages,
                 };
             });
-            console.log('Fetched data:', data);
             setFoodItems(data);
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     };
-    
+
     useEffect(() => {
-        const fetchData = async () => {
-            await fetchFoodDonations();
-        };
-        fetchData();
+        fetchFoodDonations();
     }, []);
-    useEffect(() => {
-        console.log("food items updated:", foodItems2);
-      }, [foodItems2]);  // Runs whenever foodItems state is updated
-    
-    
 
-
-    // Filter out items that are already in the cart
-    const visibleItems = foodItems2.filter(item => !isInCart(item));
+    const visibleItems = foodItems.filter(item => !isInCart(item));
 
     const renderItem = ({ item }) => (
-        
-        <View style={styles.donationItem}>
-            {/* Display the first image */}
+        <TouchableOpacity
+            style={styles.donationItem}
+            onPress={() => navigation.navigate('ItemDetail', { item, category: 'Food' })}
+        >
             <Image source={item.images[0]} style={styles.itemImage} />
             <Text style={styles.item}>{item.foodName}</Text>
             <TouchableOpacity
                 style={styles.claimButton}
-                onPress={() => navigation.navigate('ItemDetail', { item , category:'food'})}
+                onPress={() => navigation.navigate('ItemDetail', { item, category: 'Food' })}
             >
-                <Text style={styles.claimButtonText}>Claim</Text>
+                <Text style={styles.claimButtonText}>{userRole === 'donor' ? 'View' : 'Claim'}</Text>
             </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
     );
 
-    // Check if the current route name is "Food"
     const isFoodPage = route.name === 'Food';
 
     return (
@@ -135,7 +124,7 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     donationItem: {
-        backgroundColor: '#2E2E2E',
+        backgroundColor: theme.colors.TaupeBlack,
         padding: 15,
         borderRadius: 10,
         marginBottom: 20,
