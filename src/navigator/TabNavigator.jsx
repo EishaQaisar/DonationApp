@@ -43,7 +43,7 @@ function TabNavigator({navigation, route}) {
 {role=="recipient" && (
             <Tab.Screen name="ForCart" component={ForCart} options={{headerShown:false,
               tabBarIcon:({color})=> <Ionicons name="cart" size={24} color={color} />
-            } }/>
+            } }initialParams={{ ...route.params }}/>
 
           )}
       <Tab.Screen name="History" component={History} options={{headerShown:false,

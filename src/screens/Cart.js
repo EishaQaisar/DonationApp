@@ -12,11 +12,11 @@ const BackButton = ({ goBack }) => (
   </TouchableOpacity>
 );
 
-const Cart = () => {
+const Cart = ({route}) => {
   const { cartItems, removeFromCart } = useCart(); // Access cart context
   const navigation = useNavigation(); // Access navigation object
-  const route = useRoute();
-
+  // const route = useRoute();
+const {role}=route.params;
   // Set the header options to include a back button
   useEffect(() => {
     navigation.setOptions({
