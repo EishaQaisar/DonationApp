@@ -1,19 +1,20 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
 import { theme } from '../core/theme';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { CartContext } from '../CartContext';
 import axios from 'axios';
 import { getBaseUrl } from '../helpers/deviceDetection';
 
-const Clothes = () => {
+const Clothes = ({ route }) => {
     const navigation = useNavigation();
-    const route = useRoute();
+    const { role } = route.params;  // Get the 'role' passed from the previous screen
+
     const { isInCart } = useContext(CartContext);
     const [clothesItems, setClothesItems] = useState([]);
-    const userRole = "donor"; // Replace with actual role logic, such as from context or user authentication
 
+    // Fetch clothes donations from the API
     const fetchClothesDonations = async () => {
         try {
             const BASE_URL = await getBaseUrl();
@@ -42,6 +43,7 @@ const Clothes = () => {
 
     const visibleItems = clothesItems.filter(item => !isInCart(item));
 
+    // Render each item in the list
     const renderItem = ({ item }) => (
         <TouchableOpacity
             style={styles.donationItem}
@@ -53,7 +55,10 @@ const Clothes = () => {
                 style={styles.claimButton}
                 onPress={() => navigation.navigate('ItemDetail', { item, category: 'Clothes' })}
             >
-                <Text style={styles.claimButtonText}>{userRole === 'donor' ? 'View' : 'Claim'}</Text>
+                {/* Conditionally change the button text based on the user role */}
+                <Text style={styles.claimButtonText}>
+                    {role === 'donor' ? 'View' : 'Claim'}
+                </Text>
             </TouchableOpacity>
         </TouchableOpacity>
     );
