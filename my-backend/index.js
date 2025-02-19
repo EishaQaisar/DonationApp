@@ -122,6 +122,8 @@ const createTables = () => {
         console.log('EducationDonations table created successfully');
       }
     });
+
+    
   };
   
   // Call the function to create the tables
@@ -197,7 +199,10 @@ app.get('/api/food-donations', (req, res) => {
       res.json(results);
     });
   });
+  /*
   app.get('/api/clothes-donations', (req, res) => {
+
+    
     const query = 'SELECT * FROM clothesdonations WHERE claimStatus = ?';
     db.query(query, ['Unclaimed'], (err, results) => {
       if (err) {
@@ -207,6 +212,7 @@ app.get('/api/food-donations', (req, res) => {
       res.json(results);
     });
   });
+  */
 
   app.post('/api/add-education-donation', (req, res) => {
     const { type, level, c_condition, quantity, itemName, description, images, subject, donorUsername } = req.body;
@@ -238,5 +244,39 @@ app.get('/api/food-donations', (req, res) => {
   });
   
   
+  app.get("/api/clothes-donations", (req, res) => {
+    const userProfile = JSON.parse(req.query.userProfile || "{}")
   
+    // Query for all unclaimed items
+    const query = "SELECT * FROM clothesdonations WHERE claimStatus = ?"
   
+    db.query(query, ["Unclaimed"], (err, results) => {
+      if (err) {
+        console.error("Error fetching data:", err)
+        return res.status(500).send("Error fetching data")
+      }
+  
+      // Filter and sort the results based on user profile
+      const recommended = results.filter(
+        (item) =>
+          (userProfile.clothingSize && item.size === userProfile.clothingSize) ||
+          (userProfile.gender && item.gender === userProfile.gender),
+      )
+  
+      const others = results.filter(
+        (item) =>
+          (!userProfile.clothingSize || item.size !== userProfile.clothingSize) &&
+          (!userProfile.gender || item.gender !== userProfile.gender),
+      )
+  
+      // Sort both arrays by createdAt in descending order
+      const sortByCreatedAt = (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      recommended.sort(sortByCreatedAt)
+      others.sort(sortByCreatedAt)
+  
+      res.json({
+        recommended: recommended,
+        others: others,
+      })
+    })
+  })

@@ -58,12 +58,13 @@ export default function LoginScreen({ navigation, route }) {
       }
 
       if (userDoc) {
+      const userId= userDoc.id
         const userData = userDoc.data();
         const hashedEnteredPassword = CryptoJS.SHA256(passwordInput).toString();
 
         // Verify password
         if (userData.password === hashedEnteredPassword) {
-          setUser(userData);
+          setUser({ ...userData, uid: userId});
           return { success: true, message: "Login successful!" };
         } else {
           setPassword({ ...password, error: "Incorrect password" });

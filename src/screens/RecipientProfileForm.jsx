@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import auth from "@react-native-firebase/auth";
+import firestore from "@react-native-firebase/firestore";
+import React, { useState,useContext } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput } from 'react-native';
 import { Formik } from 'formik';
 import { Picker } from "@react-native-picker/picker";
@@ -7,64 +9,155 @@ import ImagePickerComponent from '../components/ImagePickerComponent';
 import { nameValidator } from '../helpers/nameValidator';
 import { validateAge } from '../helpers/ageValidator';
 import { addressValidator } from '../helpers/addressValidator';
+import { AuthContext } from "../context/AuthContext";
+
 
 const RecipientProfileForm = ({ navigation }) => {
+  const { user } = useContext(AuthContext);
   const [image, setImage] = useState(null);
 
   const genderOptions = ['Male', 'Female', 'Other'];
   const maritalStatusOptions = ['Single', 'Married', 'Divorced', 'Widowed'];
-  const occupationStatusOptions = ['Student', 'Employeed', 'Unemployeed'];
+  const occupationStatusOptions = ['Student', 'Employed', 'Unemployed'];
   const educationalStatusOptions = ['School', 'College', 'University'];
   const clothingSizes = ['S', 'M', 'L', 'XL', 'XXL'];
   const shirtSizes = ['36', '38', '40', '42', '44', '46', '48'];
+  const shoeSizes = ['34','36', '38', '40', '42', '44', '46'];
+
   const trouserSizes = ['28', '30', '32', '34', '36', '38', '40', '42'];
 
   const validate = (values) => {
     const errors = {};
-    const nameError = nameValidator(values.name);
-    if (nameError) errors.name = nameError;
-
-
-
+  
+  
+    // Age validation
     const ageError = validateAge(values.age);
     if (ageError) errors.age = ageError;
-
-
-
+  
     if (!values.age) errors.age = 'Age is required';
     if (isNaN(values.age)) errors.age = 'Age must be a number';
     if (!values.gender) errors.gender = 'Gender is required';
     if (!values.maritalStatus) errors.maritalStatus = 'Marital status is required';
+    if (values.maritalStatus=="Married" || values.maritalStatus=="Widowed" || values.maritalStatus=="Divorced"){
+      if (!values.children) errors.children = 'Number of children is required';
+    if (isNaN(values.children)) errors.children = 'Number of children must be a number';
+    if (values.children<0) errors.children = 'Number of children can not be negative';
+
+    }
     if (!values.occupation || values.occupation === 'notsel') {
       errors.occupation = 'Occupation is required';
     }
-    if (!values.income) errors.income = 'Income is required';
-    if (values.income.trim() === "") {
-      return "Income cannot contain only spaces.";
-    }
-    if (isNaN(values.income)) errors.income = 'Income must be a number';
+    if (values.occupation==='Employed'){
+      if (!values.income) errors.income = 'Income is required';
+      if (values.income.trim() === "") {
+        errors.income = "Income cannot contain only spaces.";
+      }
+      if (isNaN(values.income)) errors.income = 'Income must be a number';
+      if (values.income <0){
+        errors.income='Income can not be negative';
+      }
 
+    }
+    
+  
     const addressError = addressValidator(values.address);
     if (addressError) errors.address = addressError;
     if (!values.address) errors.address = 'Address is required';
-    if (!image) errors.image = 'Profile picture is required';
-
-    if (!values.educationLevel) errors.educationLevel = 'Education level is required';
-    if (!values.institution) errors.institution = 'Institution is required';
-    if (!values.class) errors.class = 'Class/Year is required';
-    if (!values.shoeSize) errors.shoeSize = 'Shoe size is required';////
+  
+    // Only validate education-related fields if occupation is "Student"
+    if (values.occupation === 'Student') {
+      if (!values.educationLevel) errors.educationLevel = 'Education level is required';
+      if (!values.institution) errors.institution = 'Institution is required';
+      if (!values.class) errors.class = 'Class/Year is required';
+    }
+  
+    if (!values.shoeSize) errors.shoeSize = 'Shoe size is required';
     if (!values.clothingSize) errors.clothingSize = 'Clothing size is required';
     if (!values.shirtSize) errors.shirtSize = 'Shirt size is required';
     if (!values.trouserSize) errors.trouserSize = 'Trouser size is required';
-
+    console.log(errors);
+  
     return errors;
   };
 
-  const onSubmit = (values, { setSubmitting }) => {
+  const onSubmit = async (values, { setSubmitting }) =>  {
+    console.log('Form submitted with values:', values);
     console.log(values);
     // Handle form submission
+    /*
     setSubmitting(false);
+    try {
+      await firestore()
+        .collection("individual_profiles")
+        .doc(user.uid)
+        .set({
+        name: values.name,
+        age: parseInt(values.age), // Convert to integer
+        gender: values.gender,
+        maritalStatus: values.maritalStatus,
+        children: parseInt(values.children) || 0, // Convert to integer, default to 0
+        occupation: values.occupation,
+        income: parseFloat(values.income) || 0, // Convert to decimal
+        educationLevel: values.educationLevel,
+        institution: values.institution,
+        class: values.class,
+        shoeSize: values.shoeSize,
+        clothingSize: values.clothingSize,
+        shirtSize: values.shirtSize,
+        trouserSize: values.trouserSize,
+        address: values.address,
+        profileImage: values.profileImage || "", // Ensure string (or default empty)
+        createdAt: firestore.FieldValue.serverTimestamp(), // Timestamp for when the profile is created
+          
+        });
+
+
+        
+    } catch (error) {
+      console.log("Error saving details", error);
+    }
+      
     navigation.navigate('WaitForApprovalScreen');
+    */
+    if (parseInt(values.children) > 0) {
+      navigation.navigate("ChildrenProfiles", {ParentValues: values});
+    } 
+    else{
+      setSubmitting(false);
+    try {
+      await firestore()
+        .collection("individual_profiles")
+        .doc(user.uid)
+        .set({
+        age: parseInt(values.age), // Convert to integer
+        gender: values.gender,
+        maritalStatus: values.maritalStatus,
+        children: parseInt(values.children) || 0, // Convert to integer, default to 0
+        occupation: values.occupation,
+        income: parseFloat(values.income) || 0, // Convert to decimal
+        educationLevel: values.educationLevel,
+        institution: values.institution,
+        class: values.class,
+        shoeSize: values.shoeSize,
+        clothingSize: values.clothingSize,
+        shirtSize: values.shirtSize,
+        trouserSize: values.trouserSize,
+        address: values.address,
+        profileImage: values.profileImage || "", // Ensure string (or default empty)
+        createdAt: firestore.FieldValue.serverTimestamp(), // Timestamp for when the profile is created
+          
+        });
+
+
+        
+    } catch (error) {
+      console.log("Error saving details", error);
+    }
+      
+    navigation.navigate('WaitForApprovalScreen');
+
+    }
+    
 
   };
 
@@ -79,7 +172,6 @@ const RecipientProfileForm = ({ navigation }) => {
 
         <Formik
           initialValues={{
-            name: '',
             age: '',
             gender: '',
             maritalStatus: '',
@@ -100,19 +192,7 @@ const RecipientProfileForm = ({ navigation }) => {
         >
           {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
             <>
-              {/* Name Input */}
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Name</Text>
-                <TextInput
-                  style={styles.input}
-                  onChangeText={handleChange('name')}
-                  onBlur={handleBlur('name')}
-                  value={values.name}
-                  placeholder="Enter your full name"
-                  placeholderTextColor={theme.colors.ivory}
-                />
-                {errors.name && touched.name && <Text style={styles.errorText}>{errors.name}</Text>}
-              </View>
+            
 
               {/* Age Input */}
               <View style={styles.inputContainer}>
@@ -187,7 +267,7 @@ const RecipientProfileForm = ({ navigation }) => {
               </View>
 
               {/* Children Input (Conditional) */}
-              {values.maritalStatus === 'Married' && (
+              {(values.maritalStatus === 'Married' || values.maritalStatus === 'Divorced' ||values.maritalStatus === 'Widowed') && (
                 <View style={styles.inputContainer}>
                   <Text style={styles.label}>Number of Children</Text>
                   <TextInput
@@ -199,6 +279,8 @@ const RecipientProfileForm = ({ navigation }) => {
                     placeholderTextColor={theme.colors.ivory}
                     keyboardType="numeric"
                   />
+                  {errors.children && touched.children && <Text style={styles.errorText}>{errors.children}</Text>}
+
                 </View>
               )}
 
@@ -224,6 +306,7 @@ const RecipientProfileForm = ({ navigation }) => {
 
 
               {/* Income Input */}
+              {values.occupation === 'Employed' && (
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Monthly Income</Text>
                 <TextInput
@@ -237,6 +320,7 @@ const RecipientProfileForm = ({ navigation }) => {
                 />
                 {errors.income && touched.income && <Text style={styles.errorText}>{errors.income}</Text>}
               </View>
+              )}
 
 
               {/* Student-specific fields (Conditional) */}
@@ -308,19 +392,25 @@ const RecipientProfileForm = ({ navigation }) => {
               )}
 
 
-              {/* Shoe Size Input */}
+              
+              {/* Shoe Size Selection */}
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Shoe Size</Text>
-                <TextInput
-                  style={styles.input}
-                  onChangeText={handleChange('shoeSize')}
-                  onBlur={handleBlur('shoeSize')}
-                  value={values.shoeSize}
-                  placeholder="Enter your shoe size"
-                  placeholderTextColor={theme.colors.ivory}
-                />
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    selectedValue={values.shoeSize}
+                    onValueChange={(itemValue) => setFieldValue('shoeSize', itemValue)}
+                    style={styles.picker1}
+                  >
+                    <Picker.Item label="Select shoe size" value="" />
+                    {shoeSizes.map((size) => (
+                      <Picker.Item key={size} label={size} value={size} />
+                    ))}
+                  </Picker>
+                </View>
                 {errors.shoeSize && touched.shoeSize && <Text style={styles.errorText}>{errors.shoeSize}</Text>}
               </View>
+
 
               {/* Clothing Size Selection */}
               <View style={styles.inputContainer}>
@@ -391,7 +481,13 @@ const RecipientProfileForm = ({ navigation }) => {
 
 
               {/* Submit Button */}
-              <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
+              <TouchableOpacity
+                onPress={() => {
+                  console.log('Submit button pressed');
+                  handleSubmit();
+                }}
+                style={styles.submitButton}
+              >
                 <Text style={styles.submitButtonText}>Save Profile</Text>
               </TouchableOpacity>
             </>

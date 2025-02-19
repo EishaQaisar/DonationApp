@@ -16,6 +16,8 @@ export { default as ViewNgoPostsScreen} from "./ViewNgoPostsScreen";
 export{default as DonorProfileForm} from "./DonorProfileForm";
 export{default as NGOCampaignForm} from "./NGOCampaignForm";
 export{default as RecipientProfileForm} from "./RecipientProfileForm";
+export{default as ChildrenProfiles} from "./ChildrenProfiles";
+
 
 
 

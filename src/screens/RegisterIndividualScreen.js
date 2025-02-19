@@ -1,6 +1,6 @@
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
-import React, { useState } from "react";
+import React, { useState ,useContext} from "react";
 import { TouchableOpacity, StyleSheet, View, ImageBackground } from "react-native";
 import { Text } from "react-native-paper";
 import TextInput from "../components/TextInput";
@@ -18,6 +18,8 @@ import { IsCnicUnique } from "../helpers/IsCnicUnique";
 import { IsUsernameUnique } from "../helpers/IsUsernameUnique";
 import { IsUniqueNumber } from "../helpers/isUniqueNumber";
 import CryptoJS from "crypto-js";
+import { AuthContext } from "../context/AuthContext";
+
 
 
 
@@ -30,6 +32,8 @@ export default function RegisterIndividualScreen({ navigation }) {
   const [code, setCode] = useState("");
   const [confirm, setConfirm] = useState("");
   const [approved]=useState({value:"false"});
+  const { setUser } = useContext(AuthContext); // Access setUser from AuthContext
+  
 
   
   
@@ -48,6 +52,10 @@ export default function RegisterIndividualScreen({ navigation }) {
 
   const onSignUpPressed = async () => {
     console.log("here");
+
+    //navigation.navigate("RecipientProfileForm");
+    
+
 
     const usernameError=usernameValidator(username.value);
     const nameError = nameValidator(name.value);
@@ -123,6 +131,14 @@ export default function RegisterIndividualScreen({ navigation }) {
               password: hashedPassword,
               approved:approved.value
             });
+            setUser({
+              uid: user.uid,
+              name: name.value,
+              username: username.value,
+              phone: phoneNumber.value,
+              idCard: idCard.value,
+              approved: approved.value,
+            });
 
           navigation.navigate("RecipientProfileForm");
         } catch (error) {
@@ -132,6 +148,7 @@ export default function RegisterIndividualScreen({ navigation }) {
     } catch (error) {
       console.log("Invalid verification code:", error);
     }
+      
   };
 
 

@@ -33,7 +33,7 @@ import axios from 'axios';
 
 const PHONE_IPS = [
   'http://10.100.10.242:3000', // Primary laptop IP
-  'http://192.168.1.11:3000', // eisha local network IP
+  'http://10.100.30.143:3000', // eisha local network IP
   'http://10.100.25.213:3000',  // eisha Additional allowed IP
 ];
 
@@ -66,6 +66,7 @@ export async function getBaseUrl(): Promise<string> {
   if (!isEmulator()) {
     for (let ip of PHONE_IPS) {
       const isAvailable = await checkIpAvailability(ip);
+      console.log("is available",isAvailable);
       console.log(ip);
       if (isAvailable) {
         console.log("in the is available check",ip)

@@ -19,6 +19,7 @@ import {
   ScheduleDelivery,
   StartScreen,
   WaitForApprovalScreen,
+  ChildrenProfiles
   
 } from "./src/screens";
 import TabNavigator from './src/navigator/TabNavigator';
@@ -68,6 +69,8 @@ export default function App(){
 <Stack.Screen name="ScheduleDelivery" component={ScheduleDelivery} /> 
 <Stack.Screen name="DonorProfileForm" component={DonorProfileForm}/>
 <Stack.Screen name="RecipientProfileForm" component={RecipientProfileForm}/>
+<Stack.Screen name="ChildrenProfiles" component={ChildrenProfiles}/>
+
             <Stack.Screen name="TabNavigator" component={TabNavigator} />
 
 
