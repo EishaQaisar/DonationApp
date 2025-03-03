@@ -33,6 +33,7 @@ import Loginn from './src/Loginn';
 import * as DB from './src/database/setupTables'
 import { useDrizzleStudio} from 'expo-drizzle-studio-plugin';
 import { AuthProvider } from "./src/context/AuthContext"; // Adjust the path as necessary
+import { UserProfileProvider } from "./src/context/UserProfileContext"; // Adjust the path as necessary
 
 const Stack= createStackNavigator();
 DB.setupTables();
@@ -40,6 +41,8 @@ export default function App(){
   useDrizzleStudio(DB.db);
   return(
     <AuthProvider>
+    <UserProfileProvider>
+
     <Provider theme={theme}>
 
     <NavigationContainer>
@@ -81,6 +84,8 @@ export default function App(){
       </Stack.Navigator>
     </NavigationContainer>
     </Provider>
+    </UserProfileProvider>
+
     </AuthProvider>
 
 

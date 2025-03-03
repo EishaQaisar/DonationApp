@@ -232,51 +232,105 @@ app.get('/api/food-donations', (req, res) => {
   });
 
   
-  app.get('/api/education-donations', (req, res) => {
-    const query = 'SELECT * FROM EducationDonations WHERE claimStatus = ?';
-    db.query(query, ['Unclaimed'], (err, results) => {
-      if (err) {
-        console.error('Error fetching education donations:', err);
-        return res.status(500).send('Error fetching data');
-      }
-      res.json(results);
-    });
-  });
+  app.get("/api/education-donations", (req, res) => {
+    const userProfile = JSON.parse(req.query.userProfile || "{}");
+    const childrenProfiles = userProfile.childrenProfiles || []; // Extract children profiles
   
-  
-  app.get("/api/clothes-donations", (req, res) => {
-    const userProfile = JSON.parse(req.query.userProfile || "{}")
-  
-    // Query for all unclaimed items
-    const query = "SELECT * FROM clothesdonations WHERE claimStatus = ?"
+    // Query for all unclaimed education donations
+    const query = "SELECT * FROM EducationDonations WHERE claimStatus = ?";
   
     db.query(query, ["Unclaimed"], (err, results) => {
       if (err) {
-        console.error("Error fetching data:", err)
-        return res.status(500).send("Error fetching data")
+        console.error("Error fetching data:", err);
+        return res.status(500).send("Error fetching data");
       }
   
-      // Filter and sort the results based on user profile
-      const recommended = results.filter(
-        (item) =>
-          (userProfile.clothingSize && item.size === userProfile.clothingSize) ||
-          (userProfile.gender && item.gender === userProfile.gender),
-      )
+      // Function to check if an item matches either the parent or any child's profile
+      const isRecommended = (item) => {
+        // Check for parent match
+        const parentMatch =
+          (userProfile.educationLevel && item.level === userProfile.educationLevel) &&
+          (userProfile.institution && item.institution === userProfile.institution) &&
+          (userProfile.class && item.class === userProfile.class) &&
+          (item.subject === "-" || (userProfile.subject && item.subject === userProfile.subject));
   
-      const others = results.filter(
-        (item) =>
-          (!userProfile.clothingSize || item.size !== userProfile.clothingSize) &&
-          (!userProfile.gender || item.gender !== userProfile.gender),
-      )
+        // Check if any child matches
+        const childMatch = childrenProfiles.some(
+          (child) =>
+            (child.educationLevel && item.level === child.educationLevel) &&
+            (child.institution && item.institution === child.institution) &&
+            (child.class && item.class === child.class) &&
+            (item.subject === "-" || (child.subject && item.subject === child.subject))
+        );
+  
+        return parentMatch || childMatch;
+      };
+  
+      // Filter recommendations
+      const recommended = results.filter(isRecommended);
+  
+      // Filter other items that do not match the recipient or children
+      const others = results.filter((item) => !isRecommended(item));
   
       // Sort both arrays by createdAt in descending order
-      const sortByCreatedAt = (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      recommended.sort(sortByCreatedAt)
-      others.sort(sortByCreatedAt)
+      const sortByCreatedAt = (a, b) => new Date(b.createdAt) - new Date(a.createdAt);
+      recommended.sort(sortByCreatedAt);
+      others.sort(sortByCreatedAt);
   
       res.json({
         recommended: recommended,
         others: others,
-      })
-    })
-  })
+      });
+    });
+  });
+  
+  
+  
+  app.get("/api/clothes-donations", (req, res) => {
+    const userProfile = JSON.parse(req.query.userProfile || "{}");
+    const childrenProfiles = userProfile.childrenProfiles || []; // Extract children profiles
+  
+    // Query for all unclaimed items
+    const query = "SELECT * FROM clothesdonations WHERE claimStatus = ?";
+  
+    db.query(query, ["Unclaimed"], (err, results) => {
+      if (err) {
+        console.error("Error fetching data:", err);
+        return res.status(500).send("Error fetching data");
+      }
+  
+      // Function to check if an item matches either the parent or any child's profile
+      const isRecommended = (item) => {
+        // Check for parent match
+        const parentMatch =
+          (userProfile.clothingSize && item.size === userProfile.clothingSize) &&
+          (userProfile.gender && item.gender === userProfile.gender);
+  
+        // Check if any child matches
+        const childMatch = childrenProfiles.some(
+          (child) =>
+            (child.clothingSize && item.size === child.clothingSize) &&
+            (child.gender && item.gender === child.gender)
+        );
+  
+        return parentMatch || childMatch;
+      };
+  
+      // Filter recommendations
+      const recommended = results.filter(isRecommended);
+  
+      // Filter other items that do not match parent or children
+      const others = results.filter((item) => !isRecommended(item));
+  
+      // Sort both arrays by createdAt in descending order
+      const sortByCreatedAt = (a, b) => new Date(b.createdAt) - new Date(a.createdAt);
+      recommended.sort(sortByCreatedAt);
+      others.sort(sortByCreatedAt);
+  
+      res.json({
+        recommended: recommended,
+        others: others,
+      });
+    });
+  });
+  

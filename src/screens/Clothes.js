@@ -1,7 +1,7 @@
 "use client"
 
 import { useContext, useState, useEffect } from "react"
-import { View, Text, StyleSheet, Image, TouchableOpacity, SectionList, FlatList } from "react-native"
+import { View, Text, StyleSheet, Image, TouchableOpacity, SectionList, FlatList, ScrollView } from "react-native"
 import { theme } from "../core/theme"
 import { useNavigation } from "@react-navigation/native"
 import Icon from "react-native-vector-icons/MaterialIcons"
@@ -10,38 +10,24 @@ import axios from "axios"
 import { getBaseUrl } from "../helpers/deviceDetection"
 import firestore from "@react-native-firebase/firestore"
 import { AuthContext } from "../context/AuthContext"
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
+import { UserProfileContext } from "../context/UserProfileContext"
 const Clothes = ({ route }) => {
   const navigation = useNavigation()
+  const tabBarHeight = useBottomTabBarHeight();
+  
   const { role } = route.params
   const { isInCart } = useContext(CartContext)
   const { user } = useContext(AuthContext)
-  console.log(user.uid)
 
 
   const [clothesItems, setClothesItems] = useState({ recommended: [], others: [] })
-  const [userProfile, setUserProfile] = useState(null)
-console.log(user)
-  /** Fetch user profile from Firestore */
-  const fetchUserProfile = async () => {
-    try {
-      if (user) {
-        console.log("Fetching user profile for:", user.uid)
-        const userDoc = await firestore().collection("individual_profiles").doc(user.uid).get()
-        if (userDoc.exists) {
-          setUserProfile(userDoc.data())
-          console.log("User profile fetched:", userDoc.data())
-        } else {
-          console.log("User profile not found in Firestore")
-        }
-      } else {
-        console.log("User not found in AuthContext")
-      }
-    } catch (error) {
-      console.error("Error fetching user profile:", error)
-    }
-  }
+  const { userProfile } = useContext(UserProfileContext);
+  console.log(userProfile)
+  console.log("dfgergergFERFERFGERGWEGER")
 
+  
   /** Fetch clothes donations from API */
   const fetchClothesDonations = async () => {
     if (!userProfile) return // Prevent API call if userProfile is not loaded
@@ -51,22 +37,30 @@ console.log(user)
       const BASE_URL = await getBaseUrl()
       const response = await axios.get(`${BASE_URL}/api/clothes-donations`, {
         params: { userProfile: JSON.stringify(userProfile) },
-      })
-      console.log("Clothes donations fetched:", response.data)
 
-      setClothesItems({
-        recommended: response.data.recommended || [],
-        others: response.data.others || [],
       })
+
+      const processItems = (items) => {
+
+        return items.map(item => {
+          const parsedImages = item.images ? JSON.parse(item.images) : [];
+          const validImages = parsedImages.map(imagePath => ({ uri: imagePath }));
+          return { ...item, images: validImages };
+        });
+      };
+  
+      setClothesItems({
+        recommended: response.data.recommended ? processItems(response.data.recommended) : [],
+        others: response.data.others ? processItems(response.data.others) : [],
+      });
+
     } catch (error) {
       console.error("Error fetching clothes donations:", error)
     }
   }
 
   /** Fetch user profile on component mount */
-  useEffect(() => {
-    fetchUserProfile()
-  }, [])
+
 
   /** Fetch clothes donations when userProfile is updated */
   useEffect(() => {
@@ -81,7 +75,8 @@ console.log(user)
       style={styles.donationItem}
       onPress={() => navigation.navigate("ItemDetail", { item, category: "Clothes" })}
     >
-      <Image source={{ uri: item.images[0] }} style={styles.itemImage} />
+      <Image source={item.images[0]} style={styles.itemImage} />
+      
       <Text style={styles.item}>{item.itemName}</Text>
       <Text style={styles.itemDetails}>{`Size: ${item.size}`}</Text>
       <Text style={styles.itemDetails}>{`Gender: ${item.gender}`}</Text>
@@ -108,8 +103,8 @@ console.log(user)
     { title: "Others", data: clothesItems.others.filter((item) => !isInCart(item)) },
   ]
 
-  return (
-  <View style={styles.container}>
+ return (
+  <ScrollView style={[styles.container, { marginBottom: tabBarHeight }]} showsVerticalScrollIndicator={false}>
     {/* Category Icons */}
     <View style={styles.iconContainer}>
       <TouchableOpacity onPress={() => navigation.navigate("Education")}>
@@ -141,8 +136,9 @@ console.log(user)
           data={clothesItems.recommended.filter((item) => !isInCart(item))}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
-          numColumns={2} // Keeps a two-column grid
+          numColumns={2}
           contentContainerStyle={styles.grid}
+          scrollEnabled={false} // Prevents FlatList from having independent scroll
         />
       </View>
     )}
@@ -155,12 +151,13 @@ console.log(user)
           data={clothesItems.others.filter((item) => !isInCart(item))}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
-          numColumns={2} // Keeps a two-column grid
+          numColumns={2}
           contentContainerStyle={styles.grid}
+          scrollEnabled={false} // Prevents FlatList from having independent scroll
         />
       </View>
     )}
-  </View>
+  </ScrollView>
 )
 
   

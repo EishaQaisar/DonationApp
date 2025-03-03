@@ -1,25 +1,55 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList ,ScrollView} from 'react-native';
 import { theme } from '../core/theme';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { CartContext } from '../CartContext'; // Correct import
 import axios from 'axios';
 import { getBaseUrl } from '../helpers/deviceDetection';
+import { AuthContext } from "../context/AuthContext"
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+
+import { UserProfileContext } from "../context/UserProfileContext"
 
 const Education = ({route}) => {
-    const navigation = useNavigation();
-    const { role } = route.params;  // Get the 'role' passed from the previous screen
+    const navigation = useNavigation()
+  const tabBarHeight = useBottomTabBarHeight();
+  
+  const { role } = route.params
+  const { isInCart } = useContext(CartContext)
+    const [eduItems, setEducationItems] = useState({ recommended: [], others: [] });
+    const { userProfile } = useContext(UserProfileContext);
 
-    // const route = useRoute();
-    const { isInCart } = useContext(CartContext);
-    const [eduItems, setEducationItems] = useState([]);
+
     // const userRole = "donor"; // Replace this with actual role logic
 
-    const fetchClothesDonations = async () => {
+    const fetchEducationDonations = async () => {
+        if (!userProfile) return // Prevent API call if userProfile is not loaded
+
+
         try {
+            console.log("Fetching education donations for user profile:", userProfile)
+
             const BASE_URL = await getBaseUrl();
-            const response = await axios.get(`${BASE_URL}/api/education-donations`);
+            const response = await axios.get(`${BASE_URL}/api/education-donations`, {
+                params: { userProfile: JSON.stringify(userProfile) },
+              })
+              const processItems = (items) => {
+                return items.map(item => {
+                  const parsedImages = item.images ? JSON.parse(item.images) : [];
+                  const validImages = parsedImages.map(imagePath => ({ uri: imagePath }));
+                  return { ...item, images: validImages };
+                });
+              };
+          
+              setEducationItems({
+                recommended: response.data.recommended ? processItems(response.data.recommended) : [],
+                others: response.data.others ? processItems(response.data.others) : [],
+              });
+              
+
+
+              /*
             const data = response.data.map(item => {
                 const parsedImages = item.images ? JSON.parse(item.images) : [];
                 const validImages = parsedImages.map(imagePath => ({ uri: imagePath }));
@@ -29,16 +59,16 @@ const Education = ({route}) => {
                 };
             });
             setEducationItems(data);
+            */
         } catch (error) {
             console.error('Error fetching data:', error);
         }
     };
 
     useEffect(() => {
-        fetchClothesDonations();
+        fetchEducationDonations();
     }, []);
 
-    const visibleItems = eduItems.filter(item => !isInCart(item));
 
     const renderItem = ({ item }) => (
         <TouchableOpacity
@@ -56,138 +86,182 @@ const Education = ({route}) => {
             </TouchableOpacity>
         </TouchableOpacity>
     );
+   
+      const renderSectionHeader = ({ section: { title } }) => (
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionHeaderText}>{title}</Text>
+        </View>
+      )
 
     const isEducationPage = route.name === 'Education';
+    const sections = [
+        { title: "Recommended for You", data: eduItems.recommended.filter((item) => !isInCart(item)) },
+        { title: "Others", data: eduItems.others.filter((item) => !isInCart(item)) },
+      ]
 
     return (
-        <View style={styles.container}>
-            <FlatList
-                data={visibleItems}
-                renderItem={renderItem}
-                keyExtractor={item => item.id}
-                numColumns={2}
-                contentContainerStyle={styles.grid}
-                ListHeaderComponent={
-                    <>
-                        <View style={styles.iconContainer}>
-                            <TouchableOpacity onPress={() => navigation.navigate('Education')}>
-                                <Icon
-                                    name="school"
-                                    size={40}
-                                    color={isEducationPage ? theme.colors.ivory : theme.colors.sageGreen}
-                                    style={[styles.icon, isEducationPage && styles.activeIcon]}
-                                />
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => navigation.navigate('Clothes')}>
-                                <Icon
-                                    name="checkroom"
-                                    size={40}
-                                    color={theme.colors.sageGreen}
-                                    style={styles.icon}
-                                />
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => navigation.navigate('Food')}>
-                                <Icon
-                                    name="local-dining"
-                                    size={40}
-                                    color={theme.colors.sageGreen}
-                                    style={styles.icon}
-                                />
-                            </TouchableOpacity>
-                        </View>
-                        <View style={styles.header}>
-                            <Text style={styles.title}>Education Donations</Text>
-                        </View>
-                    </>
-                }
+    <ScrollView style={[styles.container, { marginBottom: tabBarHeight }]} showsVerticalScrollIndicator={false}>
+        {/* Category Icons */}
+        <View style={styles.iconContainer}>
+          <TouchableOpacity onPress={() => navigation.navigate("Education")}>
+            <Icon name="school" size={40} 
+            color={isEducationPage ? theme.colors.ivory : theme.colors.sageGreen}
+            style={[styles.icon, isEducationPage && styles.activeIcon]}
+          /> 
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("Clothes")}>
+            <Icon
+              name="checkroom"
+              size={40}
+              color={theme.colors.sageGreen} style={styles.icon}
+              
             />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate("Food")}>
+            <Icon name="local-dining" size={40} color={theme.colors.sageGreen} style={styles.icon} />
+          </TouchableOpacity>
         </View>
-    );
-};
+    
+        {/* Page Title */}
+        <View style={styles.header}>
+          <Text style={styles.title}>Education Donations</Text>
+        </View>
+    
+        {/* Recommended Donations */}
+        {eduItems.recommended.length > 0 && (
+          <View>
+            <Text style={styles.sectionHeaderText}>Recommended for You</Text>
+            <FlatList
+              data={eduItems.recommended.filter((item) => !isInCart(item))}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id.toString()}
+              numColumns={2}
+              contentContainerStyle={styles.grid}
+              scrollEnabled={false} // Prevents FlatList from having independent scroll
+            />
+          </View>
+        )}
+    
+        {/* Other Donations */}
+        {eduItems.others.length > 0 && (
+          <View>
+            <Text style={styles.sectionHeaderText}>Others</Text>
+            <FlatList
+              data={eduItems.others.filter((item) => !isInCart(item))}
+              renderItem={renderItem}
+              keyExtractor={(item) => item.id.toString()}
+              numColumns={2}
+              contentContainerStyle={styles.grid}
+              scrollEnabled={false} // Prevents FlatList from having independent scroll
+            />
+          </View>
+        )}
+      </ScrollView>
+    )
+    
+      
+    }
+
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: theme.colors.charcoalBlack,
-    },
-    header: {
-        padding: 20,
-        alignItems: 'center',
-        borderBottomLeftRadius: 10,
-        borderBottomRightRadius: 10,
-    },
-    title: {
-        fontSize: 28,
-        color: theme.colors.ivory,
-        fontWeight: 'bold',
-    },
-    grid: {
-        justifyContent: 'space-between',
-        marginTop: 10,
-        padding: 10,
-    },
-    donationItem: {
-        backgroundColor: theme.colors.TaupeBlack,
-        padding: 15,
-        borderRadius: 10,
-        marginBottom: 20,
-        width: '45%',
-        alignItems: 'center',
-        marginHorizontal: '2.5%',
-        shadowColor: theme.colors.sageGreen,
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.5,
-        shadowRadius: 8,
-        borderWidth: 2,
-        borderColor: theme.colors.sageGreen,
-    },
-    itemImage: {
-        width: 150,
-        height: 150,
-        borderRadius: 8,
-        borderColor: theme.colors.sageGreen,
-        borderWidth: 3,
-        marginBottom: 10,
-    },
-    item: {
-        fontSize: 20,
-        color: theme.colors.ivory,
-        textAlign: 'center',
-        marginBottom: 10,
-    },
-    claimButton: {
-        backgroundColor: theme.colors.charcoalBlack,
-        paddingVertical: 10,
-        paddingHorizontal: 20,
-        borderColor: theme.colors.sageGreen,
-        borderBottomWidth: 8,
-        borderWidth: 3,
-        borderRadius: 20,
-        marginTop: 10,
-    },
-    claimButtonText: {
-        fontSize: 18,
-        color: theme.colors.ivory,
-        fontWeight: 'bold',
-    },
-    iconContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        paddingVertical: 7,
-        backgroundColor: theme.colors.charcoalBlack,
-        borderBottomWidth: 1,
-        borderBottomColor: theme.colors.sageGreen,
-    },
-    icon: {
-        backgroundColor: theme.colors.outerSpace,
-        padding: 10,
-        borderRadius: 25,
-        marginHorizontal: 5,
-    },
-    activeIcon: {
-        backgroundColor: theme.colors.sageGreen,
-        padding: 12,
-    },
-});
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.charcoalBlack,
+  },
+  header: {
+    padding: 20,
+    alignItems: "center",
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+  },
+  title: {
+    fontSize: 28,
+    color: theme.colors.ivory,
+    fontWeight: "bold",
+  },
+  grid: {
+    justifyContent: "space-between",
+    marginTop: 10,
+    padding: 10,
+  },
+  donationItem: {
+    backgroundColor: theme.colors.TaupeBlack,
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 20,
+    width: "45%",
+    alignItems: "center",
+    marginHorizontal: "2.5%",
+    shadowColor: theme.colors.sageGreen,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    borderWidth: 2,
+    borderColor: theme.colors.sageGreen,
+  },
+  itemImage: {
+    width: 150,
+    height: 150,
+    borderRadius: 8,
+    borderColor: theme.colors.sageGreen,
+    borderWidth: 3,
+    marginBottom: 10,
+  },
+  item: {
+    fontSize: 20,
+    color: theme.colors.ivory,
+    textAlign: "center",
+    marginBottom: 5,
+  },
+  itemDetails: {
+    fontSize: 16,
+    color: theme.colors.ivory,
+    textAlign: "center",
+    marginBottom: 5,
+  },
+  claimButton: {
+    backgroundColor: theme.colors.charcoalBlack,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderColor: theme.colors.sageGreen,
+    borderBottomWidth: 8,
+    borderWidth: 3,
+    borderRadius: 20,
+    marginTop: 10,
+  },
+  claimButtonText: {
+    fontSize: 18,
+    color: theme.colors.ivory,
+    fontWeight: "bold",
+  },
+  iconContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    paddingVertical: 7,
+    backgroundColor: theme.colors.charcoalBlack,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.sageGreen,
+  },
+  icon: {
+    backgroundColor: theme.colors.outerSpace,
+    padding: 10,
+    borderRadius: 25,
+    marginHorizontal: 5,
+  },
+  activeIcon: {
+    backgroundColor: theme.colors.sageGreen,
+    padding: 12,
+  },
+  sectionHeader: {
+    backgroundColor: theme.colors.charcoalBlack,
+    padding: 10,
+    marginBottom: 10,
+  },
+  sectionHeaderText: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: theme.colors.ivory,
+  },
+})
 
-export default Education;
+export default Education
