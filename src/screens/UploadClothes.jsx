@@ -24,19 +24,33 @@ const UploadClothes = ({ navigation }) => {
   const seasonOptions = ['Summers', 'Spring', 'Autumn', 'Winter'];
   const conditionOptions = ['New', 'Used Once/Twice', 'Heavily Used'];
   const sizeOptions = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+  const itemCategoryOptions=['Clothes', 'Shoes'];
+  const clothesCategoryOptions=['Upper Wear', 'Bottom Wear', 'Full Outfit', 'Accessories'];
+  const clothingSizes = ['S', 'M', 'L', 'XL', 'XXL'];
+  const shirtSizes = ['36', '38', '40', '42', '44', '46', '48'];
+  const shoeSizes = ['34', '36', '38', '40', '42', '44', '46'];
+  const trouserSizes = ['28', '30', '32', '34', '36', '38', '40', '42'];
 
   // State for form fields
   // State for form field values and errors
   const [season, setSeason] = useState({ value: '', error: '' });
   const [gender, setGender] = useState({ value: '', error: '' });
   const [ageCategory, setAgeCategory] = useState({ value: '', error: '' });
-  const [size, setSize] = useState({ value: '', error: '' });
   const [condition, setCondition] = useState({ value: '', error: '' });
   const [quantity, setQuantity] = useState({ value: '1', error: '' });
   const [fabric, setFabric] = useState({ value: '', error: '' });
   const [description, setDescription] = useState({ value: '', error: '' });
   const [images, setImages] = useState([]);
-  const [itemName, setItemName] = useState({ value: '', error: '' });
+  const [itemCategory, setItemCategory] = useState({ value: '', error: '' });
+  const [clothesCategory, setClothesCategory] = useState({ value: '', error: '' });
+  const [upperWearSize, setUpperWearSize] = useState({ value: '', error: '' });
+  const [bottomWearSize, setBottomWearSize] = useState({ value: '', error: '' });
+  const [clothingSize, setClothingSize] = useState({ value: '', error: '' });
+  const [shoeSize, setShoeSize] = useState({ value: '', error: '' });
+
+
+
+  
 
 
   const [imageErrors, setImageErrors] = useState('');
@@ -50,33 +64,67 @@ const UploadClothes = ({ navigation }) => {
 
       isValid = false;
     }
-    if (!itemName.value) {
-      setItemName((prev) => ({ ...prev, error: 'Item name is required' }));
-      isValid = false;
-    }
-    if (itemName.value.length>30) {
-      setItemName((prev) => ({ ...prev, error: 'Too long' }));
-      isValid = false;
-    }
-    if (itemName.value.length<3 && itemName.value.length>0) {
-      setItemName((prev) => ({ ...prev, error: 'Too short' }));
-      isValid = false;
-    }
+   
     if (!gender.value) {
       setGender((prev) => ({ ...prev, error: 'Gender is required' }));
+
 
       isValid = false;
     }
     if (!ageCategory.value) {
       setAgeCategory((prev) => ({ ...prev, error: 'Age category is required' }));
+
       isValid = false;
     }
-    if (!size.value) {
-      setSize((prev) => ({ ...prev, error: 'Size is required' }));
+    if (!itemCategory.value) {
+      setItemCategory((prev) => ({ ...prev, error: 'Item Category is required' }));
+
       isValid = false;
     }
+    if (itemCategory.value==='Clothes'){
+      if (!clothesCategory.value) {
+        setClothesCategory((prev) => ({ ...prev, error: 'Clothes Category is required' }));
+
+        isValid = false;
+      }
+      if (clothesCategory.value==='Upper Wear'){
+        if (!upperWearSize.value) {
+          setUpperWearSize((prev) => ({ ...prev, error: 'Size is required' }));
+
+          isValid = false;
+        }
+
+      }
+      if (clothesCategory.value==='Bottom Wear'){
+        if (!bottomWearSize.value) {
+          setBottomWearSize((prev) => ({ ...prev, error: 'Size is required' }));
+          isValid = false;
+        }
+
+      }
+      if (clothesCategory.value==='Full Outfit'){
+        if (!clothingSize.value) {
+          setClothingSize((prev) => ({ ...prev, error: 'Size is required' }));
+
+          isValid = false;
+        }
+
+      }
+
+    }
+    if (itemCategory.value==='Shoes'){
+      if (!shoeSize.value){
+        setShoeSize((prev) => ({ ...prev, error: 'Size is required' }));
+          isValid = false;
+
+      }
+
+
+    }
+
     if (!condition.value) {
       setCondition((prev) => ({ ...prev, error: 'Condition is required' }));
+
       isValid = false;
     }
     if (parseInt(quantity.value) <= 0) {
@@ -91,18 +139,22 @@ const UploadClothes = ({ navigation }) => {
       setQuantity((prev) => ({ ...prev, error: 'Quantity must be a numeric value' }));
       isValid = false;
     }
-    if (!fabric.value) {
-      setFabric((prev) => ({ ...prev, error: 'Fabric is required' }));
-      isValid = false;
+    if (clothesCategory.value != 'Accessories' && itemCategory.value!='Shoes'){
+      if (!fabric.value) {
+        setFabric((prev) => ({ ...prev, error: 'Fabric is required' }));
+        isValid = false;
+      }
+      if (fabric.value.length>20) {
+        setFabric((prev) => ({ ...prev, error: 'Too long' }));
+        isValid = false;
+      }
+      if (fabric.value.length<3 && fabric.value.length>0) {
+        setFabric((prev) => ({ ...prev, error: 'Too short' }));
+        isValid = false;
+      }
+
     }
-    if (fabric.value.length>20) {
-      setFabric((prev) => ({ ...prev, error: 'Too long' }));
-      isValid = false;
-    }
-    if (fabric.value.length<3 && fabric.value.length>0) {
-      setFabric((prev) => ({ ...prev, error: 'Too short' }));
-      isValid = false;
-    }
+    
     if (!description.value) {
       setDescription((prev) => ({ ...prev, error: 'Description is required' }));
       isValid = false;
@@ -121,6 +173,7 @@ const UploadClothes = ({ navigation }) => {
     } else {
       setImageErrors('');
     }
+    console.log("weferf");
 
 
     return isValid;
@@ -131,14 +184,21 @@ const UploadClothes = ({ navigation }) => {
     const isValid = validate();
 
 
+
     if (!isValid) return;
+
     const clothesData = {
      
       season: season.value,
-      itemName:itemName.value,
       gender: gender.value,
       ageCategory: ageCategory.value,
-      size: size.value,
+      itemCategory:itemCategory.value,
+      clothesCategory:clothesCategory.value,
+      shoeSize:shoeSize.value,
+      upperWearSize:upperWearSize.value,
+      bottomWearSize:bottomWearSize.value,
+      clothingSize:clothingSize.value,
+
       c_condition: condition.value,
       quantity: quantity.value,
       fabric: fabric.value,
@@ -183,22 +243,9 @@ const UploadClothes = ({ navigation }) => {
         />
         {season.error && <Text style={Styles.errorText}>{season.error}</Text>}
 
-    {/* Item Name */}
-    <View style={{ marginTop: 30 }}>
-          <Text style={Styles.headings}>Item Name</Text>
-          <TextInput
-            placeholder="e.g pants"
-            value={itemName.value}
-            onChangeText={(text) => setItemName({ value: text, error: '' })}
+         
 
-            style={Styles.name}
-            placeholderTextColor={theme.colors.ivory}
-            selectionColor={theme.colors.sageGreen}
-          />
-                    {itemName.error && <Text style={Styles.errorText}>{itemName.error}</Text>}
-
-        </View>
-         {/* Food Type */}
+         {/*Gender */}
          <View style={{ marginTop: 30 }}>
                 <Text style={Styles.headings}>Gender</Text>
                 <View style={Styles.radioContainer}>
@@ -240,27 +287,152 @@ const UploadClothes = ({ navigation }) => {
           {ageCategory.error && <Text style={Styles.errorText}>{ageCategory.error}</Text>}
 
         </View>
+         {/*Item Category */}
+         <View style={{ marginTop: 30 }}>
+          <Text style={Styles.headings}>Item Category</Text>
+          <View style={Styles.dropdownContainer}>
+            <Picker
+              selectedValue={itemCategory.value}
+              onValueChange={(itemValue) => setItemCategory({ value: itemValue, error: '' })}
 
-        {/* Size Selection */}
-        <View style={{ marginTop: 30 }}>
+              style={Styles.picker}
+            >
+              <Picker.Item label="Select Item Category" value="" />
+              {itemCategoryOptions.map((category) => (
+                <Picker.Item key={category} label={category} value={category} />
+              ))}
+            </Picker>
+          </View>
+          {itemCategory.error && <Text style={Styles.errorText}>{itemCategory.error}</Text>}
+
+        </View>
+
+        {(itemCategory.value === 'Clothes' ) && (
+  <>
+    {/* Clothes Category*/}
+    <View style={{ marginTop: 30 }}>
+      <Text style={Styles.headings}>Clothes Category</Text>
+      <View style={Styles.dropdownContainer}>
+        <Picker
+          selectedValue={clothesCategory.value}
+          onValueChange={(itemValue) => setClothesCategory({ value: itemValue, error: '' })}
+          style={Styles.picker}
+        >
+          <Picker.Item label="Select Clothes Category" value="" />
+          {clothesCategoryOptions.map((category) => (
+            <Picker.Item key={category} label={category} value={category} />
+          ))}
+        </Picker>
+      </View>
+      {clothesCategory.error && <Text style={Styles.errorText}>{clothesCategory.error}</Text>}
+    </View>
+
+    {/* Conditional Size Options based on Clothes Category */}
+    {clothesCategory.value === 'Upper Wear' && (
+      <View style={{ marginTop: 30 }}>
+        <Text style={Styles.headings}>Size</Text>
+        <View style={Styles.dropdownContainer}>
+          <Picker
+            selectedValue={upperWearSize.value}
+            onValueChange={(itemValue) => setUpperWearSize({ value: itemValue, error: '' })}
+            style={Styles.picker}
+          >
+            <Picker.Item label="Select Size" value="" />
+            {shirtSizes.map((size) => (
+              <Picker.Item key={size} label={size} value={size} />
+            ))}
+          </Picker>
+        </View>
+        {upperWearSize.error && <Text style={Styles.errorText}>{upperWearSize.error}</Text>}
+      </View>
+    )}
+
+    {clothesCategory.value === 'Bottom Wear' && (
+      <View style={{ marginTop: 30 }}>
+        <Text style={Styles.headings}>Size</Text>
+        <View style={Styles.dropdownContainer}>
+          <Picker
+            selectedValue={bottomWearSize.value}
+            onValueChange={(itemValue) => setBottomWearSize({ value: itemValue, error: '' })}
+            style={Styles.picker}
+          >
+            <Picker.Item label="Select Size" value="" />
+            {trouserSizes.map((size) => (
+              <Picker.Item key={size} label={size} value={size} />
+            ))}
+          </Picker>
+        </View>
+        {bottomWearSize.error && <Text style={Styles.errorText}>{bottomWearSize.error}</Text>}
+      </View>
+    )}
+
+    {clothesCategory.value === 'Full Outfit' && (
+      <View style={{ marginTop: 30 }}>
+        <Text style={Styles.headings}>Size</Text>
+        <View style={Styles.dropdownContainer}>
+          <Picker
+            selectedValue={clothingSize.value}
+            onValueChange={(itemValue) => setClothingSize({ value: itemValue, error: '' })}
+            style={Styles.picker}
+          >
+            <Picker.Item label="Select Size" value="" />
+            {clothingSizes.map((size) => (
+              <Picker.Item key={size} label={size} value={size} />
+            ))}
+          </Picker>
+        </View>
+        {clothingSize.error && <Text style={Styles.errorText}>{clothingSize.error}</Text>}
+      </View>
+    )}
+    {/* Fabric Name */}
+    {clothesCategory.value != 'Accessories' && (
+      <>
+      <View style={{ marginTop: 30 }}>
+          <Text style={Styles.headings}>Fabric</Text>
+          <TextInput
+            placeholder="e.g Lawn"
+            value={fabric.value}
+            onChangeText={(text) => setFabric({ value: text, error: '' })}
+
+            style={Styles.name}
+            placeholderTextColor={theme.colors.ivory}
+            selectionColor={theme.colors.sageGreen}
+          />
+                    {fabric.error && <Text style={Styles.errorText}>{fabric.error}</Text>}
+
+        </View>
+
+      </>
+    )}
+    
+  </>
+)}
+ {(itemCategory.value === 'Shoes' ) && (
+  <>
+   <View style={{ marginTop: 30 }}>
           <Text style={Styles.headings}>Size</Text>
           <View style={Styles.dropdownContainer}>
             <Picker
-              selectedValue={size.value}
-              onValueChange={(itemValue) => setSize({ value: itemValue, error: '' })}
+              selectedValue={shoeSize.value}
+              onValueChange={(itemValue) => setShoeSize({ value: itemValue, error: '' })}
 
               style={Styles.picker}
             >
               <Picker.Item label="Select Size" value="" />
-              {sizeOptions.map((size) => (
+              {shoeSizes.map((size) => (
                 <Picker.Item key={size} label={size} value={size} />
               ))}
             </Picker>
           </View>
-          {size.error && <Text style={Styles.errorText}>{size.error}</Text>}
+          {shoeSize.error && <Text style={Styles.errorText}>{shoeSize.error}</Text>}
 
         </View>
 
+    </>
+ )}
+
+        
+       
           
          {/* Condtion */}
          <View style={{ marginTop: 30 }}>
@@ -315,22 +487,7 @@ const UploadClothes = ({ navigation }) => {
           {quantity.error && <Text style={Styles.errorText}>{quantity.error}</Text>}
 
         </View>
-        {/* Fabric Name */}
-        <View style={{ marginTop: 30 }}>
-          <Text style={Styles.headings}>Fabric</Text>
-          <TextInput
-            placeholder="e.g Lawn"
-            value={fabric.value}
-            onChangeText={(text) => setFabric({ value: text, error: '' })}
-
-            style={Styles.name}
-            placeholderTextColor={theme.colors.ivory}
-            selectionColor={theme.colors.sageGreen}
-          />
-                    {fabric.error && <Text style={Styles.errorText}>{fabric.error}</Text>}
-
-        </View>
-
+        
         {/* Description */}
         <View style={{ marginTop: 30 }}>
           <Text style={Styles.headings}>Description</Text>

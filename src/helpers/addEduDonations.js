@@ -11,6 +11,8 @@ export async function addEduDonation(eduData) {
     description,
     images,
     subject,
+    institution,
+    grade,
     donorUsername
   } = eduData;
 
@@ -27,6 +29,8 @@ export async function addEduDonation(eduData) {
       description,
       images,
       subject,
+      institution,
+      grade,
       donorUsername,
     });
 

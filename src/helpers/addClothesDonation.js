@@ -3,7 +3,8 @@ import axios from 'axios';
 import { getBaseUrl } from './deviceDetection';
 
 export async function addClothesDonation(clothesData) {
-  const { season, itemName, gender, ageCategory, size, c_condition, quantity, fabric, description, images, donorUsername } = clothesData;
+  const { season, gender, ageCategory, itemCategory, clothesCategory, shoeSize, upperWearSize, bottomWearSize,
+     clothingSize, c_condition, quantity, fabric, description, images, donorUsername } = clothesData;
 
   try {
     // Send POST request to backend API
@@ -11,10 +12,15 @@ export async function addClothesDonation(clothesData) {
     console.log("this is the base url is", BASE_URL)
     const response = await axios.post(`${BASE_URL}/api/add-clothes-donation`, {
       season,
-      itemName,
       gender,
       ageCategory,
-      size,
+      itemCategory,
+      clothesCategory,
+      shoeSize,
+      upperWearSize,
+      bottomWearSize,
+      clothingSize,
+     
       c_condition,
       quantity,
       fabric,

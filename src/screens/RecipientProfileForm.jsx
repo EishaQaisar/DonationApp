@@ -1,6 +1,6 @@
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
-import React, { useState,useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput } from 'react-native';
 import { Formik } from 'formik';
 import { Picker } from "@react-native-picker/picker";
@@ -19,16 +19,18 @@ const RecipientProfileForm = ({ navigation }) => {
   const genderOptions = ['Male', 'Female', 'Other'];
   const maritalStatusOptions = ['Single', 'Married', 'Divorced', 'Widowed'];
   const occupationStatusOptions = ['Student', 'Employed', 'Unemployed'];
-  const educationalStatusOptions = ['School', 'College', 'University'];
+  const educationalStatusOptions = [ 'College', 'University', 'Special Education'];
   const clothingSizes = ['S', 'M', 'L', 'XL', 'XXL'];
   const shirtSizes = ['36', '38', '40', '42', '44', '46', '48'];
-  const shoeSizes = ['34','36', '38', '40', '42', '44', '46'];
-
+  const shoeSizes = ['34', '36', '38', '40', '42', '44', '46'];
   const trouserSizes = ['28', '30', '32', '34', '36', '38', '40', '42'];
+  const gradeOption = ['Nursery', 'KG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'];
+  const uniYearOption = ['1st', '2nd', '3rd', '4th'];
+  const collegeYearOption = ['1st Year', '2nd Year'];
+
 
   const validate = (values) => {
     const errors = {};
-  
   
     // Age validation
     const ageError = validateAge(values.age);
@@ -36,30 +38,28 @@ const RecipientProfileForm = ({ navigation }) => {
   
     if (!values.age) errors.age = 'Age is required';
     if (isNaN(values.age)) errors.age = 'Age must be a number';
+    if (values.age<18)errors.age='Age must be greater than 18';
     if (!values.gender) errors.gender = 'Gender is required';
     if (!values.maritalStatus) errors.maritalStatus = 'Marital status is required';
-    if (values.maritalStatus=="Married" || values.maritalStatus=="Widowed" || values.maritalStatus=="Divorced"){
+    if (values.maritalStatus == "Married" || values.maritalStatus == "Widowed" || values.maritalStatus == "Divorced") {
       if (!values.children) errors.children = 'Number of children is required';
-    if (isNaN(values.children)) errors.children = 'Number of children must be a number';
-    if (values.children<0) errors.children = 'Number of children can not be negative';
-
+      if (isNaN(values.children)) errors.children = 'Number of children must be a number';
+      if (values.children < 0) errors.children = 'Number of children can not be negative';
     }
     if (!values.occupation || values.occupation === 'notsel') {
       errors.occupation = 'Occupation is required';
     }
-    if (values.occupation==='Employed'){
+    if (values.occupation === 'Employed') {
       if (!values.income) errors.income = 'Income is required';
       if (values.income.trim() === "") {
         errors.income = "Income cannot contain only spaces.";
       }
       if (isNaN(values.income)) errors.income = 'Income must be a number';
-      if (values.income <0){
-        errors.income='Income can not be negative';
+      if (values.income < 0) {
+        errors.income = 'Income can not be negative';
       }
-
     }
     
-  
     const addressError = addressValidator(values.address);
     if (addressError) errors.address = addressError;
     if (!values.address) errors.address = 'Address is required';
@@ -80,7 +80,7 @@ const RecipientProfileForm = ({ navigation }) => {
     return errors;
   };
 
-  const onSubmit = async (values, { setSubmitting }) =>  {
+  const onSubmit = async (values, { setSubmitting }) => {
     console.log('Form submitted with values:', values);
     console.log(values);
     // Handle form submission
@@ -120,45 +120,38 @@ const RecipientProfileForm = ({ navigation }) => {
     navigation.navigate('WaitForApprovalScreen');
     */
     if (parseInt(values.children) > 0) {
-      navigation.navigate("ChildrenProfiles", {ParentValues: values});
+      navigation.navigate("ChildrenProfiles", { ParentValues: values });
     } 
-    else{
+    else {
       setSubmitting(false);
-    try {
-      await firestore()
-        .collection("individual_profiles")
-        .doc(user.uid)
-        .set({
-        age: parseInt(values.age), // Convert to integer
-        gender: values.gender,
-        maritalStatus: values.maritalStatus,
-        children: parseInt(values.children) || 0, // Convert to integer, default to 0
-        occupation: values.occupation,
-        income: parseFloat(values.income) || 0, // Convert to decimal
-        educationLevel: values.educationLevel,
-        institution: values.institution,
-        class: values.class,
-        shoeSize: values.shoeSize,
-        clothingSize: values.clothingSize,
-        shirtSize: values.shirtSize,
-        trouserSize: values.trouserSize,
-        address: values.address,
-        profileImage: values.profileImage || "", // Ensure string (or default empty)
-        createdAt: firestore.FieldValue.serverTimestamp(), // Timestamp for when the profile is created
-          
-        });
-
-
-        
-    } catch (error) {
-      console.log("Error saving details", error);
-    }
+      try {
+        await firestore()
+          .collection("individual_profiles")
+          .doc(user.uid)
+          .set({
+            age: parseInt(values.age), // Convert to integer
+            gender: values.gender,
+            maritalStatus: values.maritalStatus,
+            children: parseInt(values.children) || 0, // Convert to integer, default to 0
+            occupation: values.occupation,
+            income: parseFloat(values.income) || 0, // Convert to decimal
+            educationLevel: values.educationLevel,
+            institution: values.institution,
+            class: values.class,
+            shoeSize: values.shoeSize,
+            clothingSize: values.clothingSize,
+            shirtSize: values.shirtSize,
+            trouserSize: values.trouserSize,
+            address: values.address,
+            profileImage: values.profileImage || "", // Ensure string (or default empty)
+            createdAt: firestore.FieldValue.serverTimestamp(), // Timestamp for when the profile is created
+          });
+      } catch (error) {
+        console.log("Error saving details", error);
+      }
       
-    navigation.navigate('WaitForApprovalScreen');
-
+      navigation.navigate('WaitForApprovalScreen');
     }
-    
-
   };
 
   const [selectedOption, setSelectedOption] = useState('option1');
@@ -192,8 +185,6 @@ const RecipientProfileForm = ({ navigation }) => {
         >
           {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
             <>
-            
-
               {/* Age Input */}
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Age</Text>
@@ -267,7 +258,7 @@ const RecipientProfileForm = ({ navigation }) => {
               </View>
 
               {/* Children Input (Conditional) */}
-              {(values.maritalStatus === 'Married' || values.maritalStatus === 'Divorced' ||values.maritalStatus === 'Widowed') && (
+              {(values.maritalStatus === 'Married' || values.maritalStatus === 'Divorced' || values.maritalStatus === 'Widowed') && (
                 <View style={styles.inputContainer}>
                   <Text style={styles.label}>Number of Children</Text>
                   <TextInput
@@ -280,11 +271,8 @@ const RecipientProfileForm = ({ navigation }) => {
                     keyboardType="numeric"
                   />
                   {errors.children && touched.children && <Text style={styles.errorText}>{errors.children}</Text>}
-
                 </View>
               )}
-
-
 
               {/* occupation Status Selection */}
               <View style={styles.inputContainer}>
@@ -304,29 +292,26 @@ const RecipientProfileForm = ({ navigation }) => {
                 {errors.occupation && touched.occupation && <Text style={styles.errorText}>{errors.occupation}</Text>}
               </View>
 
-
               {/* Income Input */}
               {values.occupation === 'Employed' && (
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Monthly Income</Text>
-                <TextInput
-                  style={styles.input}
-                  onChangeText={handleChange('income')}
-                  onBlur={handleBlur('income')}
-                  value={values.income}
-                  placeholder="Enter your monthly income"
-                  placeholderTextColor={theme.colors.ivory}
-                  keyboardType="numeric"
-                />
-                {errors.income && touched.income && <Text style={styles.errorText}>{errors.income}</Text>}
-              </View>
+                <View style={styles.inputContainer}>
+                  <Text style={styles.label}>Monthly Income</Text>
+                  <TextInput
+                    style={styles.input}
+                    onChangeText={handleChange('income')}
+                    onBlur={handleBlur('income')}
+                    value={values.income}
+                    placeholder="Enter your monthly income"
+                    placeholderTextColor={theme.colors.ivory}
+                    keyboardType="numeric"
+                  />
+                  {errors.income && touched.income && <Text style={styles.errorText}>{errors.income}</Text>}
+                </View>
               )}
-
 
               {/* Student-specific fields (Conditional) */}
               {values.occupation === 'Student' && (
                 <>
-
                   {/* Educational level Status Selection */}
                   <View style={styles.inputContainer}>
                     <Text style={styles.label}>Educationl Level</Text>
@@ -334,7 +319,7 @@ const RecipientProfileForm = ({ navigation }) => {
                       <Picker
                         selectedValue={values.educationLevel}
                         onValueChange={(itemValue) => setFieldValue('educationLevel', itemValue)}
-                        style={styles.picker}
+                        style={styles.picker1}
                       >
                         <Picker.Item label="Select Educational Level" value="" />
                         {educationalStatusOptions.map((status) => (
@@ -343,7 +328,6 @@ const RecipientProfileForm = ({ navigation }) => {
                       </Picker>
                     </View>
                     {errors.educationLevel && touched.educationLevel && <Text style={styles.errorText}>{errors.educationLevel}</Text>}
-
                   </View>
 
                   <View style={styles.inputContainer}>
@@ -359,40 +343,68 @@ const RecipientProfileForm = ({ navigation }) => {
                     {errors.institution && touched.institution && <Text style={styles.errorText}>{errors.institution}</Text>}
                   </View>
 
-                  {values.educationLevel === 'School' && (
-                    <View style={styles.inputContainer}>
-                      <Text style={styles.label}>Class/Standard</Text>
-                      <TextInput
-                        style={styles.input}
-                        onChangeText={handleChange('class')}
-                        onBlur={handleBlur('class')}
-                        value={values.class}
-                        placeholder="Enter your class or standard"
-                        placeholderTextColor={theme.colors.ivory}
-                      />
-                      {errors.class && touched.class && <Text style={styles.errorText}>{errors.class}</Text>}
-                    </View>
-                  )}
+                  
 
                   {(values.educationLevel === 'College' || values.educationLevel === 'University') && (
-                    <View style={styles.inputContainer}>
-                      <Text style={styles.label}>Year of Study</Text>
-                      <TextInput
-                        style={styles.input}
-                        onChangeText={handleChange('class')}
-                        onBlur={handleBlur('class')}
-                        value={values.class}
-                        placeholder="Enter your year of study"
-                        placeholderTextColor={theme.colors.ivory}
-                      />
-                      {errors.class && touched.class && <Text style={styles.errorText}>{errors.class}</Text>}
-                    </View>
+                    <>
+                      {/* Year of Study */}
+                      <View style={styles.inputContainer}>
+                        <Text style={styles.label}>Year Of Study</Text>
+                        <View style={styles.pickerContainer}>
+                         
+                            
+                            {(values.educationLevel === 'College') && (
+
+                              <>
+                               <Picker
+                            selectedValue={values.educationLevel}
+                            onValueChange={(itemValue) => setFieldValue('class', itemValue)}
+                            style={styles.picker1}
+                          >
+                              <Picker.Item label="Select Year of Study" value="" />
+                                {collegeYearOption.map((status) => (
+                                  <Picker.Item key={status} label={status} value={status} />
+                                ))}
+                                </Picker>
+                              </>
+                            )}
+                            {(values.educationLevel === 'University') && (
+                              <>
+                              <Picker
+                            selectedValue={values.educationLevel}
+                            onValueChange={(itemValue) => setFieldValue('class', itemValue)}
+                            style={styles.picker1}
+                          >
+                                {uniYearOption.map((status) => (
+                                  <Picker.Item key={status} label="Select Year Of Study"value={status} />
+                                ))}
+                                </Picker>
+                              </>
+                            )}
+                            
+                            {(values.educationLevel === 'Special Education') && (
+
+                            <>
+                            <Picker
+                            selectedValue={values.educationLevel}
+                            onValueChange={(itemValue) => setFieldValue('class', itemValue)}
+                            style={styles.picker1}>
+                            <Picker.Item label="Special Education" value="Special Education" />
+                            </Picker>
+                            </>
+                        )}
+                    
+
+                            
+                          
+                        </View>
+                        {errors.class && touched.class && <Text style={styles.errorText}>{errors.class}</Text>}
+                      </View>
+                    </>
                   )}
                 </>
               )}
 
-
-              
               {/* Shoe Size Selection */}
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Shoe Size</Text>
@@ -410,7 +422,6 @@ const RecipientProfileForm = ({ navigation }) => {
                 </View>
                 {errors.shoeSize && touched.shoeSize && <Text style={styles.errorText}>{errors.shoeSize}</Text>}
               </View>
-
 
               {/* Clothing Size Selection */}
               <View style={styles.inputContainer}>
@@ -476,9 +487,6 @@ const RecipientProfileForm = ({ navigation }) => {
                 />
                 {errors.image && <Text style={styles.errorText}>{errors.image}</Text>}
               </View>
-
-
-
 
               {/* Submit Button */}
               <TouchableOpacity
@@ -608,4 +616,3 @@ const styles = StyleSheet.create({
 });
 
 export default RecipientProfileForm;
-

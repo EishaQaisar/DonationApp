@@ -1,73 +1,84 @@
 "use client"
 
 import { useContext, useState, useEffect } from "react"
-import { View, Text, StyleSheet, Image, TouchableOpacity, SectionList, FlatList, ScrollView } from "react-native"
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, ScrollView } from "react-native"
 import { theme } from "../core/theme"
 import { useNavigation } from "@react-navigation/native"
 import Icon from "react-native-vector-icons/MaterialIcons"
 import { CartContext } from "../CartContext"
 import axios from "axios"
 import { getBaseUrl } from "../helpers/deviceDetection"
-import firestore from "@react-native-firebase/firestore"
 import { AuthContext } from "../context/AuthContext"
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
 import { UserProfileContext } from "../context/UserProfileContext"
+
 const Clothes = ({ route }) => {
   const navigation = useNavigation()
-  const tabBarHeight = useBottomTabBarHeight();
-  
+  const tabBarHeight = useBottomTabBarHeight()
+
   const { role } = route.params
   const { isInCart } = useContext(CartContext)
   const { user } = useContext(AuthContext)
+  const { userProfile } = useContext(UserProfileContext)
 
+  const [clothesItems, setClothesItems] = useState({
+    recommended: [],
+    others: [],
+    allDonations: [], // New state for donor view
+  })
 
-  const [clothesItems, setClothesItems] = useState({ recommended: [], others: [] })
-  const { userProfile } = useContext(UserProfileContext);
-  console.log(userProfile)
-  console.log("dfgergergFERFERFGERGWEGER")
+  const isDonor = role === "donor"
 
-  
   /** Fetch clothes donations from API */
   const fetchClothesDonations = async () => {
-    if (!userProfile) return // Prevent API call if userProfile is not loaded
+    if (!userProfile && !isDonor) return // Prevent API call if userProfile is not loaded for recipients
 
     try {
-      console.log("Fetching clothes donations for user profile:", userProfile)
+      console.log(`Fetching clothes donations as ${isDonor ? "donor" : "recipient"}`)
       const BASE_URL = await getBaseUrl()
-      const response = await axios.get(`${BASE_URL}/api/clothes-donations`, {
-        params: { userProfile: JSON.stringify(userProfile) },
 
-      })
+      // Different API endpoints based on role
+      const endpoint = isDonor ? `${BASE_URL}/api/all-clothes-donations` : `${BASE_URL}/api/clothes-donations`
+
+      // Different params based on role
+      const params = isDonor ? {} : { userProfile: JSON.stringify(userProfile) }
+
+      const response = await axios.get(endpoint, { params })
 
       const processItems = (items) => {
+        return items.map((item) => {
+          const parsedImages = item.images ? JSON.parse(item.images) : []
+          const validImages = parsedImages.map((imagePath) => ({ uri: imagePath }))
+          return { ...item, images: validImages }
+        })
+      }
 
-        return items.map(item => {
-          const parsedImages = item.images ? JSON.parse(item.images) : [];
-          const validImages = parsedImages.map(imagePath => ({ uri: imagePath }));
-          return { ...item, images: validImages };
-        });
-      };
-  
-      setClothesItems({
-        recommended: response.data.recommended ? processItems(response.data.recommended) : [],
-        others: response.data.others ? processItems(response.data.others) : [],
-      });
-
+      if (isDonor) {
+        // For donors, put all donations in the allDonations array
+        setClothesItems({
+          recommended: [],
+          others: [],
+          allDonations: processItems(response.data),
+        })
+      } else {
+        // For recipients, maintain the recommended/others structure
+        setClothesItems({
+          recommended: response.data.recommended ? processItems(response.data.recommended) : [],
+          others: response.data.others ? processItems(response.data.others) : [],
+          allDonations: [],
+        })
+      }
     } catch (error) {
       console.error("Error fetching clothes donations:", error)
     }
   }
 
-  /** Fetch user profile on component mount */
-
-
-  /** Fetch clothes donations when userProfile is updated */
+  /** Fetch clothes donations when userProfile is updated or role changes */
   useEffect(() => {
-    if (userProfile) {
+    if (isDonor || userProfile) {
       fetchClothesDonations()
     }
-  }, [userProfile])
+  }, [userProfile, isDonor]) //Fixed useEffect dependencies
 
   /** Render each item */
   const renderItem = ({ item }) => (
@@ -76,91 +87,108 @@ const Clothes = ({ route }) => {
       onPress={() => navigation.navigate("ItemDetail", { item, category: "Clothes" })}
     >
       <Image source={item.images[0]} style={styles.itemImage} />
+  
+      <Text style={styles.item}>{item.itemCategory}</Text>
       
-      <Text style={styles.item}>{item.itemName}</Text>
-      <Text style={styles.itemDetails}>{`Size: ${item.size}`}</Text>
+      <Text style={styles.itemDetails}>
+        {`Size: ${
+          item.itemCategory === "Clothes" 
+            ? (
+                item.clothesCategory === "Upper Wear" 
+                  ? item.upperWearSize 
+                  : item.clothesCategory === "Bottom Wear" 
+                    ? item.bottomWearSize 
+                    : item.clothesCategory === "Full Outfit" 
+                      ? item.clothingSize 
+                      : "N/A"
+              ) 
+            : item.itemCategory === "Shoes" 
+              ? item.shoeSize 
+              : "N/A"
+        }`}
+      </Text>
       <Text style={styles.itemDetails}>{`Gender: ${item.gender}`}</Text>
       <TouchableOpacity
         style={styles.claimButton}
         onPress={() => navigation.navigate("ItemDetail", { item, category: "Clothes" })}
       >
-        <Text style={styles.claimButtonText}>{role === "donor" ? "View" : "Claim"}</Text>
+        <Text style={styles.claimButtonText}>{isDonor ? "View" : "Claim"}</Text>
       </TouchableOpacity>
     </TouchableOpacity>
   )
-
-  /** Render section headers */
-  const renderSectionHeader = ({ section: { title } }) => (
-    <View style={styles.sectionHeader}>
-      <Text style={styles.sectionHeaderText}>{title}</Text>
-    </View>
-  )
-
-  /** Define sections for SectionList */
   const isClothesPage = route.name === "Clothes"
-  const sections = [
-    { title: "Recommended for You", data: clothesItems.recommended.filter((item) => !isInCart(item)) },
-    { title: "Others", data: clothesItems.others.filter((item) => !isInCart(item)) },
-  ]
 
- return (
-  <ScrollView style={[styles.container, { marginBottom: tabBarHeight }]} showsVerticalScrollIndicator={false}>
-    {/* Category Icons */}
-    <View style={styles.iconContainer}>
-      <TouchableOpacity onPress={() => navigation.navigate("Education")}>
-        <Icon name="school" size={40} color={theme.colors.sageGreen} style={styles.icon} />
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("Clothes")}>
-        <Icon
-          name="checkroom"
-          size={40}
-          color={isClothesPage ? theme.colors.ivory : theme.colors.sageGreen}
-          style={[styles.icon, isClothesPage && styles.activeIcon]}
-        />
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("Food")}>
-        <Icon name="local-dining" size={40} color={theme.colors.sageGreen} style={styles.icon} />
-      </TouchableOpacity>
-    </View>
-
-    {/* Page Title */}
-    <View style={styles.header}>
-      <Text style={styles.title}>Clothes Donations</Text>
-    </View>
-
-    {/* Recommended Donations */}
-    {clothesItems.recommended.length > 0 && (
-      <View>
-        <Text style={styles.sectionHeaderText}>Recommended for You</Text>
-        <FlatList
-          data={clothesItems.recommended.filter((item) => !isInCart(item))}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
-          numColumns={2}
-          contentContainerStyle={styles.grid}
-          scrollEnabled={false} // Prevents FlatList from having independent scroll
-        />
+  return (
+    <ScrollView style={[styles.container, { marginBottom: tabBarHeight }]} showsVerticalScrollIndicator={false}>
+      {/* Category Icons */}
+      <View style={styles.iconContainer}>
+        <TouchableOpacity onPress={() => navigation.navigate("Education")}>
+          <Icon name="school" size={40} color={theme.colors.sageGreen} style={styles.icon} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("Clothes")}>
+          <Icon
+            name="checkroom"
+            size={40}
+            color={isClothesPage ? theme.colors.ivory : theme.colors.sageGreen}
+            style={[styles.icon, isClothesPage && styles.activeIcon]}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("Food")}>
+          <Icon name="local-dining" size={40} color={theme.colors.sageGreen} style={styles.icon} />
+        </TouchableOpacity>
       </View>
-    )}
 
-    {/* Other Donations */}
-    {clothesItems.others.length > 0 && (
-      <View>
-        <Text style={styles.sectionHeaderText}>Others</Text>
-        <FlatList
-          data={clothesItems.others.filter((item) => !isInCart(item))}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id.toString()}
-          numColumns={2}
-          contentContainerStyle={styles.grid}
-          scrollEnabled={false} // Prevents FlatList from having independent scroll
-        />
+      {/* Page Title */}
+      <View style={styles.header}>
+        <Text style={styles.title}>Clothes Donations</Text>
       </View>
-    )}
-  </ScrollView>
-)
 
-  
+      {/* Donor View - All Donations */}
+      {isDonor && (
+        <View>
+          <Text style={styles.sectionHeaderText}>All Available Donations</Text>
+          <FlatList
+            data={clothesItems.allDonations.filter((item) => !isInCart(item))}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={2}
+            contentContainerStyle={styles.grid}
+            scrollEnabled={false}
+          />
+        </View>
+      )}
+
+      {/* Recipient View - Recommended Donations */}
+      {!isDonor && clothesItems.recommended.length > 0 && (
+        <View>
+          <Text style={styles.sectionHeaderText}>Recommended for You</Text>
+          <FlatList
+            data={clothesItems.recommended.filter((item) => !isInCart(item))}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={2}
+            contentContainerStyle={styles.grid}
+            scrollEnabled={false}
+          />
+        </View>
+      )}
+
+      {/* Recipient View - Other Donations */}
+      {!isDonor && clothesItems.others.length > 0 && (
+        <View>
+          <Text style={styles.sectionHeaderText}>Others</Text>
+          <FlatList
+            data={clothesItems.others.filter((item) => !isInCart(item))}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={2}
+            contentContainerStyle={styles.grid}
+            scrollEnabled={false}
+          />
+        </View>
+      )}
+    </ScrollView>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -252,16 +280,14 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.sageGreen,
     padding: 12,
   },
-  sectionHeader: {
-    backgroundColor: theme.colors.charcoalBlack,
-    padding: 10,
-    marginBottom: 10,
-  },
   sectionHeaderText: {
     fontSize: 22,
     fontWeight: "bold",
     color: theme.colors.ivory,
+    padding: 10,
+    marginBottom: 10,
   },
 })
 
 export default Clothes
+

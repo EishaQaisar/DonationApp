@@ -18,11 +18,14 @@ const ChildrenProfiles = ({ navigation, route }) => {
   }, [numberOfChildren])
 
   const genderOptions = ["Male", "Female", "Other"]
-  const educationalStatusOptions = ["School", "College", "University"]
+  const educationalStatusOptions = ["School", "College", "Special Education"]
   const clothingSizes = ["S", "M", "L", "XL", "XXL"]
   const shirtSizes = ["36", "38", "40", "42", "44", "46", "48"]
   const shoeSizes = ["34", "36", "38", "40", "42", "44", "46"]
   const trouserSizes = ["28", "30", "32", "34", "36", "38", "40", "42"]
+  const gradeOption = ['Nursery', 'KG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'];
+  const uniYearOption = ['1st', '2nd', '3rd', '4th'];
+  const collegeYearOption = ['1st Year', '2nd Year'];
 
   const validate = (values) => {
     const errors = {}
@@ -56,7 +59,6 @@ const ChildrenProfiles = ({ navigation, route }) => {
         .collection("individual_profiles")
         .doc(user.uid)
         .set({
-        name: ParentValues.name,
         age: parseInt(ParentValues.age), // Convert to integer
         gender: ParentValues.gender,
         maritalStatus: ParentValues.maritalStatus,
@@ -79,7 +81,7 @@ const ChildrenProfiles = ({ navigation, route }) => {
 
         
     } catch (error) {
-      console.log("Error saving details", error);
+      console.log("Error saving details of parent", error);
     }
       
       const childrenProfiles = values.children.map((child) => ({
@@ -170,7 +172,7 @@ const ChildrenProfiles = ({ navigation, route }) => {
                           <Picker
                             selectedValue={child.educationLevel}
                             onValueChange={(itemValue) => setFieldValue(`children[${index}].educationLevel`, itemValue)}
-                            style={styles.picker}
+                            style={styles.picker1}
                           >
                             <Picker.Item label="Select Educational Level" value="" />
                             {educationalStatusOptions.map((status) => (
@@ -197,21 +199,37 @@ const ChildrenProfiles = ({ navigation, route }) => {
                           <Text style={styles.errorText}>{errors.children[index].institution}</Text>
                         )}
                       </View>
+                      
 
                       <View style={styles.inputContainer}>
-                        <Text style={styles.label}>Class/Year</Text>
-                        <TextInput
-                          style={styles.input}
-                          onChangeText={handleChange(`children[${index}].class`)}
-                          onBlur={handleBlur(`children[${index}].class`)}
-                          value={child.class}
-                          placeholder="Enter class or year of study"
-                          placeholderTextColor={theme.colors.ivory}
-                        />
-                        {errors.children?.[index]?.class && touched.children?.[index]?.class && (
-                          <Text style={styles.errorText}>{errors.children[index].class}</Text>
+                    <Text style={styles.label}>Class/Year</Text>
+                    <View style={styles.pickerContainer}>
+                      <Picker
+                        selectedValue={child.class}
+                        onValueChange={(itemValue) => setFieldValue(`children[${index}].class`, itemValue)}
+                        style={styles.picker1}
+                      >
+                        <Picker.Item label="Select Class/Year" value="" />
+                        {child.educationLevel === 'School' && (
+                          gradeOption.map((grade) => (
+                            <Picker.Item key={grade} label={grade} value={grade} />
+                          ))
                         )}
-                      </View>
+                        {child.educationLevel === 'College' && (
+                          collegeYearOption.map((year) => (
+                            <Picker.Item key={year} label={year} value={year} />
+                          ))
+                        )}
+                       
+                        {child.educationLevel === 'Special Education' && (
+                          <Picker.Item label="Special Education" value="Special Education" />
+                        )}
+                      </Picker>
+                    </View>
+                    {errors.children?.[index]?.class && touched.children?.[index]?.class && (
+                      <Text style={styles.errorText}>{errors.children[index].class}</Text>
+                    )}
+                  </View>
 
                       <View style={styles.inputContainer}>
                         <Text style={styles.label}>Shoe Size</Text>

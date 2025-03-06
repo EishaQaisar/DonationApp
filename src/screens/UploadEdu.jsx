@@ -22,13 +22,21 @@ const UploadEdu = ({ navigation }) => {
   ];
   const eduTypeOptions = ['Books', 'Stationary', 'Other'];
   const conditionOptions = ['New', 'Gently Used', 'Well Used'];
-  const eduLevelOptions = ['Primary', 'Secondary', 'Higher Education', 'Special Education'];
+  const eduLevelOptions = ['School', 'College', 'University', 'Special Education'];
+  const gradeOption = ['Nursery', 'KG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'];
+  const uniYearOption = ['1st', '2nd', '3rd', '4th'];
+  const collegeYearOption = ['1st Year', '2nd Year'];
+ 
+
 
   // State for form fields
   // State for form field values and errors
   const [educType, setEducType] = useState({ value: '', error: '' });
   const [eduLevel, setLevel] = useState({ value: '', error: '' });
   const [subject, setSubject] = useState({ value: '', error: '' });
+  const [institution, setInstitution]=useState({value:'', error:''});
+  const [grade, setGrade]=useState({value:'', error:''});
+
 
   const [condition, setCondition] = useState({ value: '', error: '' });
   const [quantity, setQuantity] = useState({ value: '1', error: '' });
@@ -46,6 +54,28 @@ const UploadEdu = ({ navigation }) => {
       setEducType((prev) => ({ ...prev, error: 'Type is required' }));
 
       isValid = false;
+    }
+    if (educType.value==='Books') {
+      if (!institution.value){
+        setInstitution((prev) => ({ ...prev, error: 'Institution is required' }));
+        isValid = false;
+
+
+      }
+      if (!grade.value){
+        setGrade((prev) => ({ ...prev, error: 'Grade is required' }));
+        isValid = false;
+
+
+      }
+      if (!subject.value){
+        setSubject((prev) => ({ ...prev, error: 'Subject is required' }));
+        isValid = false;
+
+
+      }
+
+      
     }
     
    
@@ -121,6 +151,8 @@ const UploadEdu = ({ navigation }) => {
       description:  description.value,
       images:images,
       subject:subject.value,
+      institution:institution.value,
+      grade:grade.value,
       donorUsername: user.username,
 
     };
@@ -194,6 +226,66 @@ const UploadEdu = ({ navigation }) => {
           {eduLevel.error && <Text style={Styles.errorText}>{eduLevel.error}</Text>}
 
         </View>
+        {(educType.value === 'Books' ) && (
+                    <>
+          {/* Institute Name */}
+          <View style={{ marginTop: 30 }}>
+          <Text style={Styles.headings}>Institute</Text>
+          <TextInput
+            placeholder="e.g Punjab College"
+            value={institution.value}
+            onChangeText={(text) => setInstitution({ value: text, error: '' })}
+
+            style={Styles.name}
+            placeholderTextColor={theme.colors.ivory}
+            selectionColor={theme.colors.sageGreen}
+          />
+          {institution.error && <Text style={Styles.errorText}>{institution.error}</Text>}
+
+          </View>
+{/* Subject */}
+<View style={{ marginTop: 30 }}>
+  <Text style={Styles.headings}>
+    {eduLevel.value === "School"
+      ? "Class / Grade"
+      : eduLevel.value === "College"
+      ? "Year"
+      : eduLevel.value === "University"
+      ? "Year"
+      : "Program"}
+  </Text>
+  <View style={Styles.dropdownContainer}>
+    <Picker
+      selectedValue={grade.value}
+      onValueChange={(itemValue) => setGrade({ value: itemValue, error: "" })}
+      style={Styles.picker}
+    >
+      <Picker.Item
+        label={
+          eduLevel.value === "School"
+            ? "Select Class/Grade"
+            : eduLevel.value === "College"
+            ? "Select Year"
+            : eduLevel.value === "University"
+            ? "Select Year"
+            : "Select Program"
+        }
+        value=""
+      />
+      {eduLevel.value === "School" &&
+        gradeOption.map((grade) => <Picker.Item key={grade} label={grade} value={grade} />)}
+      {eduLevel.value === "College" &&
+        collegeYearOption.map((year) => <Picker.Item key={year} label={year} value={year} />)}
+      {eduLevel.value === "University" &&
+        uniYearOption.map((year) => <Picker.Item key={year} label={year} value={year} />)}
+      {eduLevel.value === "Special Education" && (
+        <Picker.Item label="Special Education" value="Special Education" />
+      )}
+    </Picker>
+  </View>
+  {grade.error && <Text style={Styles.errorText}>{grade.error}</Text>}
+</View>
+
 
          {/* Subject */}
          <View style={{ marginTop: 30 }}>
@@ -214,6 +306,8 @@ const UploadEdu = ({ navigation }) => {
           {subject.error && <Text style={Styles.errorText}>{subject.error}</Text>}
 
         </View>
+        </>
+        )}
 
           
          {/* Condtion */}

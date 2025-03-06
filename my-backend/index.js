@@ -58,8 +58,12 @@ const createTables = () => {
       CREATE TABLE IF NOT EXISTS ClothesDonations (
     id INT AUTO_INCREMENT PRIMARY KEY,
     fabric VARCHAR(255) NOT NULL,
-    itemName VARCHAR(255) NOT NULL,
-    size VARCHAR(10) NOT NULL,
+    itemCategory VARCHAR(255) NOT NULL,
+    clothesCategory VARCHAR(255) NOT NULL,
+    shoeSize VARCHAR(255)  DEFAULT '-',
+    upperWearSize VARCHAR(255)  DEFAULT '-',
+    bottomWearSize VARCHAR(255)  DEFAULT '-',
+    clothingSize VARCHAR(255)  DEFAULT '-',
     c_condition VARCHAR(50) NOT NULL,
     gender VARCHAR(50) NOT NULL,
     quantity INT NOT NULL,
@@ -85,6 +89,9 @@ const createTables = () => {
     description TEXT NOT NULL,
     images TEXT,
     subject VARCHAR(255)  DEFAULT '-',
+    institution VARCHAR(255)  DEFAULT '-',
+    grade VARCHAR(255)  DEFAULT '-',
+
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     claimStatus VARCHAR(255) DEFAULT 'Unclaimed',
     donorUsername VARCHAR(255) NOT NULL
@@ -167,19 +174,33 @@ const createTables = () => {
   app.post('/api/add-clothes-donation', (req, res) => {
     console.log("hjeree");
     console.log(req.body);
-    const { season, gender,itemName, ageCategory, size, c_condition, quantity, fabric, description, images, donorUsername } = req.body;
+    const { season, gender, ageCategory, itemCategory,  clothesCategory,
+      shoeSize,
+      upperWearSize,
+      bottomWearSize,
+      clothingSize, c_condition, quantity, fabric, description, images, donorUsername } = req.body;
   
-    console.log("Received data:", { season, gender, itemName, ageCategory, size, c_condition, quantity, fabric, description, images, donorUsername });
+    console.log("Received data:", { season, gender, ageCategory,itemCategory, clothesCategory,
+      shoeSize,
+      upperWearSize,
+      bottomWearSize,
+      clothingSize,  c_condition, quantity, fabric, description, images, donorUsername });
   
     const query = `
-      INSERT INTO clothesdonations (season,itemName, gender,  age_category, size, c_condition, quantity, fabric, description, images, donorUsername)
-      VALUES (?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO clothesdonations (season, gender,  age_category, itemCategory, clothesCategory,
+       shoeSize,
+      upperWearSize,
+      bottomWearSize,
+      clothingSize,  c_condition, quantity, fabric, description, images, donorUsername)
+      VALUES (?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?)
     `;
   
     // Log the data being passed to the query
-    console.log('Executing query with:', [season, gender, ageCategory, size, c_condition, quantity, fabric, description, JSON.stringify(images), donorUsername]);
+    console.log('Executing query with:', [season, gender, ageCategory, itemCategory, clothesCategory, shoeSize, upperWearSize, bottomWearSize,
+      clothingSize, c_condition, quantity, fabric, description, JSON.stringify(images), donorUsername]);
   
-    db.query(query, [season,itemName, gender, ageCategory, size, c_condition, quantity, fabric, description, JSON.stringify(images), donorUsername], (err, results) => {
+    db.query(query, [season, gender, ageCategory, itemCategory, clothesCategory, shoeSize, upperWearSize, bottomWearSize,
+      clothingSize, c_condition, quantity, fabric, description, JSON.stringify(images), donorUsername], (err, results) => {
       if (err) {
         console.error('Error inserting clothes donation:', err);
         return res.status(500).send('Error inserting clothes donation');
@@ -215,14 +236,14 @@ app.get('/api/food-donations', (req, res) => {
   */
 
   app.post('/api/add-education-donation', (req, res) => {
-    const { type, level, c_condition, quantity, itemName, description, images, subject, donorUsername } = req.body;
+    const { type, level, c_condition, quantity, itemName, description, images, subject, institution, grade, donorUsername } = req.body;
   
     const query = `
-      INSERT INTO EducationDonations (type, level, c_condition, quantity, itemName, description, images, subject, donorUsername)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO EducationDonations (type, level, c_condition, quantity, itemName, description, images, subject,institution, grade, donorUsername)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
     `;
   
-    db.query(query, [type, level, c_condition, quantity, itemName, description, JSON.stringify(images), subject, donorUsername], (err, results) => {
+    db.query(query, [type, level, c_condition, quantity, itemName, description, JSON.stringify(images), subject, institution, grade ,donorUsername], (err, results) => {
       if (err) {
         console.error('Error inserting education donation:', err);
         return res.status(500).send('Error inserting education donation');
@@ -249,18 +270,19 @@ app.get('/api/food-donations', (req, res) => {
       const isRecommended = (item) => {
         // Check for parent match
         const parentMatch =
-          (userProfile.educationLevel && item.level === userProfile.educationLevel) &&
-          (userProfile.institution && item.institution === userProfile.institution) &&
-          (userProfile.class && item.class === userProfile.class) &&
-          (item.subject === "-" || (userProfile.subject && item.subject === userProfile.subject));
+          
+
+          ((userProfile.institution && item.institution === userProfile.institution) &&
+          (userProfile.class && item.grade === userProfile.class)) ||
+          (userProfile.class && item.grade === userProfile.class)
   
         // Check if any child matches
         const childMatch = childrenProfiles.some(
           (child) =>
-            (child.educationLevel && item.level === child.educationLevel) &&
-            (child.institution && item.institution === child.institution) &&
-            (child.class && item.class === child.class) &&
-            (item.subject === "-" || (child.subject && item.subject === child.subject))
+            
+            ((child.institution && item.institution === child.institution) &&
+            (child.class && item.class === child.class)) ||
+            (child.class && item.class === child.class)
         );
   
         return parentMatch || childMatch;
@@ -301,17 +323,50 @@ app.get('/api/food-donations', (req, res) => {
   
       // Function to check if an item matches either the parent or any child's profile
       const isRecommended = (item) => {
-        // Check for parent match
-        const parentMatch =
-          (userProfile.clothingSize && item.size === userProfile.clothingSize) &&
-          (userProfile.gender && item.gender === userProfile.gender);
+        // Check for parent match based on item category and clothing category
+        const parentMatch = (() => {
+          // Gender must match in all cases
+          if (userProfile.gender && item.gender !== userProfile.gender) {
+            return false;
+          }
   
-        // Check if any child matches
-        const childMatch = childrenProfiles.some(
-          (child) =>
-            (child.clothingSize && item.size === child.clothingSize) &&
-            (child.gender && item.gender === child.gender)
-        );
+          if (item.itemCategory === 'Clothes') {
+            if (item.clothingCategory === 'Upper Wear') {
+              return userProfile.shirtSize && item.upperWearSize === userProfile.shirtSize;
+            } else if (item.clothingCategory === 'Bottom Wear') {
+              return userProfile.trouserSize && item.bottomWearSize === userProfile.trouserSize;
+            } else if (item.clothesCategory === 'Full Outfit') {
+              console.log('fef');
+              return userProfile.clothingSize && item.clothingSize === userProfile.clothingSize;
+            }
+          } else if (item.itemCategory === 'Shoes') {
+            return userProfile.shoeSize && item.shoeSize === userProfile.shoeSize;
+          }
+  
+          return false;
+        })();
+  
+        // Check if any child matches based on item category and clothing category
+        const childMatch = childrenProfiles.some(child => {
+          // Gender must match in all cases
+          if (child.gender && item.gender !== child.gender) {
+            return false;
+          }
+  
+          if (item.itemCategory === 'Clothes') {
+            if (item.clothingCategory === 'Upper Wear') {
+              return child.shirtSize && item.upperWearSize === child.shirtSize;
+            } else if (item.clothingCategory === 'Bottom Wear') {
+              return child.trouserSize && item.bottomWearSize === child.trouserSize;
+            } else if (item.clothingCategory === 'Full Outfit') {
+              return child.clothingSize && item.clothingSize === child.clothingSize;
+            }
+          } else if (item.itemCategory === 'Shoes') {
+            return child.shoeSize && item.shoeSize === child.shoeSize;
+          }
+  
+          return false;
+        });
   
         return parentMatch || childMatch;
       };
@@ -333,4 +388,24 @@ app.get('/api/food-donations', (req, res) => {
       });
     });
   });
+  app.get("/api/all-clothes-donations", (req, res) => {
+    const query = "SELECT * FROM clothesdonations WHERE claimStatus = ?"
+    db.query(query, ["Unclaimed"], (err, results) => {
+      if (err) {
+        console.error("Error fetching data:", err)
+        return res.status(500).send("Error fetching data")
+      }
+      res.json(results)
+    })
+  })
+  app.get("/api/all-education-donations", (req, res) => {
+    const query = "SELECT * FROM educationdonations WHERE claimStatus = ?"
+    db.query(query, ["Unclaimed"], (err, results) => {
+      if (err) {
+        console.error("Error fetching education donations:", err)
+        return res.status(500).send("Error fetching data")
+      }
+      res.json(results)
+    })
+  })
   

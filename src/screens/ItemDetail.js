@@ -45,10 +45,41 @@ const ItemDetail = ({ route }) => {
             case 'Clothes':
                 return (
                     <View>
-                        <Text style={styles.title}>{item.itemName}</Text>
+                        <Text style={styles.title}>{item.itemCategory}</Text>
+                        
+                        {/* Display clothes category only when item category is Clothes */}
+                        {item.itemCategory === "Clothes" && (
+                            <Text style={styles.subtitle}>Category: {item.clothesCategory}</Text>
+                        )}
+                        
                         <View style={styles.detailsCard}>
-                            <DetailItem icon="tshirt-crew" label="Size" value={item.size} />
-                            <DetailItem icon="texture-box" label="Fabric" value={item.fabric} />
+                            {/* Conditionally display size with appropriate value based on category */}
+                            <DetailItem 
+                                icon="tshirt-crew" 
+                                label="Size" 
+                                value={
+                                    item.itemCategory === "Clothes" 
+                                        ? (
+                                            item.clothesCategory === "Upper Wear" 
+                                                ? item.upperWearSize 
+                                                : item.clothesCategory === "Bottom Wear" 
+                                                    ? item.bottomWearSize 
+                                                    : item.clothesCategory === "Full Outfit" 
+                                                        ? item.clothingSize 
+                                                        : "N/A"
+                                        ) 
+                                        : item.itemCategory === "Shoes" 
+                                            ? item.shoeSize 
+                                            : "N/A"
+                                } 
+                            />
+                            
+                            {/* Only display fabric if not shoes and not accessories */}
+                            {!(item.itemCategory === "Shoes" || 
+                               (item.itemCategory === "Clothes" && item.clothesCategory === "Accessories")) && (
+                                <DetailItem icon="texture-box" label="Fabric" value={item.fabric} />
+                            )}
+                            
                             <DetailItem icon="weather-sunny" label="Season" value={item.season} />
                             <DetailItem icon="human-male-child" label="Age" value={item.age_category} />
                             <DetailItem icon="gender-male-female" label="Gender" value={item.gender} />

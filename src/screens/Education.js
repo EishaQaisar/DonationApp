@@ -1,167 +1,171 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList ,ScrollView} from 'react-native';
-import { theme } from '../core/theme';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { CartContext } from '../CartContext'; // Correct import
-import axios from 'axios';
-import { getBaseUrl } from '../helpers/deviceDetection';
-import { AuthContext } from "../context/AuthContext"
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+"use client"
 
+import { useContext, useState, useEffect } from "react"
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList, ScrollView } from "react-native"
+import { theme } from "../core/theme"
+import { useNavigation } from "@react-navigation/native"
+import Icon from "react-native-vector-icons/MaterialIcons"
+import { CartContext } from "../CartContext"
+import axios from "axios"
+import { getBaseUrl } from "../helpers/deviceDetection"
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
 import { UserProfileContext } from "../context/UserProfileContext"
 
-const Education = ({route}) => {
-    const navigation = useNavigation()
-  const tabBarHeight = useBottomTabBarHeight();
-  
+const Education = ({ route }) => {
+  const navigation = useNavigation()
+  const tabBarHeight = useBottomTabBarHeight()
+
   const { role } = route.params
   const { isInCart } = useContext(CartContext)
-    const [eduItems, setEducationItems] = useState({ recommended: [], others: [] });
-    const { userProfile } = useContext(UserProfileContext);
+  const { userProfile } = useContext(UserProfileContext)
 
+  const [eduItems, setEducationItems] = useState({
+    recommended: [],
+    others: [],
+    allDonations: [], // New state for donor view
+  })
 
-    // const userRole = "donor"; // Replace this with actual role logic
+  const isDonor = role === "donor"
 
-    const fetchEducationDonations = async () => {
-        if (!userProfile) return // Prevent API call if userProfile is not loaded
+  const fetchEducationDonations = async () => {
+    if (!userProfile && !isDonor) return // Prevent API call if userProfile is not loaded for recipients
 
+    try {
+      console.log(`Fetching education donations as ${isDonor ? "donor" : "recipient"}`)
+      const BASE_URL = await getBaseUrl()
 
-        try {
-            console.log("Fetching education donations for user profile:", userProfile)
+      // Different API endpoints based on role
+      const endpoint = isDonor ? `${BASE_URL}/api/all-education-donations` : `${BASE_URL}/api/education-donations`
 
-            const BASE_URL = await getBaseUrl();
-            const response = await axios.get(`${BASE_URL}/api/education-donations`, {
-                params: { userProfile: JSON.stringify(userProfile) },
-              })
-              const processItems = (items) => {
-                return items.map(item => {
-                  const parsedImages = item.images ? JSON.parse(item.images) : [];
-                  const validImages = parsedImages.map(imagePath => ({ uri: imagePath }));
-                  return { ...item, images: validImages };
-                });
-              };
-          
-              setEducationItems({
-                recommended: response.data.recommended ? processItems(response.data.recommended) : [],
-                others: response.data.others ? processItems(response.data.others) : [],
-              });
-              
+      // Different params based on role
+      const params = isDonor ? {} : { userProfile: JSON.stringify(userProfile) }
 
+      const response = await axios.get(endpoint, { params })
 
-              /*
-            const data = response.data.map(item => {
-                const parsedImages = item.images ? JSON.parse(item.images) : [];
-                const validImages = parsedImages.map(imagePath => ({ uri: imagePath }));
-                return {
-                    ...item,
-                    images: validImages,
-                };
-            });
-            setEducationItems(data);
-            */
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        }
-    };
+      const processItems = (items) => {
+        return items.map((item) => {
+          const parsedImages = item.images ? JSON.parse(item.images) : []
+          const validImages = parsedImages.map((imagePath) => ({ uri: imagePath }))
+          return { ...item, images: validImages }
+        })
+      }
 
-    useEffect(() => {
-        fetchEducationDonations();
-    }, []);
+      if (isDonor) {
+        // For donors, put all donations in the allDonations array
+        setEducationItems({
+          recommended: [],
+          others: [],
+          allDonations: processItems(response.data),
+        })
+      } else {
+        // For recipients, maintain the recommended/others structure
+        setEducationItems({
+          recommended: response.data.recommended ? processItems(response.data.recommended) : [],
+          others: response.data.others ? processItems(response.data.others) : [],
+          allDonations: [],
+        })
+      }
+    } catch (error) {
+      console.error("Error fetching education donations:", error)
+    }
+  }
 
+  useEffect(() => {
+    if (isDonor || userProfile) {
+      fetchEducationDonations()
+    }
+  }, [userProfile, isDonor]) // Added isDonor and userProfile as dependencies
 
-    const renderItem = ({ item }) => (
-        <TouchableOpacity
-            style={styles.donationItem}
-            onPress={() => navigation.navigate('ItemDetail', { item, category: 'Education' })}
-        >
-            {/* Display only the first image */}
-            <Image source={item.images[0]} style={styles.itemImage} />
-            <Text style={styles.item}>{item.itemName}</Text>
-            <TouchableOpacity
-                style={styles.claimButton}
-                onPress={() => navigation.navigate('ItemDetail', { item, category: 'Education' })}
-            >
-                <Text style={styles.claimButtonText}>{role === 'donor' ? 'View' : 'Claim'}</Text>
-            </TouchableOpacity>
-        </TouchableOpacity>
-    );
-   
-      const renderSectionHeader = ({ section: { title } }) => (
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionHeaderText}>{title}</Text>
-        </View>
-      )
+  const renderItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.donationItem}
+      onPress={() => navigation.navigate("ItemDetail", { item, category: "Education" })}
+    >
+      <Image source={item.images[0]} style={styles.itemImage} />
+      <Text style={styles.item}>{item.itemName}</Text>
+      <TouchableOpacity
+        style={styles.claimButton}
+        onPress={() => navigation.navigate("ItemDetail", { item, category: "Education" })}
+      >
+        <Text style={styles.claimButtonText}>{isDonor ? "View" : "Claim"}</Text>
+      </TouchableOpacity>
+    </TouchableOpacity>
+  )
 
-    const isEducationPage = route.name === 'Education';
-    const sections = [
-        { title: "Recommended for You", data: eduItems.recommended.filter((item) => !isInCart(item)) },
-        { title: "Others", data: eduItems.others.filter((item) => !isInCart(item)) },
-      ]
+  const isEducationPage = route.name === "Education"
 
-    return (
+  return (
     <ScrollView style={[styles.container, { marginBottom: tabBarHeight }]} showsVerticalScrollIndicator={false}>
-        {/* Category Icons */}
-        <View style={styles.iconContainer}>
-          <TouchableOpacity onPress={() => navigation.navigate("Education")}>
-            <Icon name="school" size={40} 
+      {/* Category Icons */}
+      <View style={styles.iconContainer}>
+        <TouchableOpacity onPress={() => navigation.navigate("Education")}>
+          <Icon
+            name="school"
+            size={40}
             color={isEducationPage ? theme.colors.ivory : theme.colors.sageGreen}
             style={[styles.icon, isEducationPage && styles.activeIcon]}
-          /> 
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("Clothes")}>
-            <Icon
-              name="checkroom"
-              size={40}
-              color={theme.colors.sageGreen} style={styles.icon}
-              
-            />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("Food")}>
-            <Icon name="local-dining" size={40} color={theme.colors.sageGreen} style={styles.icon} />
-          </TouchableOpacity>
-        </View>
-    
-        {/* Page Title */}
-        <View style={styles.header}>
-          <Text style={styles.title}>Education Donations</Text>
-        </View>
-    
-        {/* Recommended Donations */}
-        {eduItems.recommended.length > 0 && (
-          <View>
-            <Text style={styles.sectionHeaderText}>Recommended for You</Text>
-            <FlatList
-              data={eduItems.recommended.filter((item) => !isInCart(item))}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id.toString()}
-              numColumns={2}
-              contentContainerStyle={styles.grid}
-              scrollEnabled={false} // Prevents FlatList from having independent scroll
-            />
-          </View>
-        )}
-    
-        {/* Other Donations */}
-        {eduItems.others.length > 0 && (
-          <View>
-            <Text style={styles.sectionHeaderText}>Others</Text>
-            <FlatList
-              data={eduItems.others.filter((item) => !isInCart(item))}
-              renderItem={renderItem}
-              keyExtractor={(item) => item.id.toString()}
-              numColumns={2}
-              contentContainerStyle={styles.grid}
-              scrollEnabled={false} // Prevents FlatList from having independent scroll
-            />
-          </View>
-        )}
-      </ScrollView>
-    )
-    
-      
-    }
+          />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("Clothes")}>
+          <Icon name="checkroom" size={40} color={theme.colors.sageGreen} style={styles.icon} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("Food")}>
+          <Icon name="local-dining" size={40} color={theme.colors.sageGreen} style={styles.icon} />
+        </TouchableOpacity>
+      </View>
 
+      {/* Page Title */}
+      <View style={styles.header}>
+        <Text style={styles.title}>Education Donations</Text>
+      </View>
+
+      {/* Donor View - All Donations */}
+      {isDonor && (
+        <View>
+          <Text style={styles.sectionHeaderText}>All Available Donations</Text>
+          <FlatList
+            data={eduItems.allDonations.filter((item) => !isInCart(item))}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={2}
+            contentContainerStyle={styles.grid}
+            scrollEnabled={false}
+          />
+        </View>
+      )}
+
+      {/* Recipient View - Recommended Donations */}
+      {!isDonor && eduItems.recommended.length > 0 && (
+        <View>
+          <Text style={styles.sectionHeaderText}>Recommended for You</Text>
+          <FlatList
+            data={eduItems.recommended.filter((item) => !isInCart(item))}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={2}
+            contentContainerStyle={styles.grid}
+            scrollEnabled={false}
+          />
+        </View>
+      )}
+
+      {/* Recipient View - Other Donations */}
+      {!isDonor && eduItems.others.length > 0 && (
+        <View>
+          <Text style={styles.sectionHeaderText}>Others</Text>
+          <FlatList
+            data={eduItems.others.filter((item) => !isInCart(item))}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={2}
+            contentContainerStyle={styles.grid}
+            scrollEnabled={false}
+          />
+        </View>
+      )}
+    </ScrollView>
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -252,16 +256,14 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.sageGreen,
     padding: 12,
   },
-  sectionHeader: {
-    backgroundColor: theme.colors.charcoalBlack,
-    padding: 10,
-    marginBottom: 10,
-  },
   sectionHeaderText: {
     fontSize: 22,
     fontWeight: "bold",
     color: theme.colors.ivory,
+    padding: 10,
+    marginBottom: 10,
   },
 })
 
 export default Education
+
