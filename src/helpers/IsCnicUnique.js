@@ -10,9 +10,15 @@ export async function IsCnicUnique(cnic) {
         .collection("recipients")
         .where("idCard", "==", cnic)
         .get();
+
+        const querySnapshot3 = await firestore()
+        .collection("children_profiles")
+        .where("idCard", "==", cnic)
+        .get();
   
   
-      return (querySnapshot1.empty && querySnapshot2.empty); // If empty, CNIC/ID card is unique
+  
+      return (querySnapshot1.empty && querySnapshot2.empty && querySnapshot3.empty); // If empty, CNIC/ID card is unique
     } catch (error) {
       console.log("Error checking CNIC:", error);
       return false;

@@ -1,6 +1,6 @@
 "use client"
 
-import { useContext, useEffect } from "react"
+import { useContext, useEffect, useState } from "react"
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput } from "react-native"
 import { Formik, FieldArray } from "formik"
 import { Picker } from "@react-native-picker/picker"
@@ -8,16 +8,23 @@ import { theme } from "../core/theme"
 import ImagePickerComponent from "../components/ImagePickerComponent"
 import { AuthContext } from "../context/AuthContext"
 import firestore from "@react-native-firebase/firestore"
+import { IsCnicUnique } from "../helpers/IsCnicUnique";
+import { idCardValidator } from "../helpers/idCardValidator";
+
+
 
 const ChildrenProfiles = ({ navigation, route }) => {
   const { ParentValues} = route.params
   const numberOfChildren=ParentValues.children
   const { user } = useContext(AuthContext)
+  const [khairPoints] = useState({value:100});
+  
 
   useEffect(() => {
   }, [numberOfChildren])
 
   const genderOptions = ["Male", "Female", "Other"]
+  const enrollmentOptions = ["Enrolled", "Not Enrolled"]
   const educationalStatusOptions = ["School", "College", "Special Education"]
   const clothingSizes = ["S", "M", "L", "XL", "XXL"]
   const shirtSizes = ["36", "38", "40", "42", "44", "46", "48"]
@@ -27,6 +34,15 @@ const ChildrenProfiles = ({ navigation, route }) => {
   const uniYearOption = ['1st', '2nd', '3rd', '4th'];
   const collegeYearOption = ['1st Year', '2nd Year'];
 
+  // Function to check if ID card is duplicate within the form
+  const isDuplicateIdCard = (idCard, currentIndex, allChildren) => {
+    if (!idCard) return false
+    
+    return allChildren.some((child, index) => 
+      index !== currentIndex && child.idCard === idCard
+    )
+  }
+
   const validate = (values) => {
     const errors = {}
     values.children.forEach((child, index) => {
@@ -35,13 +51,28 @@ const ChildrenProfiles = ({ navigation, route }) => {
       if (isNaN(child.age)) childErrors.age = "Age must be a number"
       if (child.age>=18)childErrors.age="Child older than 18 can not be registered"
       if (!child.gender) childErrors.gender = "Gender is required"
-      if (!child.educationLevel) childErrors.educationLevel = "Education level is required"
-      if (!child.institution) childErrors.institution = "Institution is required"
-      if (!child.class) childErrors.class = "Class/Year is required"
+      if (!child.enrollmentStatus) childErrors.enrollmentStatus = "Enrollment status is required"
+      
+      // Only validate education fields if child is enrolled
+      if (child.enrollmentStatus === "Enrolled") {
+        if (!child.educationLevel) childErrors.educationLevel = "Education level is required"
+        if (!child.institution) childErrors.institution = "Institution is required"
+        if (!child.class) childErrors.class = "Class/Year is required"
+      }
+      
       if (!child.shoeSize) childErrors.shoeSize = "Shoe size is required"
       if (!child.clothingSize) childErrors.clothingSize = "Clothing size is required"
       if (!child.shirtSize) childErrors.shirtSize = "Shirt size is required"
       if (!child.trouserSize) childErrors.trouserSize = "Trouser size is required"
+      if (!child.idCard) childErrors.idCard = "ID Card is required"
+      else {
+        const idCardError = idCardValidator(child.idCard)
+        if (idCardError) {
+          childErrors.idCard = idCardError
+        } else if (isDuplicateIdCard(child.idCard, index, values.children)) {
+          childErrors.idCard = "This ID Card is already used for another child"
+        }
+      }
       if (Object.keys(childErrors).length > 0) {
         errors.children = errors.children || []
         errors.children[index] = childErrors
@@ -51,40 +82,57 @@ const ChildrenProfiles = ({ navigation, route }) => {
   }
 
   const onSubmit = async (values, { setSubmitting }) => {
+    setSubmitting(true)
+    
+    // Check ID card uniqueness for all children
+    const uniquenessChecks = await Promise.all(
+      values.children.map(async (child) => {
+        if (child.idCard && !idCardValidator(child.idCard)) {
+          return await IsCnicUnique(child.idCard)
+        }
+        return true
+      })
+    )
+    
+    // If any ID card is not unique, stop submission
+    if (uniquenessChecks.includes(false)) {
+      setSubmitting(false)
+      return
+    }
 
     try {
       setSubmitting(false);
-    try {
-      await firestore()
-        .collection("individual_profiles")
-        .doc(user.uid)
-        .set({
-        age: parseInt(ParentValues.age), // Convert to integer
-        gender: ParentValues.gender,
-        maritalStatus: ParentValues.maritalStatus,
-        children: parseInt(ParentValues.children) || 0, // Convert to integer, default to 0
-        occupation: ParentValues.occupation,
-        income: parseFloat(ParentValues.income) || 0, // Convert to decimal
-        educationLevel: ParentValues.educationLevel,
-        institution: ParentValues.institution,
-        class: ParentValues.class,
-        shoeSize: ParentValues.shoeSize,
-        clothingSize: ParentValues.clothingSize,
-        shirtSize: ParentValues.shirtSize,
-        trouserSize: ParentValues.trouserSize,
-        address: ParentValues.address,
-        profileImage: ParentValues.profileImage || "", // Ensure string (or default empty)
-        createdAt: firestore.FieldValue.serverTimestamp(), // Timestamp for when the profile is created
-        membersCount: Number.parseInt(ParentValues.membersCount) || 0,
+      try {
+        await firestore()
+          .collection("individual_profiles")
+          .doc(user.uid)
+          .set({
+          age: parseInt(ParentValues.age), // Convert to integer
+          gender: ParentValues.gender,
+          maritalStatus: ParentValues.maritalStatus,
+          children: parseInt(ParentValues.children) || 0, // Convert to integer, default to 0
+          occupation: ParentValues.occupation,
+          income: parseFloat(ParentValues.income) || 0, // Convert to decimal
+          educationLevel: ParentValues.educationLevel,
+          institution: ParentValues.institution,
+          class: ParentValues.class,
+          shoeSize: ParentValues.shoeSize,
+          clothingSize: ParentValues.clothingSize,
+          shirtSize: ParentValues.shirtSize,
+          trouserSize: ParentValues.trouserSize,
+          address: ParentValues.address,
+          profileImage: ParentValues.profileImage || "", // Ensure string (or default empty)
+          createdAt: firestore.FieldValue.serverTimestamp(), // Timestamp for when the profile is created
+          membersCount: Number.parseInt(ParentValues.membersCount) || 0,
+          khairPoints:khairPoints.value + (khairPoints.value * numberOfChildren)
+
+            
+          });
           
-        });
-
-
+      } catch (error) {
+        console.log("Error saving details of parent", error);
+      }
         
-    } catch (error) {
-      console.log("Error saving details of parent", error);
-    }
-      
       const childrenProfiles = values.children.map((child) => ({
         ...child,
         age: Number.parseInt(child.age),
@@ -103,6 +151,7 @@ const ChildrenProfiles = ({ navigation, route }) => {
     children: Array.from({ length: numberOfChildren }, () => ({
       age: "",
       gender: "",
+      enrollmentStatus: "",
       educationLevel: "",
       institution: "",
       class: "",
@@ -110,6 +159,7 @@ const ChildrenProfiles = ({ navigation, route }) => {
       clothingSize: "",
       shirtSize: "",
       trouserSize: "",
+      idCard:""
     })),
   }
 
@@ -168,69 +218,135 @@ const ChildrenProfiles = ({ navigation, route }) => {
                       </View>
 
                       <View style={styles.inputContainer}>
-                        <Text style={styles.label}>Educational Level</Text>
-                        <View style={styles.pickerContainer}>
-                          <Picker
-                            selectedValue={child.educationLevel}
-                            onValueChange={(itemValue) => setFieldValue(`children[${index}].educationLevel`, itemValue)}
-                            style={styles.picker1}
-                          >
-                            <Picker.Item label="Select Educational Level" value="" />
-                            {educationalStatusOptions.map((status) => (
-                              <Picker.Item key={status} label={status} value={status} />
-                            ))}
-                          </Picker>
-                        </View>
-                        {errors.children?.[index]?.educationLevel && touched.children?.[index]?.educationLevel && (
-                          <Text style={styles.errorText}>{errors.children[index].educationLevel}</Text>
-                        )}
-                      </View>
-
-                      <View style={styles.inputContainer}>
-                        <Text style={styles.label}>Institution Name</Text>
+                        <Text style={styles.label}>ID Card</Text>
                         <TextInput
                           style={styles.input}
-                          onChangeText={handleChange(`children[${index}].institution`)}
-                          onBlur={handleBlur(`children[${index}].institution`)}
-                          value={child.institution}
-                          placeholder="Enter institution name"
+                          onChangeText={handleChange(`children[${index}].idCard`)}
+                          onBlur={async (e) => {
+                            handleBlur(`children[${index}].idCard`)(e)
+                            // Check for uniqueness when field loses focus
+                            if (child.idCard && !idCardValidator(child.idCard)) {
+                              // First check if it's duplicate within the form
+                              if (isDuplicateIdCard(child.idCard, index, values.children)) {
+                                setFieldValue(`children[${index}].idCardError`, "This ID Card is already used for another child")
+                                return
+                              }
+                              
+                              // Then check if it's unique in the database
+                              const isUnique = await IsCnicUnique(child.idCard)
+                              if (!isUnique) {
+                                setFieldValue(`children[${index}].idCardError`, "This ID Card is already registered")
+                              } else {
+                                setFieldValue(`children[${index}].idCardError`, "")
+                              }
+                            }
+                          }}
+                          value={child.idCard}
+                          placeholder="Format: 34101-7678623-8"
                           placeholderTextColor={theme.colors.ivory}
                         />
-                        {errors.children?.[index]?.institution && touched.children?.[index]?.institution && (
-                          <Text style={styles.errorText}>{errors.children[index].institution}</Text>
+                        {errors.children?.[index]?.idCard && touched.children?.[index]?.idCard && (
+                          <Text style={styles.errorText}>{errors.children[index].idCard}</Text>
+                        )}
+                        {child.idCardError && (
+                          <Text style={styles.errorText}>{child.idCardError}</Text>
                         )}
                       </View>
-                      
 
                       <View style={styles.inputContainer}>
-                    <Text style={styles.label}>Class/Year</Text>
-                    <View style={styles.pickerContainer}>
-                      <Picker
-                        selectedValue={child.class}
-                        onValueChange={(itemValue) => setFieldValue(`children[${index}].class`, itemValue)}
-                        style={styles.picker1}
-                      >
-                        <Picker.Item label="Select Class/Year" value="" />
-                        {child.educationLevel === 'School' && (
-                          gradeOption.map((grade) => (
-                            <Picker.Item key={grade} label={grade} value={grade} />
-                          ))
+                        <Text style={styles.label}>Enrollment Status</Text>
+                        <View style={styles.radioContainer}>
+                          {enrollmentOptions.map((option) => (
+                            <TouchableOpacity
+                              key={option}
+                              style={styles.radioOption}
+                              onPress={() => {
+                                setFieldValue(`children[${index}].enrollmentStatus`, option)
+                                // Clear education fields if changing to Not Enrolled
+                                if (option === "Not Enrolled") {
+                                  setFieldValue(`children[${index}].educationLevel`, "")
+                                  setFieldValue(`children[${index}].institution`, "")
+                                  setFieldValue(`children[${index}].class`, "")
+                                }
+                              }}
+                            >
+                              <View style={[styles.radioCircle, child.enrollmentStatus === option && styles.radioSelected]} />
+                              <Text style={styles.radioLabel}>{option}</Text>
+                            </TouchableOpacity>
+                          ))}
+                        </View>
+                        {errors.children?.[index]?.enrollmentStatus && touched.children?.[index]?.enrollmentStatus && (
+                          <Text style={styles.errorText}>{errors.children[index].enrollmentStatus}</Text>
                         )}
-                        {child.educationLevel === 'College' && (
-                          collegeYearOption.map((year) => (
-                            <Picker.Item key={year} label={year} value={year} />
-                          ))
-                        )}
-                       
-                        {child.educationLevel === 'Special Education' && (
-                          <Picker.Item label="Special Education" value="Special Education" />
-                        )}
-                      </Picker>
-                    </View>
-                    {errors.children?.[index]?.class && touched.children?.[index]?.class && (
-                      <Text style={styles.errorText}>{errors.children[index].class}</Text>
-                    )}
-                  </View>
+                      </View>
+
+                      {child.enrollmentStatus === "Enrolled" && (
+                        <>
+                          <View style={styles.inputContainer}>
+                            <Text style={styles.label}>Educational Level</Text>
+                            <View style={styles.pickerContainer}>
+                              <Picker
+                                selectedValue={child.educationLevel}
+                                onValueChange={(itemValue) => setFieldValue(`children[${index}].educationLevel`, itemValue)}
+                                style={styles.picker1}
+                              >
+                                <Picker.Item label="Select Educational Level" value="" />
+                                {educationalStatusOptions.map((status) => (
+                                  <Picker.Item key={status} label={status} value={status} />
+                                ))}
+                              </Picker>
+                            </View>
+                            {errors.children?.[index]?.educationLevel && touched.children?.[index]?.educationLevel && (
+                              <Text style={styles.errorText}>{errors.children[index].educationLevel}</Text>
+                            )}
+                          </View>
+
+                          <View style={styles.inputContainer}>
+                            <Text style={styles.label}>Institution Name</Text>
+                            <TextInput
+                              style={styles.input}
+                              onChangeText={handleChange(`children[${index}].institution`)}
+                              onBlur={handleBlur(`children[${index}].institution`)}
+                              value={child.institution}
+                              placeholder="Enter institution name"
+                              placeholderTextColor={theme.colors.ivory}
+                            />
+                            {errors.children?.[index]?.institution && touched.children?.[index]?.institution && (
+                              <Text style={styles.errorText}>{errors.children[index].institution}</Text>
+                            )}
+                          </View>
+                          
+                          <View style={styles.inputContainer}>
+                            <Text style={styles.label}>Class/Year</Text>
+                            <View style={styles.pickerContainer}>
+                              <Picker
+                                selectedValue={child.class}
+                                onValueChange={(itemValue) => setFieldValue(`children[${index}].class`, itemValue)}
+                                style={styles.picker1}
+                              >
+                                <Picker.Item label="Select Class/Year" value="" />
+                                {child.educationLevel === 'School' && (
+                                  gradeOption.map((grade) => (
+                                    <Picker.Item key={grade} label={grade} value={grade} />
+                                  ))
+                                )}
+                                {child.educationLevel === 'College' && (
+                                  collegeYearOption.map((year) => (
+                                    <Picker.Item key={year} label={year} value={year} />
+                                  ))
+                                )}
+                              
+                                {child.educationLevel === 'Special Education' && (
+                                  <Picker.Item label="Special Education" value="Special Education" />
+                                )}
+                              </Picker>
+                            </View>
+                            {errors.children?.[index]?.class && touched.children?.[index]?.class && (
+                              <Text style={styles.errorText}>{errors.children[index].class}</Text>
+                            )}
+                          </View>
+                        </>
+                      )}
 
                       <View style={styles.inputContainer}>
                         <Text style={styles.label}>Shoe Size</Text>
@@ -449,4 +565,3 @@ const styles = StyleSheet.create({
 })
 
 export default ChildrenProfiles
-

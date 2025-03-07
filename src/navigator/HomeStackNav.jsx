@@ -24,6 +24,7 @@ const HomeStackNav = ({ navigation, route }) => {
           options={{ headerShown: false }}
           initialParams={{ ...route.params }}/>
       )}
+      
       <Stack.Screen name='ChooseCategory' component={ChooseCategory} options={{ headerShown: false }} />
 
 

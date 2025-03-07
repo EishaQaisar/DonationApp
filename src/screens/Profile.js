@@ -13,11 +13,15 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { theme } from '../core/theme';
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from "../context/AuthContext";
+import { UserProfileContext } from "../context/UserProfileContext"
+
 
 const Profile = ({ route }) => {
   const navigation = useNavigation();
   const { user } = useContext(AuthContext);
   const {role}=route.params;
+  const { userProfile } = useContext(UserProfileContext)
+  
 
   const imageScale = new Animated.Value(0.8);
   const fadeAnim = new Animated.Value(0);
@@ -65,7 +69,8 @@ const Profile = ({ route }) => {
 
         <View style={styles.khairPointsContainer}>
           <MaterialCommunityIcons name="star" size={24} color={theme.colors.sageGreen} />
-          <Text style={styles.khairPoints}>100 Khair Points</Text>
+          <Text style={styles.khairPoints}>{userProfile.khairPoints} Khair Points</Text>
+
         </View>
 
         <View style={styles.infoContainer}>

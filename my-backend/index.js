@@ -209,10 +209,15 @@ const createTables = () => {
       res.status(200).send('Clothes donation added successfully');
     });
 });
-
 app.get("/api/food-donations", (req, res) => {
   const userProfile = JSON.parse(req.query.userProfile || "{}")
-  const membersCount = userProfile.membersCount || 0
+
+  // Extract person count and children count instead of total members
+  const personCount = 1 // The person themselves
+  const childrenProfiles = userProfile.childrenProfiles || []
+  const childrenCount = childrenProfiles.length
+  const totalCount = personCount + childrenCount
+  console.log(totalCount)
 
   // Query for all unclaimed food donations
   const query = "SELECT * FROM fooddonations WHERE claimStatus = ?"
@@ -225,10 +230,9 @@ app.get("/api/food-donations", (req, res) => {
 
     // Function to check if a food item is recommended based on quantity
     const isRecommended = (item) => {
-      // Check if the donation quantity is appropriate for the family size
-      // Recommend items where quantity is sufficient but not excessive for the family
-      
-      return item.quantity >= membersCount && item.quantity <= membersCount * 1.5
+      // Check if the donation quantity is appropriate for the person and their children
+      // Recommend items where quantity is sufficient but not excessive
+      return item.quantity >= totalCount && item.quantity <= totalCount * 1.5
     }
 
     // Filter recommendations
@@ -241,8 +245,8 @@ app.get("/api/food-donations", (req, res) => {
     const sortByCreatedAt = (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     recommended.sort(sortByCreatedAt)
     others.sort(sortByCreatedAt)
-    console.log(recommended);
-    console.log(others);
+
+    
 
     res.json({
       recommended: recommended,
@@ -252,9 +256,8 @@ app.get("/api/food-donations", (req, res) => {
 })
 
 
-
 app.get('/api/all-food-donations', (req, res) => {
-    const query = 'SELECT * FROM FoodDonations WHERE claimStatus = ?';
+    const query = 'SELECT * FROM fooddonations WHERE claimStatus = ?';
     db.query(query, ['Unclaimed'], (err, results) => {
       if (err) {
         console.error('Error fetching data:', err);
@@ -297,59 +300,77 @@ app.get('/api/all-food-donations', (req, res) => {
 
   
   app.get("/api/education-donations", (req, res) => {
-    const userProfile = JSON.parse(req.query.userProfile || "{}");
-    const childrenProfiles = userProfile.childrenProfiles || []; // Extract children profiles
+    const userProfile = JSON.parse(req.query.userProfile || "{}")
+    const childrenProfiles = userProfile.childrenProfiles || [] // Extract children profiles
   
     // Query for all unclaimed education donations
-    const query = "SELECT * FROM EducationDonations WHERE claimStatus = ?";
+    const query = "SELECT * FROM educationdonations WHERE claimStatus = ?"
   
     db.query(query, ["Unclaimed"], (err, results) => {
       if (err) {
-        console.error("Error fetching data:", err);
-        return res.status(500).send("Error fetching data");
+        console.error("Error fetching data:", err)
+        return res.status(500).send("Error fetching data")
       }
   
-      // Function to check if an item matches either the parent or any child's profile
+      // Function to check if an item matches either the parent or any enrolled child's profile
       const isRecommended = (item) => {
-        // Check for parent match
-        const parentMatch =
-          
-
-          ((userProfile.institution && item.institution === userProfile.institution) &&
-          (userProfile.class && item.grade === userProfile.class)) ||
-          (userProfile.class && item.grade === userProfile.class)
+        let parentMatch = false
+        let childMatch = false
   
-        // Check if any child matches
-        const childMatch = childrenProfiles.some(
-          (child) =>
-            
-            ((child.institution && item.institution === child.institution) &&
-            (child.class && item.class === child.class)) ||
-            (child.class && item.class === child.class)
-        );
+        // Different matching logic based on item type
+        if (item.type === "Stationary") {
+          // For stationary items, compare education level
+          parentMatch = userProfile.educationLevel && item.level === userProfile.educationLevel
   
-        return parentMatch || childMatch;
-      };
+          // Check if any enrolled child's education level matches
+          childMatch = childrenProfiles.some(
+            (child) =>
+              // Only consider children who are enrolled in education
+              child.enrollmentStatus === "Enrolled" && child.educationLevel && item.level === child.educationLevel,
+          )
+        } else {
+          // For non-stationary items, use the original matching logic
+          parentMatch =
+            (userProfile.institution &&
+              item.institution.toLowerCase() === userProfile.institution.toLowerCase() &&
+              userProfile.class &&
+              item.grade === userProfile.class) ||
+            (userProfile.class && item.grade === userProfile.class)
+  
+          // Check if any enrolled child matches
+          childMatch = childrenProfiles.some(
+            (child) =>
+              // Only consider children who are enrolled in education
+              child.enrollmentStatus === "Enrolled" &&
+              ((child.institution &&
+                item.institution === child.institution &&
+                child.class &&
+                item.grade === child.class) ||
+                (child.class && item.grade === child.class)),
+          )
+        }
+  
+        return parentMatch || childMatch
+      }
   
       // Filter recommendations
-      const recommended = results.filter(isRecommended);
+      const recommended = results.filter(isRecommended)
   
       // Filter other items that do not match the recipient or children
-      const others = results.filter((item) => !isRecommended(item));
+      const others = results.filter((item) => !isRecommended(item))
   
       // Sort both arrays by createdAt in descending order
-      const sortByCreatedAt = (a, b) => new Date(b.createdAt) - new Date(a.createdAt);
-      recommended.sort(sortByCreatedAt);
-      others.sort(sortByCreatedAt);
+      const sortByCreatedAt = (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      recommended.sort(sortByCreatedAt)
+      others.sort(sortByCreatedAt)
+      console.log(recommended)
   
       res.json({
         recommended: recommended,
         others: others,
-      });
-    });
-  });
-  
-  
+      })
+    })
+  })
   
   app.get("/api/clothes-donations", (req, res) => {
     const userProfile = JSON.parse(req.query.userProfile || "{}");

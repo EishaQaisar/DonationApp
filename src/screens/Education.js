@@ -83,6 +83,9 @@ const Education = ({ route }) => {
     >
       <Image source={item.images[0]} style={styles.itemImage} />
       <Text style={styles.item}>{item.itemName}</Text>
+      <Text style={styles.itemDetails}>{`Level: ${item.level}`}</Text>
+    
+
       <TouchableOpacity
         style={styles.claimButton}
         onPress={() => navigation.navigate("ItemDetail", { item, category: "Education" })}

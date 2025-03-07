@@ -9,8 +9,12 @@ import ImagePickerComponent from "../components/ImagePickerComponent"
 import { validateAge } from "../helpers/ageValidator"
 import { addressValidator } from "../helpers/addressValidator"
 import { AuthContext } from "../context/AuthContext"
+import { UserProfileContext } from "../context/UserProfileContext"
+
 
 const RecipientProfileForm = ({ navigation }) => {
+    const [khairPoints] = useState({value:100});
+  
   const { user } = useContext(AuthContext)
   const [image, setImage] = useState(null)
 
@@ -154,6 +158,9 @@ const RecipientProfileForm = ({ navigation }) => {
             profileImage: values.profileImage || "", // Ensure string (or default empty)
             createdAt: firestore.FieldValue.serverTimestamp(), // Timestamp for when the profile is created
             membersCount: Number.parseInt(values.membersCount) || 0, // Convert to integer, default to 0
+            khairPoints:khairPoints.value
+
+            
           })
       } catch (error) {
         console.log("Error saving details", error)

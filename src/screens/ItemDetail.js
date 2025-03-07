@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState,useContext } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Modal, TouchableWithoutFeedback } from 'react-native';
 import { theme } from '../core/theme';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MaterialIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useCart } from '../CartContext';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { UserProfileContext } from "../context/UserProfileContext"
 
 const ItemDetail = ({ route }) => {
     const { item, category, role } = route.params; // Assuming userRole is passed in route params
@@ -12,8 +13,18 @@ const ItemDetail = ({ route }) => {
     const { addToCart, isInCart } = useCart();
     const [isModalVisible, setIsModalVisible] = useState(false);
     const tabBarHeight = useBottomTabBarHeight();
+  const { userProfile } = useContext(UserProfileContext)
 
     const isClaimed = isInCart(item);
+    const khairPointsPerCategory = {
+        Food: 10,
+        Education: 20,
+        Clothes: 15,
+      };
+      
+      const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
+
+      
 
     // Normalize userRole to handle case variations
     const isDonor = role && role.toLowerCase() === 'donor';  // Checks if user is a donor
@@ -93,17 +104,26 @@ const ItemDetail = ({ route }) => {
             case 'Education':
                 return (
                     <View>
-                        <Text style={styles.title}>{item.itemName}</Text>
-                        <View style={styles.detailsCard}>
-                            <DetailItem icon="book-open-variant" label="Subject" value={item.subject} />
-                            <DetailItem icon="school" label="Level" value={item.level} />
-                            <DetailItem icon="shape-outline" label="Type" value={item.type} />
-                            <DetailItem icon="star-outline" label="Condition" value={item.c_condition} />
-                            <DetailItem icon="numeric" label="Quantity" value={item.quantity.toString()} />
-                            <DetailItem icon="text-short" label="Description" value={item.description} />
-                            <DetailItem icon="account" label="Donor Username" value={item.donorUsername} />
-                        </View>
-                    </View>
+    <Text style={styles.title}>{item.itemName}</Text>
+    <View style={styles.detailsCard}>
+        {item.type !== "Stationary" && (
+            <DetailItem icon="book-open-variant" label="Subject" value={item.subject} />
+        )}
+        {item.type === "Books" && (
+            <DetailItem icon="school" label="Grade" value={item.grade} />
+        )}
+         {item.type === "Books" && (
+            <DetailItem icon="school" label="Institute" value={item.institution} />
+        )}
+        <DetailItem icon="school" label="Level" value={item.level} />
+        <DetailItem icon="shape-outline" label="Type" value={item.type} />
+        <DetailItem icon="star-outline" label="Condition" value={item.c_condition} />
+        <DetailItem icon="numeric" label="Quantity" value={item.quantity.toString()} />
+        <DetailItem icon="text-short" label="Description" value={item.description} />
+        <DetailItem icon="account" label="Donor Username" value={item.donorUsername} />
+    </View>
+</View>
+
                 );
             default:
                 return (
@@ -123,74 +143,119 @@ const ItemDetail = ({ route }) => {
     };
 
     const confirmClaimItem = () => {
+        
         addToCart(item); // Add to cart if confirmed
         setIsModalVisible(false);
     };
+    const handleClaim = () => {
+        const itemKhairPoints = khairPointsPerCategory[category] || 0;
+        const requiredKhairPoints = item.quantity * itemKhairPoints;
+      
+        if (userProfile.khairPoints>= requiredKhairPoints) {
+            
+          showConfirmationModal();
+        } else {
+          setIsErrorModalVisible(true); // Show error modal if insufficient points
+        }
+      };
+      const hideErrorModal = () => {
+        setIsErrorModalVisible(false);
+      };
 
-    return (
+      return (
         <ScrollView style={[styles.container, { marginBottom: tabBarHeight }]}>
-            <View style={styles.imageContainer}>
-                <TouchableOpacity onPress={handlePreviousImage} style={styles.navButton}>
-                    <Icon name="chevron-left" size={20} color={theme.colors.ivory} />
-                </TouchableOpacity>
-                <Image source={item.images[currentImageIndex]} style={styles.image} />
-                <TouchableOpacity onPress={handleNextImage} style={styles.navButton}>
-                    <Icon name="chevron-right" size={20} color={theme.colors.ivory} />
-                </TouchableOpacity>
-            </View>
-
-            {renderCategoryDetails()}
-
-            {/* Only show claim button if user is NOT a donor */}
-            {!isDonor && (
-                <TouchableOpacity
-                    style={[styles.claimButton, isClaimed && styles.disabledClaimButton]}
-                    onPress={() => !isClaimed && showConfirmationModal()}
-                    disabled={isClaimed}
-                >
-                    <Text style={styles.claimButtonText}>
-                        {isClaimed ? 'Claimed' : 'Claim Item'}
-                    </Text>
-                </TouchableOpacity>
-            )}
-
-            {/* Custom Confirmation Modal */}
-            <Modal
-                transparent={true}
-                visible={isModalVisible}
-                animationType="fade"
-                onRequestClose={hideConfirmationModal}
+          <View style={styles.imageContainer}>
+            <TouchableOpacity onPress={handlePreviousImage} style={styles.navButton}>
+              <Icon name="chevron-left" size={20} color={theme.colors.ivory} />
+            </TouchableOpacity>
+            <Image source={item.images[currentImageIndex]} style={styles.image} />
+            <TouchableOpacity onPress={handleNextImage} style={styles.navButton}>
+              <Icon name="chevron-right" size={20} color={theme.colors.ivory} />
+            </TouchableOpacity>
+          </View>
+      
+          {renderCategoryDetails()}
+      
+          {/* Only show claim button if user is NOT a donor */}
+          {!isDonor && (
+            <TouchableOpacity
+              style={[styles.claimButton, isClaimed && styles.disabledClaimButton]}
+              onPress={() => !isClaimed && handleClaim()}
+              disabled={isClaimed}
             >
-                <TouchableWithoutFeedback onPress={hideConfirmationModal}>
-                    <View style={styles.modalOverlay}>
-                        <TouchableWithoutFeedback>
-                            <View style={styles.modalContent}>
-                                <Text style={styles.modalTitle}>Confirm Claim</Text>
-                                <Text style={styles.modalMessage}>
-                                    Are you sure you want to claim this item?
-                                </Text>
-
-                                <View style={styles.modalButtons}>
-                                    <TouchableOpacity
-                                        style={[styles.modalButton, styles.cancelButton]}
-                                        onPress={hideConfirmationModal}
-                                    >
-                                        <Text style={styles.modalButtonText}>No</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        style={[styles.modalButton, styles.confirmButton]}
-                                        onPress={confirmClaimItem}
-                                    >
-                                        <Text style={styles.modalButtonText}>Yes</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </TouchableWithoutFeedback>
+              <Text style={styles.claimButtonText}>
+                {isClaimed ? 'Claimed' : 'Claim Item'}
+              </Text>
+            </TouchableOpacity>
+          )}
+      
+          {/* Custom Confirmation Modal */}
+          <Modal
+            transparent={true}
+            visible={isModalVisible}
+            animationType="fade"
+            onRequestClose={hideConfirmationModal}
+          >
+            <TouchableWithoutFeedback onPress={hideConfirmationModal}>
+              <View style={styles.modalOverlay}>
+                <TouchableWithoutFeedback>
+                  <View style={styles.modalContent}>
+                    <Text style={styles.modalTitle}>Confirm Claim</Text>
+                    <Text style={styles.modalMessage}>
+                      Are you sure you want to claim this item?
+                    </Text>
+      
+                    <View style={styles.modalButtons}>
+                      <TouchableOpacity
+                        style={[styles.modalButton, styles.cancelButton]}
+                        onPress={hideConfirmationModal}
+                      >
+                        <Text style={styles.modalButtonText}>No</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={[styles.modalButton, styles.confirmButton]}
+                        onPress={confirmClaimItem}
+                      >
+                        <Text style={styles.modalButtonText}>Yes</Text>
+                      </TouchableOpacity>
                     </View>
+                  </View>
                 </TouchableWithoutFeedback>
-            </Modal>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
+      
+          {/* Error Modal when recipient lacks Khair Points */}
+          <Modal
+            transparent={true}
+            visible={isErrorModalVisible}
+            animationType="fade"
+            onRequestClose={hideErrorModal}
+          >
+            <TouchableWithoutFeedback onPress={hideErrorModal}>
+              <View style={styles.modalOverlay}>
+                <TouchableWithoutFeedback>
+                  <View style={styles.modalContent}>
+                    <Text style={styles.modalTitle}>Insufficient Khair Points</Text>
+                    <Text style={styles.modalMessage}>
+                      You do not have enough Khair Points to claim this item.
+                    </Text>
+      
+                    <View style={styles.modalButtons}>
+                      <TouchableOpacity
+                        style={[styles.modalButton, styles.confirmButton]}
+                        onPress={hideErrorModal}
+                      >
+                        <Text style={styles.modalButtonText}>OK</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
         </ScrollView>
-    );
+      );
 };
 
 const DetailItem = ({ icon, label, value }) => (

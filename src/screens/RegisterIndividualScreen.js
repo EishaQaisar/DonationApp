@@ -33,7 +33,7 @@ export default function RegisterIndividualScreen({ navigation }) {
   const [confirm, setConfirm] = useState("");
   const [approved]=useState({value:"false"});
   const { setUser } = useContext(AuthContext); // Access setUser from AuthContext
-  
+
 
   
   
