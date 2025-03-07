@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useRef } from "react";
+import React, { useState, useEffect,useRef, useContext } from "react";
 import { View, Text, Dimensions, Pressable, StyleSheet } from "react-native";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import { Marker } from "react-native-maps"
@@ -9,13 +9,16 @@ import firestore from '@react-native-firebase/firestore';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import NewOrderPopup from "../components/NewOrderPopup";
 import * as Location from 'expo-location';
+import { AuthContext } from "../context/AuthContext";
 
 
 const GOOGLE_API_KEY = "AIzaSyB9irjntPHdEJf024h7H_XKpS11OeW1Nh8";
 const origin = { latitude: 37.3318456, longitude: -122.0296002 };
 const destination = { latitude: 37.771707, longitude: -122.4053769 };
 
-const RiderFinalHomeScreen = ({ navigation }) => {
+const RiderFinalHomeScreen = ({ navigation,route }) => {
+    const {user} =useContext(AuthContext);
+    console.log(user.username);
     const [myPosition, setMyPosition] = useState(null);
     const [routeInfo, setRouteInfo] = useState({ distance: 0, duration: 0 });
     const [distance, setDistance] = useState(null);
