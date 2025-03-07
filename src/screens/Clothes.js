@@ -87,8 +87,13 @@ const Clothes = ({ route }) => {
       onPress={() => navigation.navigate("ItemDetail", { item, category: "Clothes" })}
     >
       <Image source={item.images[0]} style={styles.itemImage} />
+       {item.itemCategory === "Shoes" && (
+                                  <Text style={styles.item}> {item.itemCategory}</Text>
+                              )}
+                              {item.itemCategory === "Clothes" && (
+                                  <Text style={styles.item}>{item.clothesCategory}</Text>
+                              )}
   
-      <Text style={styles.item}>{item.itemCategory}</Text>
       
       <Text style={styles.itemDetails}>
         {`Size: ${

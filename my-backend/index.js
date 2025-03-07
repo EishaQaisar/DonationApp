@@ -210,7 +210,50 @@ const createTables = () => {
     });
 });
 
-app.get('/api/food-donations', (req, res) => {
+app.get("/api/food-donations", (req, res) => {
+  const userProfile = JSON.parse(req.query.userProfile || "{}")
+  const membersCount = userProfile.membersCount || 0
+
+  // Query for all unclaimed food donations
+  const query = "SELECT * FROM fooddonations WHERE claimStatus = ?"
+
+  db.query(query, ["Unclaimed"], (err, results) => {
+    if (err) {
+      console.error("Error fetching data:", err)
+      return res.status(500).send("Error fetching data")
+    }
+
+    // Function to check if a food item is recommended based on quantity
+    const isRecommended = (item) => {
+      // Check if the donation quantity is appropriate for the family size
+      // Recommend items where quantity is sufficient but not excessive for the family
+      
+      return item.quantity >= membersCount && item.quantity <= membersCount * 1.5
+    }
+
+    // Filter recommendations
+    const recommended = results.filter(isRecommended)
+
+    // Filter other items that do not match the quantity criteria
+    const others = results.filter((item) => !isRecommended(item))
+
+    // Sort both arrays by createdAt in descending order
+    const sortByCreatedAt = (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    recommended.sort(sortByCreatedAt)
+    others.sort(sortByCreatedAt)
+    console.log(recommended);
+    console.log(others);
+
+    res.json({
+      recommended: recommended,
+      others: others,
+    })
+  })
+})
+
+
+
+app.get('/api/all-food-donations', (req, res) => {
     const query = 'SELECT * FROM FoodDonations WHERE claimStatus = ?';
     db.query(query, ['Unclaimed'], (err, results) => {
       if (err) {
@@ -331,12 +374,11 @@ app.get('/api/food-donations', (req, res) => {
           }
   
           if (item.itemCategory === 'Clothes') {
-            if (item.clothingCategory === 'Upper Wear') {
+            if (item.clothesCategory === 'Upper Wear') {
               return userProfile.shirtSize && item.upperWearSize === userProfile.shirtSize;
-            } else if (item.clothingCategory === 'Bottom Wear') {
+            } else if (item.clothesCategory === 'Bottom Wear') {
               return userProfile.trouserSize && item.bottomWearSize === userProfile.trouserSize;
             } else if (item.clothesCategory === 'Full Outfit') {
-              console.log('fef');
               return userProfile.clothingSize && item.clothingSize === userProfile.clothingSize;
             }
           } else if (item.itemCategory === 'Shoes') {
@@ -354,11 +396,11 @@ app.get('/api/food-donations', (req, res) => {
           }
   
           if (item.itemCategory === 'Clothes') {
-            if (item.clothingCategory === 'Upper Wear') {
+            if (item.clothesCategory === 'Upper Wear') {
               return child.shirtSize && item.upperWearSize === child.shirtSize;
-            } else if (item.clothingCategory === 'Bottom Wear') {
+            } else if (item.clothesCategory === 'Bottom Wear') {
               return child.trouserSize && item.bottomWearSize === child.trouserSize;
-            } else if (item.clothingCategory === 'Full Outfit') {
+            } else if (item.clothesCategory === 'Full Outfit') {
               return child.clothingSize && item.clothingSize === child.clothingSize;
             }
           } else if (item.itemCategory === 'Shoes') {

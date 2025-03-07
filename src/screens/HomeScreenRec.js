@@ -1,13 +1,18 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, Pressable } from 'react-native';
+import {React,useContext} from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, Pressable} from 'react-native';
 import { theme } from "../core/theme";
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ngoPostsData } from './ViewNgoPostsScreen';
+import { AuthContext } from "../context/AuthContext";
+
 
 const HomeScreenRec = ({ navigation, route }) => {
   const tabBarHeight = useBottomTabBarHeight();
   const { role, type } = route.params;  // Assuming `role` and `type` are passed in params
+  const { user } = useContext(AuthContext);
+  console.log(user.username);
+  
 
   return (
     <View style={[Styles.container, { marginBottom: tabBarHeight }]}>

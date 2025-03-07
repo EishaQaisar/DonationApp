@@ -45,11 +45,13 @@ const ItemDetail = ({ route }) => {
             case 'Clothes':
                 return (
                     <View>
-                        <Text style={styles.title}>{item.itemCategory}</Text>
                         
                         {/* Display clothes category only when item category is Clothes */}
+                        {item.itemCategory === "Shoes" && (
+                            <Text style={styles.title}> {item.itemCategory}</Text>
+                        )}
                         {item.itemCategory === "Clothes" && (
-                            <Text style={styles.subtitle}>Category: {item.clothesCategory}</Text>
+                            <Text style={styles.title}>{item.clothesCategory}</Text>
                         )}
                         
                         <View style={styles.detailsCard}>

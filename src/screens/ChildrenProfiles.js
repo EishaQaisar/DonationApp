@@ -75,6 +75,7 @@ const ChildrenProfiles = ({ navigation, route }) => {
         address: ParentValues.address,
         profileImage: ParentValues.profileImage || "", // Ensure string (or default empty)
         createdAt: firestore.FieldValue.serverTimestamp(), // Timestamp for when the profile is created
+        membersCount: Number.parseInt(ParentValues.membersCount) || 0,
           
         });
 
