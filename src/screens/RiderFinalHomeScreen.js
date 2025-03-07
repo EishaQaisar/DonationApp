@@ -15,8 +15,6 @@ const GOOGLE_API_KEY = "AIzaSyB9irjntPHdEJf024h7H_XKpS11OeW1Nh8";
 const origin = { latitude: 37.3318456, longitude: -122.0296002 };
 const destination = { latitude: 37.771707, longitude: -122.4053769 };
 
-               
-
 const RiderFinalHomeScreen = ({ navigation }) => {
     const [myPosition, setMyPosition] = useState(null);
     const [routeInfo, setRouteInfo] = useState({ distance: 0, duration: 0 });
@@ -44,15 +42,15 @@ const RiderFinalHomeScreen = ({ navigation }) => {
     
                 if (snapshot.empty) {
                     console.log("No pending orders found.");
-                    setOrder(null);
+                    setNewOrder(null);
                     return;
                 }
     
                 console.log("Pending order found.");
-                const newOrder = snapshot.docs[0].data();
-                newOrder.id = snapshot.docs[0].id; // Get Firestore document ID
-                setNewOrder(newOrder);
-                console.log("Order details:", newOrder);
+                const newOrderData = snapshot.docs[0].data();
+                newOrderData.id = snapshot.docs[0].id; // Get Firestore document ID
+                setNewOrder(newOrderData);
+                console.log("Order details:", newOrderData);
             }, error => {
                 console.error("Error accessing Firestore:", error);
             });
@@ -60,48 +58,50 @@ const RiderFinalHomeScreen = ({ navigation }) => {
         return () => unsubscribe(); // Cleanup subscription
     }, []);
     
-
-    // Show pickup banner when order is accepted but not yet picked up
+    // Update banners based on order status
     useEffect(() => {
-        setShowPickupBanner(order && !orderPickedUp);
-        console.log("order is picked uo ?", orderPickedUp);
-        setShowDeliveryBanner(orderPickedUp);
+        if (order && !orderPickedUp) {
+            setShowPickupBanner(true);
+            setShowDeliveryBanner(false);
+        } else if (order && orderPickedUp) {
+            setShowPickupBanner(false);
+            setShowDeliveryBanner(true);
+        } else {
+            setShowPickupBanner(false);
+            setShowDeliveryBanner(false);
+        }
+        
+        console.log("Order status updated - Picked up:", orderPickedUp);
+        console.log("Pickup banner:", showPickupBanner);
+        console.log("Delivery banner:", showDeliveryBanner);
     }, [order, orderPickedUp]);
 
     // 📌 Rider Accepts Order
     const onAccept = async () => {
-
-        console.log("Order accepted:", newOrder);
-        setOrder(newOrder);
-        setNewOrder(null);
-
-        if (!order) return;
+        if (!newOrder) return;
         
-        await firestore().collection('orders').doc(order.id).update({
-            status: 'accepted',
-            riderId: 'rider123' // Assign the order to a rider (Replace with actual ID)
-        });
-
-        setOrderPickedUp(false);
-        if (mapRef.current) {
-            mapRef.current.fitToCoordinates(
-                [origin, newOrder.origin],
-                { edgePadding: { top: 50, right: 50, bottom: 50, left: 50 }, animated: true }
-            );
+        console.log("Order accepted:", newOrder);
+        
+        try {
+            await firestore().collection('orders').doc(newOrder.id).update({
+                status: 'accepted',
+                riderId: 'rider123' // Replace with actual ID
+            });
+            
+            setOrder(newOrder);
+            setNewOrder(null);
+            setOrderPickedUp(false);
+            
+            if (mapRef.current && myPosition) {
+                mapRef.current.fitToCoordinates(
+                    [myPosition, newOrder.origin],
+                    { edgePadding: { top: 50, right: 50, bottom: 50, left: 50 }, animated: true }
+                );
+            }
+        } catch (error) {
+            console.error("Error accepting order:", error);
         }
     };
-
-
-
-
-    // Show pickup banner when order is accepted but not yet picked up
-    useEffect(() => {
-        if (order && !orderPickedUp) {
-            setShowPickupBanner(true);
-        } else {
-            setShowPickupBanner(false);
-        }
-    }, [order, orderPickedUp]);
 
     const onDecline = () => {
         setNewOrder(null);
@@ -111,25 +111,31 @@ const RiderFinalHomeScreen = ({ navigation }) => {
     const onPickupConfirm = async () => {
         if (!order) return;
 
-        console.log("calleddddddddddddddddd");
+        console.log("Pickup confirmed");
 
+        try {
+            await firestore().collection('orders').doc(order.id).update({
+                status: 'picked_up'
+            });
 
-        await firestore().collection('orders').doc(order.id).update({
-            status: 'picked_up'
-        });
-
-        setOrderPickedUp(true);
-        setShowPickupBanner(false);
-        setShowDeliveryBanner(true);
-
-
-        if (mapRef.current && myPosition) {
-            console.log("thisbhjbjhbhjbhj",order.destination);
-            console.log("thisbhjbjhbhjbhj go go go go my position",myPosition);
-            mapRef.current.fitToCoordinates(
-                [myPosition, order.destination], // Ensure order.destination is set
-                { edgePadding: { top: 50, right: 50, bottom: 50, left: 50 }, animated: true }
-            );
+            setOrderPickedUp(true);
+            
+            // Log to verify the state is updated
+            console.log("Order picked up state set to true");
+            console.log("Order destination:", order.destination);
+            console.log("Current position:", myPosition);
+            
+            // Force re-render of the map
+            if (mapRef.current && myPosition && order.destination) {
+                setTimeout(() => {
+                    mapRef.current.fitToCoordinates(
+                        [myPosition, order.destination],
+                        { edgePadding: { top: 50, right: 50, bottom: 50, left: 50 }, animated: true }
+                    );
+                }, 500); // Small delay to ensure state is updated
+            }
+        } catch (error) {
+            console.error("Error confirming pickup:", error);
         }
     };
 
@@ -137,14 +143,19 @@ const RiderFinalHomeScreen = ({ navigation }) => {
     const onDeliveryDone = async () => {
         if (!order) return;
 
-        await firestore().collection('orders').doc(order.id).update({
-            status: 'delivered'
-        });
-        console.log("in delivery botton");
+        console.log("Delivery completed");
 
-        setOrder(null);
-        setShowDeliveryBanner(false);
-        setOrderPickedUp(false);
+        try {
+            await firestore().collection('orders').doc(order.id).update({
+                status: 'delivered'
+            });
+
+            setOrder(null);
+            setOrderPickedUp(false);
+            setShowDeliveryBanner(false);
+        } catch (error) {
+            console.error("Error completing delivery:", error);
+        }
     };
 
     const onGopress = () => {
@@ -155,22 +166,28 @@ const RiderFinalHomeScreen = ({ navigation }) => {
         const newLocation = event.nativeEvent.coordinate;
         console.log("📍 Updated Position:", newLocation);
 
-        if (!order) return; // No order, no tracking needed
-
         setMyPosition(newLocation);
 
+        if (!order) return; // No order, no tracking needed
+
         // Compute remaining distance
-        const distanceLeft = haversineDistance(newLocation, order.destination);
-        const durationLeft = (distanceLeft / routeInfo.distance) * routeInfo.duration; 
+        if (order.destination) {
+            const distanceLeft = haversineDistance(newLocation, order.destination);
+            const durationLeft = routeInfo.distance > 0 
+                ? (distanceLeft / routeInfo.distance) * routeInfo.duration 
+                : 0;
 
-        // console.log(`🚴 ${distanceLeft.toFixed(2)} km left, approx. ${durationLeft.toFixed(2)} min`);
+            console.log(`🚴 ${distanceLeft.toFixed(2)} km left, approx. ${durationLeft.toFixed(2)} min`);
 
-        if (distanceLeft < 0.01) { 
-            console.log("🎉 You have reached your destination!");
+            if (distanceLeft < 0.01) { 
+                console.log("🎉 You have reached your destination!");
+            }
         }
     };
 
     const haversineDistance = (coord1, coord2) => {
+        if (!coord1 || !coord2) return 0;
+        
         const R = 6371; // Radius of the Earth in km
         const dLat = (coord2.latitude - coord1.latitude) * (Math.PI / 180);
         const dLon = (coord2.longitude - coord1.longitude) * (Math.PI / 180);
@@ -185,10 +202,6 @@ const RiderFinalHomeScreen = ({ navigation }) => {
         return R * c; // Distance in km
     };
     
-    const onDirectionFound = (event) => {
-        console.log("user directions", event);
-    };
-
     const renderBottomTitle = () => {
         if (order) {
             return (
@@ -215,7 +228,7 @@ const RiderFinalHomeScreen = ({ navigation }) => {
                     <Text style={styles.bottomTextuser}>
                         {orderPickedUp 
                             ? `Delivering to destination` 
-                            : `Picking up donation from DUMMY`}
+                            : `Picking up donation from ${order.user?.name || 'Customer'}`}
                     </Text>
                 </View>
             );
@@ -238,13 +251,13 @@ const RiderFinalHomeScreen = ({ navigation }) => {
                 </View>
             )}
 
-               {/* Delivery Banner (Only visible after pickup) */}
-               {showDeliveryBanner && (
+            {/* Delivery Banner (Only visible after pickup) */}
+            {showDeliveryBanner && (
                 <View style={styles.deliveryBanner}>
                     <Text style={styles.deliveryText}>Delivering the package</Text>
                     <Pressable 
                         style={styles.checkButton}
-                        onPress={onPickupConfirm}
+                        onPress={onDeliveryDone} // FIXED: Changed from onPickupConfirm to onDeliveryDone
                     >
                         <Text style={styles.checkButtonText}>✓ Delivery Done</Text>
                     </Pressable>
@@ -255,7 +268,7 @@ const RiderFinalHomeScreen = ({ navigation }) => {
                 ref={mapRef}
                 style={{ 
                     width: '100%', 
-                    height: showPickupBanner 
+                    height: (showPickupBanner || showDeliveryBanner)
                         ? Dimensions.get('window').height - 170 
                         : Dimensions.get('window').height - 120 
                 }}
@@ -270,11 +283,10 @@ const RiderFinalHomeScreen = ({ navigation }) => {
                     longitudeDelta: 5.0,
                 }}
             >
-                
-                {order && (
+                {order && myPosition && (
                     <>
-                        {/* Route to pickup location */}
-                        {!orderPickedUp && (
+                        {/* Route to pickup location - only show when not picked up */}
+                        {!orderPickedUp && order.origin && (
                             <MapViewDirections
                                 origin={myPosition}
                                 destination={order.origin}
@@ -282,7 +294,7 @@ const RiderFinalHomeScreen = ({ navigation }) => {
                                 strokeWidth={5}
                                 strokeColor="blue"
                                 onReady={(result) => {
-                                    // console.log("Route to pickup found:", result);
+                                    console.log("Route to pickup found:", result);
                                     setPickupDistance(result.distance);
                                     setPickupDuration(result.duration);
                                     
@@ -296,8 +308,8 @@ const RiderFinalHomeScreen = ({ navigation }) => {
                             />
                         )}
                         
-                        {/* Route to destination (only shown after pickup) */}
-                        {orderPickedUp && (
+                        {/* Route to destination - only show after pickup */}
+                        {orderPickedUp && order.destination && (
                             <MapViewDirections
                                 origin={myPosition}
                                 destination={order.destination}
@@ -305,7 +317,7 @@ const RiderFinalHomeScreen = ({ navigation }) => {
                                 strokeWidth={5}
                                 strokeColor="red"
                                 onReady={(result) => {
-                                    // console.log("Route to destination found:", result);
+                                    console.log("Route to destination found:", result);
                                     setDistance(result.distance);
                                     setDuration(result.duration);
                                     setRouteInfo({
@@ -319,6 +331,9 @@ const RiderFinalHomeScreen = ({ navigation }) => {
                                             animated: true,
                                         });
                                     }
+                                }}
+                                onError={(error) => {
+                                    console.error("MapViewDirections error:", error);
                                 }}
                             />
                         )}
@@ -380,7 +395,7 @@ const RiderFinalHomeScreen = ({ navigation }) => {
                     duration={8}
                     distance={5}
                     onDecline={onDecline}
-                    onAccept={() => onAccept(newOrder)}
+                    onAccept={onAccept}
                 />
             )}
         </View>
