@@ -158,7 +158,8 @@ const RecipientProfileForm = ({ navigation }) => {
             profileImage: values.profileImage || "", // Ensure string (or default empty)
             createdAt: firestore.FieldValue.serverTimestamp(), // Timestamp for when the profile is created
             membersCount: Number.parseInt(values.membersCount) || 0, // Convert to integer, default to 0
-            khairPoints:khairPoints.value
+            khairPoints:khairPoints.value,
+            lastPointsReassignmentDate:firestore.FieldValue.serverTimestamp(),
 
             
           })
@@ -380,7 +381,7 @@ const RecipientProfileForm = ({ navigation }) => {
                     )}
                   </View>
 
-                  {(values.educationLevel === "College" || values.educationLevel === "University") && (
+                  {(values.educationLevel === "College" || values.educationLevel === "University" || values.educationLevel==="Special Education") && (
                     <>
                       {/* Year of Study */}
                       <View style={styles.inputContainer}>

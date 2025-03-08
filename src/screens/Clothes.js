@@ -31,17 +31,17 @@ const Clothes = ({ route }) => {
 
   /** Fetch clothes donations from API */
   const fetchClothesDonations = async () => {
-    if (!userProfile && !isDonor) return // Prevent API call if userProfile is not loaded for recipients
+    if (!userProfile && !isDonor && user.recipientType != "ngo") return // Prevent API call if userProfile is not loaded for recipients
 
     try {
       console.log(`Fetching clothes donations as ${isDonor ? "donor" : "recipient"}`)
       const BASE_URL = await getBaseUrl()
 
       // Different API endpoints based on role
-      const endpoint = isDonor ? `${BASE_URL}/api/all-clothes-donations` : `${BASE_URL}/api/clothes-donations`
+      const endpoint = isDonor || user.recipientType === "ngo" ? `${BASE_URL}/api/all-clothes-donations` : `${BASE_URL}/api/clothes-donations`
 
       // Different params based on role
-      const params = isDonor ? {} : { userProfile: JSON.stringify(userProfile) }
+      const params = isDonor|| user.recipientType === "ngo" ? {} : { userProfile: JSON.stringify(userProfile) }
 
       const response = await axios.get(endpoint, { params })
 
@@ -53,7 +53,7 @@ const Clothes = ({ route }) => {
         })
       }
 
-      if (isDonor) {
+      if (isDonor || user.recipientType === "ngo") {
         // For donors, put all donations in the allDonations array
         setClothesItems({
           recommended: [],
@@ -75,7 +75,7 @@ const Clothes = ({ route }) => {
 
   /** Fetch clothes donations when userProfile is updated or role changes */
   useEffect(() => {
-    if (isDonor || userProfile) {
+    if (isDonor || userProfile || user.recipientType === "ngo") {
       fetchClothesDonations()
     }
   }, [userProfile, isDonor]) //Fixed useEffect dependencies
@@ -149,7 +149,7 @@ const Clothes = ({ route }) => {
       </View>
 
       {/* Donor View - All Donations */}
-      {isDonor && (
+      {(isDonor || user.recipientType === "ngo")&& (
         <View>
           <Text style={styles.sectionHeaderText}>All Available Donations</Text>
           <FlatList

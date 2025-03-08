@@ -64,7 +64,7 @@ export default function LoginScreen({ navigation, route }) {
 
         // Verify password
         if (userData.password === hashedEnteredPassword) {
-          setUser({ ...userData, uid: userId});
+          setUser({ ...userData, uid: userId, role:role});
           return { success: true, message: "Login successful!" };
         } else {
           setPassword({ ...password, error: "Incorrect password" });
@@ -101,10 +101,20 @@ export default function LoginScreen({ navigation, route }) {
           // Handle recipient's navigation after checking NGO status
           if (collectionFound==="ngos") {
             navigation.navigate("TabNavigator", { role: "recipient", type: "ngo" });
+            setUser((prevUser) => ({
+              ...prevUser, // This preserves ALL existing properties
+              recipientType:"ngo"
+            }))
+            
+            
             // navigation.navigate("HomeScreenRec", { role: "recipient", type: "ngo" });
 
           } else if (collectionFound==='recipients') {
             navigation.navigate("TabNavigator", { role: "recipient", type: "individual" });
+            setUser((prevUser) => ({
+              ...prevUser, // This preserves ALL existing properties
+              recipientType:"individual"
+            }))
           }
         } else if (role === 'rider') {
           navigation.navigate("TabNavigator", { role: "rider" });

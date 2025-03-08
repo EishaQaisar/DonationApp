@@ -35,6 +35,7 @@ const PHONE_IPS = [
   'http://10.100.10.242:3000', // Primary laptop IP
   'http://10.100.30.143:3000', // eisha local network IP
   'http://10.100.25.213:3000',  // eisha Additional allowed IP
+  'http://192.168.138.1:3000'
 ];
 
 export function isEmulator(): boolean {

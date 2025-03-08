@@ -1,63 +1,164 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
-import firestore from "@react-native-firebase/firestore";
-import { AuthContext } from "./AuthContext"; // Import AuthContext
+"use client"
 
-export const UserProfileContext = createContext();
+import { createContext, useState, useEffect, useContext } from "react"
+import firestore from "@react-native-firebase/firestore"
+import { AuthContext } from "./AuthContext" // Import AuthContext
+
+export const UserProfileContext = createContext()
+
+// Base khair points per member
+const BASE_KHAIR_POINTS = 100
 
 export const UserProfileProvider = ({ children }) => {
-  const [userProfile, setUserProfile] = useState(null);
-  const { user } = useContext(AuthContext); // Get user from AuthContext
+  const [userProfile, setUserProfile] = useState(null)
+  const { user } = useContext(AuthContext) // Get user from AuthContext
+  const [loading, setLoading] = useState(true)
+
+  // Function to check if a month has passed since the last reassignment
+  const hasMonthPassed = (lastReassignmentDate) => {
+    if (!lastReassignmentDate) return true
+
+    const now = new Date()
+    const lastDate = new Date(lastReassignmentDate.toDate ? lastReassignmentDate.toDate() : lastReassignmentDate)
+
+    // Check if it's a different month or year
+    return now.getMonth() !== lastDate.getMonth() || now.getFullYear() !== lastDate.getFullYear()
+  }
+
+  // Function to calculate khair points based on family members
+  const calculateKhairPoints = ( childrenCount) => {
+    // Base points for the parent
+    let totalPoints = BASE_KHAIR_POINTS
+
+    // Add points for children
+    if (childrenCount && childrenCount > 0) {
+      totalPoints += BASE_KHAIR_POINTS * childrenCount
+    }
+    // If membersCount is provided and different from children+1, use that instead
+    
+
+    return totalPoints
+  }
+
+  // Function to reassign khair points
+  const reassignMonthlyKhairPoints = async (userId, userData, childrenProfiles) => {
+    try {
+      const now = new Date()
+
+      // Calculate the number of family members
+      const childrenCount = childrenProfiles?.length || userData.children || 0
+
+      // Calculate khair points based on family members
+      const newKhairPoints = calculateKhairPoints( childrenCount)
+
+      await firestore().collection("individual_profiles").doc(userId).update({
+        khairPoints: newKhairPoints,
+        lastPointsReassignmentDate: now,
+      })
+
+      console.log("Monthly khair points reassigned successfully:", newKhairPoints)
+      return newKhairPoints
+    } catch (error) {
+      console.error("Error reassigning monthly khair points:", error)
+      return null
+    }
+  }
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!user) {
-        setUserProfile(null);
-        return;
+        setUserProfile(null)
+        setLoading(false)
+        return
       }
 
-      console.log("Fetching user profile for:", user.uid);
+      console.log("Fetching user profile for:", user.uid)
       try {
         // Fetch parent profile
-        const userDoc = await firestore()
-          .collection("individual_profiles")
-          .doc(user.uid)
-          .get();
+        const userDoc = await firestore().collection("individual_profiles").doc(user.uid).get()
 
         if (userDoc.exists) {
-          let userData = userDoc.data();
-          console.log("User profile set:", userData);
+          let userData = userDoc.data()
+          console.log("User profile set:", userData)
 
-          // Fetch children profiles from `children_profiles` collection
-          const childrenDoc = await firestore()
-            .collection("children_profiles")
-            .doc(user.uid)
-            .get();
+          // Fetch children profiles
+          let childrenProfiles = []
+          const childrenDoc = await firestore().collection("children_profiles").doc(user.uid).get()
 
           if (childrenDoc.exists) {
-            const childrenProfiles = childrenDoc.data().children || [];
-            userData = { ...userData, childrenProfiles };
+            childrenProfiles = childrenDoc.data().children || []
+            userData = { ...userData, childrenProfiles }
           } else {
-            userData = { ...userData, childrenProfiles: [] }; // No children data
+            userData = { ...userData, childrenProfiles: [] } // No children data
           }
 
-          setUserProfile(userData);
+          // Check if we need to reassign monthly khair points
+          if (user.role === "recipient" && hasMonthPassed(userData.lastPointsReassignmentDate)) {
+            const newKhairPoints = await reassignMonthlyKhairPoints(user.uid, userData, childrenProfiles)
+
+            if (newKhairPoints !== null) {
+              userData.khairPoints = newKhairPoints
+              userData.lastPointsReassignmentDate = new Date()
+            }
+          }
+
+          // Make sure to include the uid in the userProfile
+          userData = { ...userData, uid: user.uid }
+
+          setUserProfile(userData)
         } else {
-          console.log("User profile not found in Firestore");
-          setUserProfile(null);
+          console.log("User profile not found in Firestore")
+          setUserProfile(null)
         }
       } catch (error) {
-        console.error("Error fetching user profile:", error);
+        console.error("Error fetching user profile:", error)
+      } finally {
+        setLoading(false)
       }
-    };
+    }
 
-    fetchUserProfile();
-  }, [user]); // Runs whenever the user changes
+    fetchUserProfile()
+  }, [user]) // Runs whenever the user changes
+
+  // Add a function to update khair points in the context
+  const updateUserKhairPoints = async (newPoints) => {
+    if (!user) return false
+
+    try {
+      // Update in Firestore
+      await firestore().collection("individual_profiles").doc(user.uid).update({
+        khairPoints: newPoints,
+      })
+
+      // Update local state using functional update
+      setUserProfile((prevProfile) => {
+        if (!prevProfile) return null
+        return {
+          ...prevProfile,
+          khairPoints: newPoints,
+        }
+      })
+
+      return true
+    } catch (error) {
+      console.error("Error updating khair points:", error)
+      return false
+    }
+  }
 
   return (
-    <UserProfileContext.Provider value={{ userProfile, setUserProfile }}>
+    <UserProfileContext.Provider
+      value={{
+        userProfile,
+        setUserProfile,
+        updateUserKhairPoints,
+        loading,
+      }}
+    >
       {children}
     </UserProfileContext.Provider>
-  );
-};
+  )
+}
 
-export const useUserProfile = () => useContext(UserProfileContext);
+export const useUserProfile = () => useContext(UserProfileContext)
+

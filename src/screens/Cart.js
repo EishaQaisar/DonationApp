@@ -17,6 +17,7 @@ const Cart = ({route}) => {
   const navigation = useNavigation(); // Access navigation object
   // const route = useRoute();
 const {role}=route.params;
+
   // Set the header options to include a back button
   useEffect(() => {
     navigation.setOptions({
@@ -37,15 +38,18 @@ const {role}=route.params;
   const isCartPage = route.name === 'Cart';
 
   const renderItem = ({ item }) => (
+  
     <View style={styles.itemRow}>
       <Image source={item.images[0]} style={styles.image} />
       <View style={styles.detailsContainer}>
         <Text style={styles.title}>{item.itemName || item.title}</Text>
         <Text style={styles.description}>{item.description}</Text>
+        <Text style={styles.description}>{item.category}</Text>
+
       </View>
       <TouchableOpacity
         style={styles.removeButton}
-        onPress={() => removeFromCart(item.id)} // Pass the item id to removeFromCart
+        onPress={() => removeFromCart(item)} // Pass the item id to removeFromCart
       >
         <Text style={styles.removeButtonText}>Remove</Text>
       </TouchableOpacity>

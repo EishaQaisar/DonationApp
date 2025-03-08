@@ -10,6 +10,8 @@ import axios from "axios"
 import { getBaseUrl } from "../helpers/deviceDetection"
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
 import { UserProfileContext } from "../context/UserProfileContext"
+import { AuthContext } from "../context/AuthContext"
+
 
 const Education = ({ route }) => {
   const navigation = useNavigation()
@@ -18,6 +20,10 @@ const Education = ({ route }) => {
   const { role } = route.params
   const { isInCart } = useContext(CartContext)
   const { userProfile } = useContext(UserProfileContext)
+  const { user } = useContext(AuthContext)
+
+  console.log(user.recipientType)
+
 
   const [eduItems, setEducationItems] = useState({
     recommended: [],
@@ -28,17 +34,17 @@ const Education = ({ route }) => {
   const isDonor = role === "donor"
 
   const fetchEducationDonations = async () => {
-    if (!userProfile && !isDonor) return // Prevent API call if userProfile is not loaded for recipients
+    if (!userProfile && !isDonor && user.recipientType != "ngo") return // Prevent API call if userProfile is not loaded for recipients
 
     try {
       console.log(`Fetching education donations as ${isDonor ? "donor" : "recipient"}`)
       const BASE_URL = await getBaseUrl()
 
       // Different API endpoints based on role
-      const endpoint = isDonor ? `${BASE_URL}/api/all-education-donations` : `${BASE_URL}/api/education-donations`
+      const endpoint = isDonor || user.recipientType === "ngo" ?  `${BASE_URL}/api/all-education-donations` : `${BASE_URL}/api/education-donations`
 
       // Different params based on role
-      const params = isDonor ? {} : { userProfile: JSON.stringify(userProfile) }
+      const params = isDonor || user.recipientType === "ngo"? {} : { userProfile: JSON.stringify(userProfile) }
 
       const response = await axios.get(endpoint, { params })
 
@@ -50,7 +56,7 @@ const Education = ({ route }) => {
         })
       }
 
-      if (isDonor) {
+      if (isDonor || user.recipientType === "ngo") {
         // For donors, put all donations in the allDonations array
         setEducationItems({
           recommended: [],
@@ -71,7 +77,7 @@ const Education = ({ route }) => {
   }
 
   useEffect(() => {
-    if (isDonor || userProfile) {
+    if (isDonor || userProfile|| user.recipientType === "ngo" ) {
       fetchEducationDonations()
     }
   }, [userProfile, isDonor]) // Added isDonor and userProfile as dependencies
@@ -123,7 +129,7 @@ const Education = ({ route }) => {
       </View>
 
       {/* Donor View - All Donations */}
-      {isDonor && (
+      {(isDonor || user.recipientType === "ngo") && (
         <View>
           <Text style={styles.sectionHeaderText}>All Available Donations</Text>
           <FlatList

@@ -124,7 +124,10 @@ const ChildrenProfiles = ({ navigation, route }) => {
           profileImage: ParentValues.profileImage || "", // Ensure string (or default empty)
           createdAt: firestore.FieldValue.serverTimestamp(), // Timestamp for when the profile is created
           membersCount: Number.parseInt(ParentValues.membersCount) || 0,
-          khairPoints:khairPoints.value + (khairPoints.value * numberOfChildren)
+          khairPoints:khairPoints.value + (khairPoints.value * numberOfChildren),
+          lastPointsReassignmentDate:firestore.FieldValue.serverTimestamp(),
+
+          
 
             
           });

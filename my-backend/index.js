@@ -331,22 +331,22 @@ app.get('/api/all-food-donations', (req, res) => {
         } else {
           // For non-stationary items, use the original matching logic
           parentMatch =
-            (userProfile.institution &&
+            ( userProfile.educationLevel==item.level && userProfile.institution &&
               item.institution.toLowerCase() === userProfile.institution.toLowerCase() &&
               userProfile.class &&
               item.grade === userProfile.class) ||
-            (userProfile.class && item.grade === userProfile.class)
+            (userProfile.class && item.grade === userProfile.class) && userProfile.educationLevel==item.level
   
           // Check if any enrolled child matches
           childMatch = childrenProfiles.some(
             (child) =>
               // Only consider children who are enrolled in education
               child.enrollmentStatus === "Enrolled" &&
-              ((child.institution &&
+              ((child.educationLevel==item.level && child.institution &&
                 item.institution === child.institution &&
                 child.class &&
                 item.grade === child.class) ||
-                (child.class && item.grade === child.class)),
+                (child.class && item.grade === child.class && child.educationLevel==item.level)),
           )
         }
   

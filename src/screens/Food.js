@@ -31,17 +31,17 @@ const Food = ({ route }) => {
 
   /** Fetch food donations from API */
   const fetchFoodDonations = async () => {
-    if (!userProfile && !isDonor) return // Prevent API call if userProfile is not loaded for recipients
+    if (!userProfile && !isDonor && user.recipientType!="ngo") return // Prevent API call if userProfile is not loaded for recipients
 
     try {
       console.log(`Fetching food donations as ${isDonor ? "donor" : "recipient"}`)
       const BASE_URL = await getBaseUrl()
 
       // Different API endpoints based on role
-      const endpoint = isDonor ? `${BASE_URL}/api/all-food-donations` : `${BASE_URL}/api/food-donations`
+      const endpoint = isDonor || user.recipientType === "ngo"  ? `${BASE_URL}/api/all-food-donations` : `${BASE_URL}/api/food-donations`
 
       // Different params based on role
-      const params = isDonor ? {} : { userProfile: JSON.stringify(userProfile) }
+      const params = isDonor || user.recipientType === "ngo"? {} : { userProfile: JSON.stringify(userProfile) }
 
       const response = await axios.get(endpoint, { params })
 
@@ -53,7 +53,7 @@ const Food = ({ route }) => {
         })
       }
 
-      if (isDonor) {
+      if (isDonor ||  user.recipientType === "ngo") {
         // For donors, put all donations in the allDonations array
         setFoodItems({
           recommended: [],
@@ -75,7 +75,7 @@ const Food = ({ route }) => {
 
   /** Fetch food donations when userProfile is updated or role changes */
   useEffect(() => {
-    if (isDonor || userProfile) {
+    if (isDonor || userProfile || user.recipientType === "ngo") {
       fetchFoodDonations()
     }
   }, [userProfile, isDonor])
@@ -128,7 +128,7 @@ const Food = ({ route }) => {
       </View>
 
       {/* Donor View - All Donations */}
-      {isDonor && (
+      {(isDonor || user.recipientType === "ngo") && (
         <View>
           <Text style={styles.sectionHeaderText}>All Available Donations</Text>
           <FlatList
@@ -143,7 +143,7 @@ const Food = ({ route }) => {
       )}
 
       {/* Recipient View - Recommended Donations */}
-      {!isDonor && foodItems.recommended.length > 0 && (
+      {(!isDonor && user.recipientType != "ngo") && foodItems.recommended.length > 0 && (
         <View>
           <Text style={styles.sectionHeaderText}>Recommended for You</Text>
           <FlatList
@@ -158,7 +158,7 @@ const Food = ({ route }) => {
       )}
 
       {/* Recipient View - Other Donations */}
-      {!isDonor && foodItems.others.length > 0 && (
+      {!isDonor && user.recipientType != "ngo" && foodItems.others.length > 0 && (
         <View>
           <Text style={styles.sectionHeaderText}>Others</Text>
           <FlatList
