@@ -193,22 +193,25 @@ const ItemDetail = ({ route }) => {
     };
 
     try {
-      const BASE_URL = await getBaseUrl(); 
-        const response = await fetch(`${BASE_URL}/api/add-claimed-item`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(claimedItemDetails),
-        });
-
-        if (response.ok) {
-            console.log('Item claimed successfully in the database');
-        } else {
-            console.error('Error claiming item in the database');
-        }
+      const BASE_URL = await getBaseUrl();
+      const response = await axios.post(`${BASE_URL}/api/add-claimed-item`, claimedItemDetails);
+      
+      console.log('Item claimed successfully in the database');
+      return response.data;
     } catch (error) {
-        console.error('Error claiming item:', error);
+      // Better error logging
+      if (error.response) {
+        // The server responded with a status code outside the 2xx range
+        console.error('Server error:', error.response.status, error.response.data);
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error('No response received:', error.request);
+      } else {
+        // Something happened in setting up the request
+        console.error('Request setup error:', error.message);
+      }
+      console.error('Error config:', error.config);
+      throw error;
     }
 };
 
