@@ -36,6 +36,24 @@ const createTables = () => {
         category VARCHAR(255) NOT NULL
       );
     `;
+    const claimedItemsTable = `
+    CREATE TABLE IF NOT EXISTS ClaimedItems (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      itemName VARCHAR(255) NOT NULL,
+
+      donorUsername VARCHAR(255) NOT NULL,
+      claimerUsername VARCHAR(255) NOT NULL,
+      donationType VARCHAR(255) NOT NULL, -- Type of donation (e.g., food, clothes, education)
+      itemId INT NOT NULL, -- The ID of the donated item
+      claimDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      scheduledelivery VARCHAR(255) DEFAULT 'Unscehduled',
+      claimStatus VARCHAR(255) DEFAULT 'Claimed',
+      khairPoints INT NOT NULL
+
+      
+    );
+
+  `;
   
     const foodDonationsTable = `
       CREATE TABLE IF NOT EXISTS FoodDonations (
@@ -106,7 +124,13 @@ const createTables = () => {
         console.log('Donations table created successfully');
       }
     });
-  
+    db.query(claimedItemsTable, (err, result) => {
+      if (err) {
+        console.log('Error creating ClaimedItems table:', err);
+      } else {
+        console.log('ClaimedItems table created successfully');
+      }
+    });
     db.query(foodDonationsTable, (err, result) => {
       if (err) {
         console.log('Error creating FoodDonations table:', err);
@@ -135,6 +159,7 @@ const createTables = () => {
   
   // Call the function to create the tables
   createTables();
+  
 
   // API endpoint to add a food donation
 
@@ -471,4 +496,240 @@ app.get('/api/all-food-donations', (req, res) => {
       res.json(results)
     })
   })
+
+
+
+  /*notification funcs*/
+  app.post('/api/add-claimed-item', (req, res) => {
+    console.log(req.body);
+    const { donorUsername, claimerUsername, donationType,claimStatus,itemName, itemId,scheduledelivery, khairPoints } = req.body;
+    // const claimStatus = 'Claimed';
+
+    console.log("Received data:", { donorUsername, claimerUsername, donationType,itemName, itemId, claimStatus,scheduledelivery,khairPoints });
+
+    // Query to insert a claimed item into the ClaimedItems table
+    const query = `
+      INSERT INTO ClaimedItems (donorUsername, claimerUsername, donationType,itemName, itemId, scheduledelivery,claimStatus, khairPoints)
+      VALUES (?, ?, ?, ?, ?,?,?,?)
+    `;
+
+    // Log the data being passed to the query
+    console.log('Executing query with:', [donorUsername, claimerUsername, donationType,    itemName ,
+      itemId,scheduledelivery,claimStatus|| 'Claimed'],khairPoints);
+
+    // Execute the query
+    db.query(query, [donorUsername, claimerUsername, donationType,itemName, itemId,scheduledelivery, claimStatus || 'Claimed', khairPoints], (err, results) => {
+        if (err) {
+            console.error('Error inserting claimed item:', err);
+            return res.status(500).send('Error claiming item');
+        }
+        console.log('Insert result:', results); // Log the results to ensure insertion
+        res.status(200).send('Item claimed successfully');
+    });
+});
+
+
+    // API endpoint to approve a claimed item
+app.post('/api/approve-claim', (req, res) => {
+  const { id } = req.body;
+
+  const query = `
+    UPDATE ClaimedItems 
+    SET claimStatus = 'Approved' 
+    WHERE id = ?
+  `;
+
+  db.query(query, [id], (err, result) => {
+    if (err) {
+      console.error('Error approving claim:', err);
+      return res.status(500).send('Error approving claim');
+    }
+    res.status(200).send('Claim approved successfully');
+  });
+});
+
+// API endpoint to delete a claim (decline a claim)
+
+app.delete('/api/delete-claim/:id', (req, res) => {
+  const { id } = req.params;
+  const { itemId, category } = req.query; // Extract `itemId` and `category` from query parameters
+
+  let query;
+  let values;
+
+  if (id !== 'null') {
+    // Delete by `id` if it exists in the request
+    query = `DELETE FROM ClaimedItems WHERE id = ?`;
+    values = [id];
+  } else if (itemId && category) {
+    // Delete by `itemId` and `category` if provided
+    query = `DELETE FROM ClaimedItems WHERE itemId = ? AND donationType = ?`;
+    values = [itemId, category];
+  } else {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Invalid request: Provide either claim ID or both itemId and category',
+    });
+  }
+
+  // Execute the query
+  db.query(query, values, (err, result) => {
+    if (err) {
+      console.error('Error deleting claim:', err);
+      return res.status(500).json({
+        status: 'error',
+        message: 'Error deleting claim',
+      });
+    }
+
+    // Check if any rows were deleted
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Claim not found',
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Claim deleted successfully',
+    });
+  });
+});
+
+  //for tables after clicking yes
+  app.post('/api/approve-claims', (req, res) => {
+    const { id,category } = req.body;
+    console.log("id while updating",id);
   
+    let query = '';
+    
+    // Determine which table to update based on the category
+    switch (category) {
+      case 'Education':
+        query = `
+          UPDATE educationdonations 
+          SET claimStatus = 'Claimed' 
+          WHERE id = ?
+        `;
+        break;
+      case 'Clothes':
+        query = `
+          UPDATE clothesdonations 
+          SET claimStatus = 'Claimed' 
+          WHERE id = ?
+        `;
+        break;
+      case 'Food':
+        query = `
+          UPDATE fooddonations 
+          SET claimStatus = 'Claimed' 
+          WHERE id = ?
+        `;
+        break;
+      default:
+        return res.status(400).send('Invalid category');
+    }
+  
+    // Execute the query with the item ID
+    db.query(query, [id], (err, result) => {
+      if (err) {
+        console.error('Error approving claim:', err);
+        return res.status(500).send('Error approving claim');
+      }
+      res.status(200).send('Claim updated successfully');
+    });
+  });
+  //api to return notifications to recipient
+  app.get('/api/claimed-status', (req, res) => {
+    const query = 'SELECT * FROM ClaimedItems WHERE claimStatus = ?';
+    
+    // Execute the database query with 'Approved' status instead of 'Claimed'
+    db.query(query, ['Approved'], (err, results) => {
+        if (err) {
+            // Log the error for debugging
+            console.error('Error fetching claimed items:', err);
+            return res.status(500).json({
+                status: 'error',
+                message: 'Error fetching claimed items',
+                error: err.message, // Optional: Return the actual error for debugging (remove in production)
+            });
+        }
+
+        // Return the results in a structured format
+        return res.status(200).json({
+            status: 'success',
+            data: results,
+        });
+    });
+});
+
+
+ app.get('/api/claimed-items', (req, res) => {
+    const query = 'SELECT * FROM ClaimedItems WHERE claimStatus = ?';
+    
+    // Execute the database query
+    db.query(query, ['Claimed'], (err, results) => {
+        if (err) {
+            // Log the error for debugging
+            console.error('Error fetching claimed items:', err);
+            return res.status(500).json({
+                status: 'error',
+                message: 'Error fetching claimed items',
+                error: err.message, // Optional: Return the actual error for debugging (remove in production)
+            });
+        }
+
+        // Return the results in a structured format
+        return res.status(200).json({
+            status: 'success',
+            data: results,
+        });
+    });
+});
+
+//for revesing to unclaimed if declined
+app.post('/api/reverse-claim-status', (req, res) => {
+  const { itemId,category } = req.body;
+  console.log(req.body)
+  console.log("sefesfe",itemId,category)
+
+  let query = '';
+  
+  // Determine which table to update based on the category
+  switch (category) {
+    case 'Education':
+      query = `
+        UPDATE educationdonations 
+        SET claimStatus = 'Unclaimed' 
+        WHERE id = ?
+      `;
+      break;
+    case 'Clothes':
+      query = `
+        UPDATE clothesdonations 
+        SET claimStatus = 'Unclaimed' 
+        WHERE id = ?
+      `;
+      break;
+    case 'Food':
+      query = `
+        UPDATE fooddonations 
+        SET claimStatus = 'Unclaimed' 
+        WHERE id = ?
+      `;
+      break;
+    default:
+      return res.status(400).send('Invalid category');
+  }
+
+  // Execute the query with the item ID
+  db.query(query, [itemId], (err, result) => {
+    if (err) {
+      console.error('Error declining claim:', err);
+      return res.status(500).send('Error declined claim');
+    }
+    res.status(200).send('Claim updated successfully');
+  });
+});
+

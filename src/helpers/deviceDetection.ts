@@ -35,7 +35,7 @@ const PHONE_IPS = [
   'http://10.100.10.242:3000', // Primary laptop IP
   'http://10.100.30.143:3000', // eisha local network IP
   'http://10.100.25.213:3000',  // eisha Additional allowed IP
-  'http://192.168.138.1:3000'
+  'http://192.168.1.9:3000'
 ];
 
 export function isEmulator(): boolean {
@@ -61,8 +61,11 @@ export function checkIpAvailability(ip: string): Promise<boolean> {
 }
 
 export async function getBaseUrl(): Promise<string> {
+  
   const EMULATOR_IP = 'http://10.0.2.2:3000';
+  /*
   let PHYSICAL_DEVICE_IP = PHONE_IPS[0];  // Default to the first IP
+  
 
   if (!isEmulator()) {
     for (let ip of PHONE_IPS) {
@@ -77,7 +80,10 @@ export async function getBaseUrl(): Promise<string> {
     }
   }
   console.log("before returning",PHYSICAL_DEVICE_IP);
-  return isEmulator() ? EMULATOR_IP : PHYSICAL_DEVICE_IP;
+  */
+  return isEmulator() ? EMULATOR_IP : 'http://192.168.1.9:3000';
+  
+  
 }
 
 

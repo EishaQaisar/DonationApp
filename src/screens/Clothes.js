@@ -27,7 +27,7 @@ const Clothes = ({ route }) => {
     allDonations: [], // New state for donor view
   })
 
-  const isDonor = role === "donor"
+  const isDonor = user.role === "donor"
 
   /** Fetch clothes donations from API */
   const fetchClothesDonations = async () => {

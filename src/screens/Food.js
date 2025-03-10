@@ -27,7 +27,7 @@ const Food = ({ route }) => {
     allDonations: [], // For donor view
   })
 
-  const isDonor = role === "donor"
+  const isDonor = user.role === "donor"
 
   /** Fetch food donations from API */
   const fetchFoodDonations = async () => {

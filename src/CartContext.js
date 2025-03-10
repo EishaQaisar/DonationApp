@@ -3,6 +3,10 @@ import React, { createContext, useState, useContext } from 'react';
 import firestore from "@react-native-firebase/firestore"
 import { AuthContext } from "./context/AuthContext"
 import { UserProfileContext } from "./context/UserProfileContext"
+import axios from "axios"
+import { getBaseUrl } from './helpers/deviceDetection';
+
+
 
 export const CartContext = createContext();
 
@@ -22,12 +26,27 @@ export const CartProvider = ({ children }) => {
 
   const removeFromCart =async (item) => {
     const itemId=item.id
+    const category=item.category
     const itemKP=khairPointsPerCategory[item.category]* item.quantity
     const currentKP=userProfile.khairPoints
     const newKP=currentKP + itemKP;
     const success = await updateKhairPoints(newKP)
-
     setCartItems((prevItems) => prevItems.filter(cartItem => cartItem.id !== itemId));
+    console.log(itemId, category)
+    const BASE_URL=await getBaseUrl()
+
+
+    const response=await axios.post(`${BASE_URL}/api/reverse-claim-status`, { itemId, category })
+    const response1 = await axios.delete(`${BASE_URL}/api/delete-claim/null`, {
+      params: {
+        itemId: itemId,  // Replace with actual itemId
+        category: category // Replace with actual category
+      }
+    });
+    
+    
+    
+
   };
 
   const { userProfile, setUserProfile } = useContext(UserProfileContext)

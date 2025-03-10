@@ -22,7 +22,6 @@ const Education = ({ route }) => {
   const { userProfile } = useContext(UserProfileContext)
   const { user } = useContext(AuthContext)
 
-  console.log(user.recipientType)
 
 
   const [eduItems, setEducationItems] = useState({
@@ -31,7 +30,7 @@ const Education = ({ route }) => {
     allDonations: [], // New state for donor view
   })
 
-  const isDonor = role === "donor"
+  const isDonor = user.role === "donor"
 
   const fetchEducationDonations = async () => {
     if (!userProfile && !isDonor && user.recipientType != "ngo") return // Prevent API call if userProfile is not loaded for recipients

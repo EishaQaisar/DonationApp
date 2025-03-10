@@ -1,6 +1,7 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 import Notifications from "../screens/Notifications"
-import { StyleSheet } from "react-native"
+import { View, Text, Button, TouchableOpacity, StyleSheet, ScrollView,Image } from 'react-native';
+
 import { theme } from "../core/theme"
 import Entypo from "@expo/vector-icons/Entypo"
 import Ionicons from "@expo/vector-icons/Ionicons"
@@ -39,14 +40,16 @@ function TabNavigator({ navigation, route }) {
           initialParams={{ role }}
         />
 
-        <Tab.Screen
-          name="Notifications"
-          component={Notifications}
-          options={{
-            headerShown: false,
-            tabBarIcon: ({ color }) => <Ionicons name="notifications" size={24} color={color} />,
-          }}
-        />
+        <Tab.Screen name="Notifications" component={Notifications} 
+            options={{headerShown:false,
+              tabBarIcon:({color})=> (
+                <View>
+                  <Ionicons name="notifications" size={24} color={color} />
+                
+                </View>
+              )
+            }} initialParams={{ ...route.params }}
+          />
 
         {role === "recipient" && (
           <Tab.Screen

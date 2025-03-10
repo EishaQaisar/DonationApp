@@ -19,6 +19,9 @@ import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
 import { UserProfileContext } from "../context/UserProfileContext"
 import firestore from "@react-native-firebase/firestore"
 import { AuthContext } from "../context/AuthContext"
+import { getBaseUrl } from "../helpers/deviceDetection"
+import axios from 'axios';
+
 
 const ItemDetail = ({ route }) => {
   const { item, category, role } = route.params
@@ -29,6 +32,7 @@ const ItemDetail = ({ route }) => {
   const { userProfile, setUserProfile } = useContext(UserProfileContext)
   const [requiredKhairPoints, setRequiredKhairPoints] = useState(0)
   const { user } = useContext(AuthContext)
+  const [not, setNot] = useState([]);
 
   const isClaimed = isInCart(item)
   const khairPointsPerCategory = {
@@ -160,6 +164,68 @@ const ItemDetail = ({ route }) => {
         )
     }
   }
+  /*notification work*/
+  const claimItemInDB = async () => {
+    let requiredItemName;
+
+    if (category==='Food'){
+      requiredItemName=item.foodName;
+
+    }
+    else if (category==='Clothes'){
+      requiredItemName=item.itemCategory
+
+    }
+    else {
+      requiredItemName=item.itemName
+     
+    }
+    const claimedItemDetails = {
+        donorUsername: item.donorUsername,
+        claimerUsername: user.username, // Replace this with the actual claimer's username (you can get this from user context or route)
+        donationType: category,
+        itemId: item.id,
+        claimStatus:'Claimed',
+        scheduledelivery:'Unscheduled',
+         // Assuming each item has a unique ID
+         itemName:requiredItemName,
+         khairPoints: parseInt(requiredKhairPoints)
+    };
+
+    try {
+      const BASE_URL = await getBaseUrl(); 
+        const response = await fetch(`${BASE_URL}/api/add-claimed-item`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(claimedItemDetails),
+        });
+
+        if (response.ok) {
+            console.log('Item claimed successfully in the database');
+        } else {
+            console.error('Error claiming item in the database');
+        }
+    } catch (error) {
+        console.error('Error claiming item:', error);
+    }
+};
+
+const changingStatus = async (category,id) => {
+  try {
+      const BASE_URL = await getBaseUrl();  // If you're using a base URL helper function
+
+      await axios.post(`${BASE_URL}/api/approve-claims`, { id,category }); // Pass the id in the request body
+      // setNot(not.filter(item => item.id !== id));
+
+      
+  } catch (error) {
+      console.error(`Error changing claim status of table ${category}:`, error);
+      
+  }
+};
+
 
   const showConfirmationModal = () => {
     setIsModalVisible(true)
@@ -183,7 +249,9 @@ const ItemDetail = ({ route }) => {
     
 
     if (success) {
+      changingStatus(category,item.id);
       addToCart(item,category) // Add to cart if points were successfully updated
+      claimItemInDB();
       setIsModalVisible(false)
     } else {
       // Handle error - could show an error message

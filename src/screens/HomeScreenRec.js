@@ -11,8 +11,6 @@ const HomeScreenRec = ({ navigation, route }) => {
   const tabBarHeight = useBottomTabBarHeight();
   const { role, type } = route.params;  // Assuming `role` and `type` are passed in params
   const { user } = useContext(AuthContext);
-  console.log(user.username);
-  console.log(user.recipientType);
   
 
   return (
