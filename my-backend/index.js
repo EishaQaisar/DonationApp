@@ -734,3 +734,26 @@ app.post('/api/reverse-claim-status', (req, res) => {
   });
 });
 
+
+app.get('/api/claimed-items', (req, res) => {
+  const query = "SELECT * FROM ClaimedItems WHERE scheduleDelivery = 'Unscheduled'";
+
+  // Execute the database query
+  db.query(query, (err, results) => {
+      if (err) {
+          console.error('Error fetching claimed items:', err);
+          return res.status(500).json({
+              status: 'error',
+              message: 'Error fetching claimed items',
+              error: err.message, 
+          });
+      }
+
+      return res.status(200).json({
+          status: 'success',
+          data: results,
+      });
+  });
+});
+
+

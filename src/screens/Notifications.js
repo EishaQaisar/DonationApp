@@ -202,6 +202,8 @@ const Notifications = ({ route }) => {
 
       // Also refresh in the background to ensure data consistency
       fetchNotifications()
+      console.log("the is to be sent to the Sdelivery page",id);
+      navigation.navigate('ScheduleRDeliveryScreen', { id });
     } catch (error) {
       console.error("Error approving claim:", error)
       setMessage("Failed to approve the claim.")

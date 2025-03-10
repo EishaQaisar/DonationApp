@@ -21,7 +21,16 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.zhalay.DK2"
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ],
+      "package": "com.zhalay.DK2",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyB9irjntPHdEJf024h7H_XKpS11OeW1Nh8"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"

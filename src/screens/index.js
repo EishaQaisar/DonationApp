@@ -18,6 +18,9 @@ export{default as NGOCampaignForm} from "./NGOCampaignForm";
 export{default as RecipientProfileForm} from "./RecipientProfileForm";
 export{default as ChildrenProfiles} from "./ChildrenProfiles";
 
+export{default as RiderFinalHomeScreen} from './RiderFinalHomeScreen';
+export{default as DonorOrderTrackingScreen} from './DonerOrderTrackingScreen';
+
 
 
 
@@ -31,6 +34,8 @@ export { default as RegisterNGOScreen } from "./RegisterNGOScreen";
 export { default as ResetPasswordScreen } from "./ResetPasswordScreen";
 export { default as  ScheduleRDeliveryScreen} from "./ScheduleRDeliveryScreen";
 export {default as DonationSuccessScreen} from './DonationSuccessScreen';
+export {default as DeliveryHistory} from "./DeliveryHistory";
+
 
 //eishah nadeem screens:
 // Exporting all the screens from a single file for easy imports
