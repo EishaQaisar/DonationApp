@@ -20,9 +20,10 @@ export const CartProvider = ({ children }) => {
   };
 
   const isInCart = (item) => {
-
-    return cartItems.some(cartItem => cartItem.id === item.id);
+    return cartItems.some(cartItem => cartItem.id === item.id );
   };
+  
+  
 
   const removeFromCart =async (item) => {
     const itemId=item.id

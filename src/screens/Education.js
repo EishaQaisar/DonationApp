@@ -34,7 +34,7 @@ const Education = ({ route }) => {
 
   const fetchEducationDonations = async () => {
     if (!userProfile && !isDonor && user.recipientType != "ngo") return // Prevent API call if userProfile is not loaded for recipients
-
+console.log("jere")
     try {
       console.log(`Fetching education donations as ${isDonor ? "donor" : "recipient"}`)
       const BASE_URL = await getBaseUrl()
@@ -63,6 +63,7 @@ const Education = ({ route }) => {
           allDonations: processItems(response.data),
         })
       } else {
+        console.log("hwerwer")
         // For recipients, maintain the recommended/others structure
         setEducationItems({
           recommended: response.data.recommended ? processItems(response.data.recommended) : [],

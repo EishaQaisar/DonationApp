@@ -389,6 +389,7 @@ app.get('/api/all-food-donations', (req, res) => {
       recommended.sort(sortByCreatedAt)
       others.sort(sortByCreatedAt)
       console.log(recommended)
+      console.log(others)
   
       res.json({
         recommended: recommended,
