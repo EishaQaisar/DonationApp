@@ -40,16 +40,12 @@ function TabNavigator({ navigation, route }) {
           initialParams={{ role }}
         />
 
-        <Tab.Screen name="Notifications" component={Notifications} 
-            options={{headerShown:false,
-              tabBarIcon:({color})=> (
-                <View>
-                  <Ionicons name="notifications" size={24} color={color} />
-                
-                </View>
-              )
-            }} initialParams={{ ...route.params }}
-          />
+{(role === "recipient" || role === "donor") && (
+  <Tab.Screen name="Notifications" component={Notifications} options={{
+    headerShown: false,
+    tabBarIcon: ({ color }) => <Ionicons name="notifications" size={24} color={color} />
+  }} initialParams={{ ...route.params }}/>
+)}
 
         {role === "recipient" && (
           <Tab.Screen
@@ -72,6 +68,8 @@ function TabNavigator({ navigation, route }) {
           }}
           initialParams={{ role }}
         />
+
+        
       </Tab.Navigator>
     </CartProvider>
   )

@@ -11,7 +11,7 @@ import firestore from "@react-native-firebase/firestore"
 import { UserProfileContext } from "../context/UserProfileContext"
 
 
-const Notifications = ({ route }) => {
+const Notifications = ({ route,navigation }) => {
   const { role } = route.params
   const [notifications, setNotifications] = useState([])
   const [message, setMessage] = useState("")

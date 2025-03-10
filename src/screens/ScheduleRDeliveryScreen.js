@@ -65,10 +65,10 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
 
     try {
       const BASE_URL = await getBaseUrl();
-      const endpoint = `${BASE_URL}/api/claimed-items`;
+      const endpoint = `${BASE_URL}/api/claimed-items/unscheduled`;
       const response = await axios.get(endpoint);
 
-      console.log("Fetched Claimed Items:", response.data); // Debugging step
+      console.log("Fetched Claimed Items unscheduled:", response.data); // Debugging step
 
       // Ensure response.data.data exists and is an array before using find()
       if (Array.isArray(response.data?.data)) {

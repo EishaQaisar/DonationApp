@@ -7,6 +7,7 @@ import MapViewDirections from "react-native-maps-directions"
 import { Ionicons, MaterialIcons, FontAwesome5 } from "react-native-vector-icons"
 import firestore from "@react-native-firebase/firestore"
 import { AuthContext } from "../context/AuthContext";
+import { theme } from '../core/theme'
 
 // Status mapping for user-friendly display
 const statusMessages = {
@@ -31,7 +32,7 @@ const statusColors = {
 // Replace with your Google Maps API key
 const GOOGLE_API_KEY = "AIzaSyB9irjntPHdEJf024h7H_XKpS11OeW1Nh8"
 
-const DonorOrderTrackingScreen = ({ route, navigation }) => {
+const DonorOrderTrackingScreen = ({route,navigation}) => {
   const { user } = useContext(AuthContext);
   // Extract orderId from route params or use null if not provided
   const orderId = route.params?.orderId || null;
@@ -562,7 +563,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   backButton: {
-    backgroundColor: "#4a90e2",
+    backgroundColor: theme.colors.sageGreen,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,

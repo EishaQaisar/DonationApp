@@ -113,7 +113,7 @@ const DonorHomeScreen = ({ navigation }) => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => navigation.navigate("ScheduleRDeliveryScreen")}
+            onPress={() => navigation.navigate("DonorOrderTrackingScreen")}
             style={Styles.optionCards}
           >
             <Image source={require('../../assets/items/moni.jpg')} style={{
@@ -129,7 +129,7 @@ const DonorHomeScreen = ({ navigation }) => {
 
 
           <TouchableOpacity
-            onPress={() => navigation.navigate("ScheduleRDeliveryScreen")}
+            onPress={() => navigation.navigate("DonorOrderTrcaking")}
             style={Styles.optionCards}
           >
             <Image source={require('../../assets/items/viewanalytics2.jpg')} style={{

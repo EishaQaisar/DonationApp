@@ -66,7 +66,7 @@ const Profile = ({ route }) => {
   useEffect(() => {
     setIsReady(true)
   }, [])
-  if ((!isReady || !userProfile) && user.role!='donor') {
+  if ((!isReady || !userProfile) && user.role!='donor' && user.role!='rider') {
     // Show a loading state or placeholder while waiting for data
     return (
       <View style={[styles.container, { justifyContent: "center" }]}>
@@ -106,11 +106,25 @@ const Profile = ({ route }) => {
       </Animated.View>
 
       <View style={styles.buttonsContainer}>
-        {role === "donor" ? (
-          <AnimatedButton icon="gift" text="My Donations" onPress={() => navigation.navigate("ClaimsHistory")} />
-        ) : (
-          <AnimatedButton icon="history" text="My Claims" onPress={() => navigation.navigate("ClaimsHistory")} />
-        )}
+      {role === "donor" ? (
+    <AnimatedButton
+      icon="gift"
+      text="My Donations"
+      onPress={() => navigation.navigate("ClaimsHistory")}
+    />
+  ) : role === "recipient" ? (
+    <AnimatedButton
+      icon="history"
+      text="My Claims"
+      onPress={() => navigation.navigate("ClaimsHistory")}
+    />
+  ) : role === "rider" ? (
+    <AnimatedButton
+      icon="truck-delivery"
+      text="My Deliveries"
+      onPress={() => navigation.navigate("DeliveryHistory")}
+    />
+  ) : null}
         <AnimatedButton
           icon="logout"
           text="Logout"

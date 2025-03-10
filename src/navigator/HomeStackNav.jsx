@@ -2,7 +2,7 @@ import { View, Text } from 'react-native'
 import React from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
 import { theme } from '../core/theme'
-import { ChooseCategory, DonorHomeScreen, ScheduleRDeliveryScreen, UploadClothes, UploadEdu, UploadFood, HomeScreenRec, Education, Clothes, Food, ClaimsHistory, ItemDetail, RecepientStartScreen, DonationSuccessScreen, NgoPostDetailsScreen, ViewNgoPostsScreen, NGOCampaignForm } from '../screens';
+import { ChooseCategory, DonorHomeScreen, ScheduleRDeliveryScreen, UploadClothes, UploadEdu, UploadFood, HomeScreenRec, Education, Clothes, Food, ClaimsHistory, ItemDetail, RecepientStartScreen, DonationSuccessScreen, NgoPostDetailsScreen, ViewNgoPostsScreen, NGOCampaignForm ,RiderFinalHomeScreen ,DonorOrderTrackingScreen} from '../screens';
 const Stack = createStackNavigator();
 const HomeStackNav = ({ navigation, route }) => {
   const { role } = route.params;
@@ -23,6 +23,16 @@ const HomeStackNav = ({ navigation, route }) => {
           component={HomeScreenRec}
           options={{ headerShown: false }}
           initialParams={{ ...route.params }}/>
+      )}
+
+{role === "rider" && (
+        <Stack.Screen
+          name="Start"
+          component={RiderFinalHomeScreen}
+          options={{ headerShown: false }}
+          initialParams={{ ...route.params }}/>
+
+          
       )}
       
       <Stack.Screen name='ChooseCategory' component={ChooseCategory} options={{ headerShown: false }} />
@@ -64,6 +74,16 @@ const HomeStackNav = ({ navigation, route }) => {
         }}
 
       />
+
+{/* <Stack.Screen name='DonorOrderTrackingScreen' component={DonorOrderTrackingScreen}
+        options={{
+          title: "Monitoring", headerTitleStyle: { textAlign: 'center' },
+          headerTitleAlign: 'center', headerStyle: { backgroundColor: theme.colors.charcoalBlack, height: 70 },
+          headerTintColor: theme.colors.ivory
+        }}
+
+      /> */}
+        
 
       <Stack.Screen
         name="Clothes"
@@ -116,7 +136,7 @@ const HomeStackNav = ({ navigation, route }) => {
       <Stack.Screen name='NgoPostDetailsScreen' component={NgoPostDetailsScreen} options={{ headerShown: false }} />
      
       <Stack.Screen name='NGOCampaignForm' component={NGOCampaignForm} options={{headerShown:false}}/>
-
+      <Stack.Screen name='DonorOrderTrackingScreen' component={DonorOrderTrackingScreen} options={{headerShown:false}}/>
 
 
 

@@ -19,7 +19,7 @@ export{default as RecipientProfileForm} from "./RecipientProfileForm";
 export{default as ChildrenProfiles} from "./ChildrenProfiles";
 
 export{default as RiderFinalHomeScreen} from './RiderFinalHomeScreen';
-export{default as DonorOrderTrackingScreen} from './DonerOrderTrackingScreen';
+
 
 
 
@@ -55,6 +55,8 @@ export { default as Food } from './Food';
 export { default as Clothes } from './Clothes';
 export { default as RecepientStartScreen } from './RecepientStartScreen';
 export { default as NgoPostDetailsScreen} from "./NgoPostDetailsScreen";
+
+export {default as DonorOrderTrackingScreen} from "./DonerOrderTrackingScreen";
 
 
 

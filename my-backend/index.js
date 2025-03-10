@@ -689,6 +689,31 @@ app.delete('/api/delete-claim/:id', (req, res) => {
     });
 });
 
+
+app.get('/api/claimed-items/unscheduled', (req, res) => {
+  const query = 'SELECT * FROM ClaimedItems WHERE scheduledelivery = ?';
+  
+  // Execute the database query
+  db.query(query, ['Unscheduled'], (err, results) => {
+      if (err) {
+          // Log the error for debugging
+          console.error('Error fetching unscheduled claimed items:', err);
+          return res.status(500).json({
+              status: 'error',
+              message: 'Error fetching unscheduled claimed items',
+              error: err.message, // Optional: Remove in production
+          });
+      }
+
+      // Return the results in a structured format
+      return res.status(200).json({
+          status: 'success',
+          data: results,
+      });
+  });
+});
+
+
 //for revesing to unclaimed if declined
 app.post('/api/reverse-claim-status', (req, res) => {
   const { itemId,category } = req.body;
