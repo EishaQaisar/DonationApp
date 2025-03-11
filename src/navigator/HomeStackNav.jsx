@@ -142,6 +142,11 @@ const HomeStackNav = ({ navigation, route }) => {
       />
 
       <Stack.Screen name='DonorOrderTrackingScreen' component={DonorOrderTrackingScreen} options={{headerShown:false}}/>
+    
+
+       
+
+
       <Stack.Screen
         name="ViewNgoPostsScreen"
         component={ViewNgoPostsScreen}
@@ -154,11 +159,6 @@ const HomeStackNav = ({ navigation, route }) => {
      <Stack.Screen name='NgoPostDetailsScreen' component={NgoPostDetailsScreen} options={{ headerShown: false }}initialParams={{ ...route.params }} />
      
      <Stack.Screen name='NGOCampaignForm' component={NGOCampaignForm} options={{headerShown:false}}initialParams={{ ...route.params }}/>
-
-
-
-       
-
 
 
      

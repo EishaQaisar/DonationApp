@@ -1,15 +1,39 @@
-import React ,{useState, useContext}from 'react';
+import React ,{useState, useContext,useEffect}from 'react';
 import { View, Text, Button, TouchableOpacity, StyleSheet, ScrollView, Image, Pressable } from 'react-native';
 import { theme } from "../core/theme";
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { AuthContext } from "../context/AuthContext";
 import { ngoPostsData } from './ViewNgoPostsScreen';
+import { getBaseUrl } from "../helpers/deviceDetection";
+import axios from 'axios';
+
 
 
 const DonorHomeScreen = ({ navigation }) => {
   const tabBarHeight = useBottomTabBarHeight();
   const { user } = useContext(AuthContext);
+    const [campaigns, setCampaigns] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+     // Fetch campaigns data when component mounts
+      useEffect(() => {
+        const fetchCampaigns = async () => {
+          try {
+            const BASE_URL = await getBaseUrl();
+            const response = await axios.get(`${BASE_URL}/api/get-ngo-campaigns`);
+            setCampaigns(response.data);
+            setLoading(false);
+          } catch (error) {
+            console.error('Error fetching campaigns:', error);
+            setLoading(false);
+          }
+        };
+    
+        fetchCampaigns();
+      }, []);
+    
+  
 
   return (
 
@@ -153,35 +177,50 @@ const DonorHomeScreen = ({ navigation }) => {
             <Text style={[Styles.viewAllButton, { marginTop: 0 }]}>View All</Text>
           </TouchableOpacity>
         </View>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-        >
-          {ngoPostsData.slice(0, 3).map((post) => (
-            <TouchableOpacity
-              key={post.id}
-              onPress={() => navigation.navigate('NgoPostDetailsScreen', {
-                title: post.title,
-                description: post.fullDescription,
-                image: post.source,
-                donateUrl: post.donateUrl,
-              })}
-              style={Styles.CampCards}
-            >
-              <Image source={post.source} style={{
-                width: '100%',
-                opacity: 0.8,
-                height: '80%',
-                borderColor: 'black',
-                borderTopLeftRadius: 20,
-                borderTopRightRadius: 20,
-              }} />
-              <View style={Styles.campaignContent}>
-                <Text style={Styles.campaignTitle} numberOfLines={1}>{post.title}</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+             {!loading && campaigns.length > 0 ? (
+               campaigns.slice(0, 3).map((campaign) => (
+                 <TouchableOpacity
+                   key={campaign.id}
+                   onPress={() => navigation.navigate('NgoPostDetailsScreen', {
+                     id: campaign.id, // Make sure to pass the ID
+                     title: campaign.campaignTitle,
+                     description: campaign.fullDescription,
+                     image: campaign.image,
+                     phoneNumber: campaign.phoneNumber,
+                     email: campaign.email,
+                     bankAccount: campaign.bankAccount,
+                     ngoName: campaign.ngoName,
+                     createdAt: campaign.createdAt,
+                   })}
+                   style={Styles.CampCards}
+                 >
+                   {/* Display campaign image */}
+                   <Image
+                     source={{ uri: campaign.image }}
+                     style={{
+                       width: '100%',
+                       opacity: 0.8,
+                       height: '80%',
+                       borderColor: 'black',
+                       borderTopLeftRadius: 20,
+                       borderTopRightRadius: 20,
+                     }}
+                   />
+                   <View style={Styles.campaignContent}>
+                     {/* Display campaign title */}
+                     <Text style={Styles.campaignTitle} numberOfLines={1}>{campaign.campaignTitle}</Text>
+                   </View>
+                 </TouchableOpacity>
+               ))
+             ) : (
+               <View style={Styles.CampCards}>
+                 <Text style={Styles.campaignTitle}>
+                   {loading ? "Loading campaigns..." : "No campaigns available"}
+                 </Text>
+               </View>
+             )}
+           </ScrollView>
         </ScrollView>
     </View>
   );
