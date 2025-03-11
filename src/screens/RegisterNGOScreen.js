@@ -1,6 +1,6 @@
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
-import React, { useState } from "react";
+import React, { useState ,useContext} from "react";
 import { TouchableOpacity, StyleSheet, View, ImageBackground, Dimensions } from "react-native";
 import { Text } from "react-native-paper";
 import * as DocumentPicker from 'expo-document-picker'; 
@@ -12,6 +12,7 @@ import TextInput from "../components/TextInput";
 import BackButton from "../components/BackButton";
 import { theme } from "../core/theme";
 import CryptoJS from "crypto-js";
+import { AuthContext } from "../context/AuthContext";
 
 
 
@@ -33,6 +34,8 @@ export default function RegisterNGOScreen({ navigation }) {
   const [approved]=useState({value:"false"});
   const [confirm, setConfirm] = useState("");
   const [code, setCode] = useState("");
+    const { setUser } = useContext(AuthContext); // Access setUser from AuthContext
+  
   
 
 
@@ -138,8 +141,15 @@ export default function RegisterNGOScreen({ navigation }) {
               password: hashedPassword,
               approved:approved.value
             });
+            setUser({
+              uid: user.uid,
+              name: name.value,
+              username: username.value,
+              phone: phoneNumber.value,
+              approved: approved.value,
+            });
 
-          navigation.navigate("WaitForApprovalScreen", { uid: user.uid });
+          navigation.navigate("NGOprofileDetailsScreen");
         } catch (error) {
           console.log("Error saving details", error);
         }

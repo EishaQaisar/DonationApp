@@ -19,7 +19,15 @@ const History = ({ route }) => {
         options={{ headerShown: false }}
         initialParams={{ ...route.params }}
       />
-      <Stack.Screen name="ClaimsHistory" component={ClaimsHistory} options={{ title: "ClaimsHistory" }} />
+      <Stack.Screen
+              name="ClaimsHistory"
+              component={ClaimsHistory}
+              options={{
+                title: 'Claims History', headerTitleStyle: { textAlign: 'center' },
+                headerTitleAlign: 'center', headerStyle: { backgroundColor: theme.colors.charcoalBlack, height: 70 },
+                headerTintColor: theme.colors.ivory
+              }} // Optional: Customize header title
+            />
        <Stack.Screen
               name="DonationsHistory"
               component={DonationsHistory}

@@ -22,7 +22,7 @@ export{default as ChildrenProfiles} from "./ChildrenProfiles";
 
 export{default as RiderFinalHomeScreen} from './RiderFinalHomeScreen';
 export {default as DonationsHistory} from './DonationsHistory'
-
+export{default as NGOProfileDetailsScreen} from './NGOprofileDetailsScreen'
 
 
 

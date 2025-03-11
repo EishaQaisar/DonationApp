@@ -1,14 +1,20 @@
-import React, { useState } from 'react';
+import { useEffect, useState, useContext, useCallback } from "react"
+
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput } from 'react-native';
 import { Formik } from 'formik';
 import { theme } from "../core/theme";
+import axios from "axios"
+import { getBaseUrl } from "../helpers/deviceDetection"
+import { AuthContext } from "../context/AuthContext"
+
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import ImagePickerComponent from '../components/ImagePickerComponent';
 
 const NGOCampaignForm = ({ navigation }) => {
     const tabBarHeight = useBottomTabBarHeight();
     const [image, setImage] = useState(null);
-
+    const { user } = useContext(AuthContext)
+    
     const validate = (values) => {
         const errors = {};
         if (!values.ngoName) errors.ngoName = 'NGO name is required';
@@ -46,13 +52,41 @@ const NGOCampaignForm = ({ navigation }) => {
         return errors;
     };
 
-    const onSubmit = (values, { setSubmitting }) => {
-        console.log({ ...values, image });
-        setSubmitting(false);
-        navigation.navigate("DonationSuccessScreen");
-        
+    const onSubmit = async (values, { setSubmitting }) => {
+        try {
+            const formData = {
+                ...values,
+                image, // Assuming image is already a base64 string or proper format.
+                campaignCreatorUsername: user.username, // Replace with dynamic username if necessary
+            };
+    
+            console.log('Form data being sent:', formData);
+            const BASE_URL = await getBaseUrl(); // If you're using a base URL helper function
+    
+            const response = await axios.post(`${BASE_URL}/api/add-ngo-campaign`, formData, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+    
+            // Check for a successful response
+            if (response.status === 200 || response.status === 201) {
+                console.log('Success:', response.data); // response.data contains the actual data
+                navigation.navigate("DonationSuccessScreen");
+            } else {
+                throw new Error('Failed to create campaign');
+            }
+        } catch (error) {
+            if (error.response) {
+                console.error('Error response from API:', error.response.data);
+            } else {
+                console.error('Error submitting form:', error.message);
+            }
+        } finally {
+            setSubmitting(false);
+        }
     };
-
+    
     const formatPhoneNumber = (value) => {
         const cleaned = value.replace(/[^\d]/g, ''); // Remove all non-numeric characters
         const countryCode = "+92";
@@ -311,4 +345,3 @@ const styles = StyleSheet.create({
 });
 
 export default NGOCampaignForm;
-

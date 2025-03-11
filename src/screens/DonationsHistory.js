@@ -10,6 +10,7 @@ import axios from "axios"
 const DonationsHistory = () => {
   const [clothesDonations, setClothesDonations] = useState([])
   const [foodDonations, setFoodDonations] = useState([])
+  const [educationDonations, setEducationDonations] = useState([]) // New state for education donations
   const [activeTab, setActiveTab] = useState("clothes")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -22,7 +23,7 @@ const DonationsHistory = () => {
         return
       }
 
-      console.log("Fetching donations history for user:", user.id)
+      console.log("Fetching donations history for user:", user.username)
 
       try {
         const BASE_URL = await getBaseUrl()
@@ -45,6 +46,16 @@ const DonationsHistory = () => {
         } catch (err) {
           console.error("Error fetching food donations:", err)
           setError("Failed to load food donations")
+        }
+
+        // Fetch education donations
+        try {
+          const educationResponse = await axios.get(`${BASE_URL}/api/user-education-donations?userId=${user.username}`)
+          console.log(`Found ${educationResponse.data.length} education donations for this user.`)
+          setEducationDonations(educationResponse.data)
+        } catch (err) {
+          console.error("Error fetching education donations:", err)
+          setError("Failed to load education donations")
         }
       } catch (err) {
         console.error("Error getting base URL:", err)
@@ -121,11 +132,34 @@ const DonationsHistory = () => {
       <Text style={styles.donationTitle}>{item.foodName || "Unnamed Item"}</Text>
 
       <View style={styles.donationDetails}>
-        <Text style={styles.categoryInfo}>Category: {item.foodCategory || item.itemCategory || "Unknown"}</Text>
+        <Text style={styles.categoryInfo}>Meal Type: {item.mealType || item.itemCategory || "Unknown"}</Text>
 
         {item.quantity && <Text style={styles.quantityInfo}>Quantity: {item.quantity}</Text>}
 
         {item.expiryDate && <Text style={styles.expiryInfo}>Expires on: {formatDate(item.expiryDate)}</Text>}
+
+        <Text style={styles.donationDate}>Donated on: {formatDate(item.createdAt)}</Text>
+      </View>
+
+      <View style={[styles.statusBadge, getStatusStyle(item.claimStatus)]}>
+        <Text style={styles.statusText}>{item.claimStatus}</Text>
+      </View>
+    </View>
+  )
+
+  // New render function for education items
+  const renderEducationItem = ({ item }) => (
+    <View style={styles.donationItem}>
+      <Text style={styles.donationTitle}>{item.itemName || "Unnamed Item"}</Text>
+
+      <View style={styles.donationDetails}>
+        <Text style={styles.categoryInfo}>Type: {item.type|| item.itemCategory || "Unknown"}</Text>
+
+        {item.subject && <Text style={styles.subjectInfo}>Subject: {item.subject}</Text>}
+
+        {item.grade && <Text style={styles.gradeInfo}>Grade/Level: {item.grade}</Text>}
+
+        {item.condition && <Text style={styles.conditionInfo}>Condition: {item.condition}</Text>}
 
         <Text style={styles.donationDate}>Donated on: {formatDate(item.createdAt)}</Text>
       </View>
@@ -153,6 +187,13 @@ const DonationsHistory = () => {
         >
           <Text style={[styles.tabText, activeTab === "food" && styles.activeTabText]}>Food</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.tabButton, activeTab === "education" && styles.activeTab]}
+          onPress={() => setActiveTab("education")}
+        >
+          <Text style={[styles.tabText, activeTab === "education" && styles.activeTabText]}>Education</Text>
+        </TouchableOpacity>
       </View>
 
       {activeTab === "clothes" &&
@@ -175,6 +216,18 @@ const DonationsHistory = () => {
             data={foodDonations}
             keyExtractor={(item) => item.id.toString()}
             renderItem={renderFoodItem}
+            contentContainerStyle={styles.listContainer}
+          />
+        ))}
+
+      {activeTab === "education" &&
+        (educationDonations.length === 0 ? (
+          <Text style={styles.emptyText}>You haven't made any education donations yet</Text>
+        ) : (
+          <FlatList
+            data={educationDonations}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={renderEducationItem}
             contentContainerStyle={styles.listContainer}
           />
         ))}
@@ -268,6 +321,21 @@ const styles = StyleSheet.create({
     color: theme.colors.pearlWhite,
     marginTop: 2,
   },
+  subjectInfo: {
+    fontSize: 14,
+    color: theme.colors.pearlWhite,
+    marginTop: 2,
+  },
+  gradeInfo: {
+    fontSize: 14,
+    color: theme.colors.pearlWhite,
+    marginTop: 2,
+  },
+  conditionInfo: {
+    fontSize: 14,
+    color: theme.colors.pearlWhite,
+    marginTop: 2,
+  },
   donationDate: {
     fontSize: 14,
     color: theme.colors.pearlWhite,
@@ -313,4 +381,3 @@ const styles = StyleSheet.create({
 })
 
 export default DonationsHistory
-

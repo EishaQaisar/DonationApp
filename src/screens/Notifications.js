@@ -179,6 +179,14 @@ const Notifications = ({ route }) => {
       } else {
         setMessage("No claimed items found.")
       }
+       // Reset notification count after viewing
+       await axios.get(`${BASE_URL}/api/reset-notification-count`, {
+        params: {
+          username: user.username,
+          role: role
+        }
+      });
+      
       setRefreshing(false)
     } catch (error) {
       console.error("Error fetching notifications:", error)

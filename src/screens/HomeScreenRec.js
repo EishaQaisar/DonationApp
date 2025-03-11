@@ -1,21 +1,39 @@
-import {React,useContext} from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, Pressable} from 'react-native';
+import React, { useContext, useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, Pressable } from 'react-native';
 import { theme } from "../core/theme";
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { ngoPostsData } from './ViewNgoPostsScreen';
+import axios from 'axios';
+import { getBaseUrl } from "../helpers/deviceDetection";
 import { AuthContext } from "../context/AuthContext";
-
 
 const HomeScreenRec = ({ navigation, route }) => {
   const tabBarHeight = useBottomTabBarHeight();
   const { role, type } = route.params;  // Assuming `role` and `type` are passed in params
   const { user } = useContext(AuthContext);
   
+  const [campaigns, setCampaigns] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch campaigns data when component mounts
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        const BASE_URL = await getBaseUrl();
+        const response = await axios.get(`${BASE_URL}/api/get-ngo-campaigns`);
+        setCampaigns(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching campaigns:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchCampaigns();
+  }, []);
 
   return (
     <View style={[Styles.container, { marginBottom: tabBarHeight }]}>
-
       <ScrollView>
         <View style={Styles.banner}>
           <Image source={require('../../assets/items/hi_rec.jpg')} style={{ opacity: 0.3, width: '100%', height: '100%', position: 'relative' }} />
@@ -56,41 +74,70 @@ const HomeScreenRec = ({ navigation, route }) => {
           </View>
         </View>
 
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 10, marginTop: 10 }}>
-          <Text style={[Styles.headings, { marginTop: 0 }]}>Campaigns</Text>
-          <TouchableOpacity onPress={() => navigation.navigate("ViewNgoPostsScreen")}>
-            <Text style={[Styles.viewAllButton, { marginTop: 0 }]}>View All</Text>
-          </TouchableOpacity>
-        </View>
+        {/* <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 10, marginTop: 10 }}> */}
+          {/* <Text style={[Styles.headings, { marginTop: 0 }]}>Campaigns</Text> */}
+          {/* <TouchableOpacity onPress={() => navigation.navigate("ViewNgoPostsScreen")}> */}
+            {/* <Text style={[Styles.viewAllButton, { marginTop: 0 }]}>View All</Text> */}
+          {/* </TouchableOpacity> */}
+        {/* </View> */}
 
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {ngoPostsData.slice(0, 3).map((post) => (
-            <TouchableOpacity
-              key={post.id}
-              onPress={() => navigation.navigate('NgoPostDetailsScreen', {
-                title: post.title,
-                description: post.fullDescription,
-                image: post.source,
-                donateUrl: post.donateUrl,
-              })}
-              style={Styles.CampCards}
-            >
-              <Image source={post.source} style={{
+        {/* Only show campaigns section if role is not recipient or if type is ngo */}
+{!(role === 'recipient' && user.recipientType !== 'ngo') && (
+  <>
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 10, marginTop: 10 }}>
+      <Text style={[Styles.headings, { marginTop: 0 }]}>Campaigns</Text>
+      <TouchableOpacity onPress={() => navigation.navigate("ViewNgoPostsScreen")}>
+        <Text style={[Styles.viewAllButton, { marginTop: 0 }]}>View All</Text>
+      </TouchableOpacity>
+    </View>
+
+    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      {!loading && campaigns.length > 0 ? (
+        campaigns.slice(0, 3).map((campaign) => (
+          <TouchableOpacity
+            key={campaign.id}
+            onPress={() => navigation.navigate('NgoPostDetailsScreen', {
+              id: campaign.id, // Make sure to pass the ID
+              title: campaign.campaignTitle,
+              description: campaign.fullDescription,
+              image: campaign.image,
+              phoneNumber: campaign.phoneNumber,
+              email: campaign.email,
+              bankAccount: campaign.bankAccount,
+              ngoName: campaign.ngoName,
+              createdAt: campaign.createdAt,
+            })}
+            style={Styles.CampCards}
+          >
+            {/* Display campaign image */}
+            <Image
+              source={{ uri: campaign.image }}
+              style={{
                 width: '100%',
                 opacity: 0.8,
                 height: '80%',
                 borderColor: 'black',
                 borderTopLeftRadius: 20,
                 borderTopRightRadius: 20,
-              }} />
-              <View style={Styles.campaignContent}>
-                <Text style={Styles.campaignTitle} numberOfLines={1}>{post.title}</Text>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
-        {role === 'recipient' && type === 'ngo' && (
+              }}
+            />
+            <View style={Styles.campaignContent}>
+              {/* Display campaign title */}
+              <Text style={Styles.campaignTitle} numberOfLines={1}>{campaign.campaignTitle}</Text>
+            </View>
+          </TouchableOpacity>
+        ))
+      ) : (
+        <View style={Styles.CampCards}>
+          <Text style={Styles.campaignTitle}>
+            {loading ? "Loading campaigns..." : "No campaigns available"}
+          </Text>
+        </View>
+      )}
+    </ScrollView>
+  </>
+)}
+        {role === 'recipient' && user.recipientType === 'ngo' && (
           <View style={Styles.campaignButtonContainer}>
             <TouchableOpacity
               onPress={() => navigation.navigate('NGOCampaignForm')}
@@ -100,12 +147,13 @@ const HomeScreenRec = ({ navigation, route }) => {
             </TouchableOpacity>
           </View>
         )}
-
       </ScrollView>
-
     </View>
   );
 };
+
+
+
 
 const Styles = StyleSheet.create({
   container: {

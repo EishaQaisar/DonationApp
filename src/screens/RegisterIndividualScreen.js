@@ -38,6 +38,7 @@ export default function RegisterIndividualScreen({ navigation }) {
   
   
   const validateFields = async (username, phoneNumber, cnic) => {
+    console.log("dfverferer");
     const isUsernameUnique = await IsUsernameUnique(username);
     const isPhoneUnique = await IsUniqueNumber(phoneNumber);
     const isCnicUnique = await IsCnicUnique(cnic);
@@ -62,6 +63,7 @@ export default function RegisterIndividualScreen({ navigation }) {
     const numberError=numberValidator(phoneNumber.value);
     const passwordError=passwordValidator(password.value);
     const idCardError = idCardValidator(idCard.value);
+    console.log("hererwe2");
     if (nameError || idCardError || passwordError || usernameError || numberError ) {
       setName({ ...name, error: nameError });
       setidCard({ ...idCard, error: idCardError });
@@ -70,6 +72,7 @@ export default function RegisterIndividualScreen({ navigation }) {
       setPhoneNumber({ ...phoneNumber,error: numberError });
       return;
     }
+    console.log("ferferferferf");
 
     const { isUsernameUnique, isPhoneUnique, isCnicUnique } = await validateFields(
       username.value,
@@ -97,9 +100,11 @@ export default function RegisterIndividualScreen({ navigation }) {
     } catch (error) {
       console.log("Error sending code", error);
     }
+    console.log("erferfer");
   };
 
   const confirmCode = async () => {
+    console.log("hereee");
     if (!confirm) {
       console.log("No confirmation object. Call signInWithPhoneNumber first.");
       return;

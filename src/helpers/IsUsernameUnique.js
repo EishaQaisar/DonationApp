@@ -19,9 +19,9 @@ export async function IsUsernameUnique (username)  {
         .where("username", "==", username)
         .get();
         
-        
+        console.log(querySnapshot3.docs)
   
-      console.log("returning the username is unique wala file");
+      console.log("returning the username is unvsdgsffsdfsdique wala file");
       return (querySnapshot1.empty && querySnapshot2.empty && querySnapshot3.empty); // If empty, username is unique
        
     

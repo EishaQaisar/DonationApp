@@ -23,6 +23,7 @@ import {
   RiderFinalHomeScreen,
   DeliveryHistory,
   DonorOrderTrackingScreen,
+  NGOProfileDetailsScreen
   
   
 } from "./src/screens";
@@ -70,6 +71,8 @@ export default function App(){
 <Stack.Screen name="LoginScreen" component={LoginScreen} />   
 <Stack.Screen name="RegisterScreenDonor" component={RegisterScreenDonor} />  
 <Stack.Screen name="RegisterNGOScreen" component={RegisterNGOScreen} />  
+<Stack.Screen name="NGOprofileDetailsScreen" component={NGOProfileDetailsScreen}/>
+
 <Stack.Screen name="RegisterIndividualScreen" component={RegisterIndividualScreen} />   
 <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} /> 
 <Stack.Screen name="WaitForApprovalScreen" component={WaitForApprovalScreen} /> 
@@ -81,6 +84,8 @@ export default function App(){
 <Stack.Screen name="DeliveryHistory" component={DeliveryHistory}/>
 <Stack.Screen name="ScheduleRDeliveryScreen" component={ScheduleRDeliveryScreen}/>
 <Stack.Screen name="DonorOrderTrackingScreen" component={DonorOrderTrackingScreen}/>
+
+
 
             <Stack.Screen name="TabNavigator" component={TabNavigator} />
 

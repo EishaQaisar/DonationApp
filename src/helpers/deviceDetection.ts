@@ -81,11 +81,11 @@ export async function getBaseUrl(): Promise<string> {
   }
   console.log("before returning",PHYSICAL_DEVICE_IP);
   
-  // eisha home ip  http://192.168.1.9:3000 http://10.54.5.160:3000'
+  // eisha home ip  http://192.168.1.9:3000 http://10.54.5.160:3000  10.54.17.116'
   
   */
  
-  return isEmulator() ? EMULATOR_IP : '  http://192.168.1.9:3000';
+  return isEmulator() ? EMULATOR_IP : '  http://10.54.17.116:3000';
   
   
 }
