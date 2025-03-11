@@ -31,12 +31,13 @@ const RecipientProfileForm = ({ navigation }) => {
   const collegeYearOption = ["1st Year", "2nd Year"]
 
   const validate = (values) => {
+    console.log("HFEE")
     const errors = {}
-
+  
     // Age validation
     const ageError = validateAge(values.age)
     if (ageError) errors.age = ageError
-
+  
     if (!values.age) errors.age = "Age is required"
     if (isNaN(values.age)) errors.age = "Age must be a number"
     if (values.age < 18) errors.age = "Age must be greater than 18"
@@ -46,12 +47,11 @@ const RecipientProfileForm = ({ navigation }) => {
       if (!values.children) errors.children = "Number of children is required"
       if (isNaN(values.children)) errors.children = "Number of children must be a number"
       if (values.children < 0) errors.children = "Number of children can not be negative"
-      if (parseInt(values.children) > parseInt(values.membersCount)) 
-        {
-          errors.children="Number of children can not exceed number of family members"
-
-        }
-
+      if (Number(values.children) !== Number.parseInt(values.children))
+        errors.children = "Number of children must be a whole number"
+      if (Number.parseInt(values.children) > Number.parseInt(values.membersCount)) {
+        errors.children = "Number of children can not exceed number of family members"
+      }
     }
     if (!values.occupation || values.occupation === "notsel") {
       errors.occupation = "Occupation is required"
@@ -66,33 +66,36 @@ const RecipientProfileForm = ({ navigation }) => {
         errors.income = "Income can not be negative"
       }
     }
-
+  
     const addressError = addressValidator(values.address)
     if (addressError) errors.address = addressError
     if (!values.address) errors.address = "Address is required"
-
+  
     // Only validate education-related fields if occupation is "Student"
     if (values.occupation === "Student") {
       if (!values.educationLevel) errors.educationLevel = "Education level is required"
       if (!values.institution) errors.institution = "Institution is required"
       if (!values.class) errors.class = "Class/Year is required"
     }
-
+  
     if (!values.shoeSize) errors.shoeSize = "Shoe size is required"
     if (!values.clothingSize) errors.clothingSize = "Clothing size is required"
     if (!values.shirtSize) errors.shirtSize = "Shirt size is required"
     if (!values.trouserSize) errors.trouserSize = "Trouser size is required"
-
+  
     if (!values.membersCount && values.membersCount !== 0) errors.membersCount = "Number of family members is required"
     if (isNaN(values.membersCount)) errors.membersCount = "Number of family members must be a number"
     if (values.membersCount < 0) errors.membersCount = "Number of family members cannot be negative"
+    if (Number(values.membersCount) !== Number.parseInt(values.membersCount))
+      errors.membersCount = "Number of family members must be a whole number"
     if (values.membersCount > 10) errors.membersCount = "Number of family members should be less than 10"
-
+  
     console.log(errors)
-
+  
     return errors
   }
-
+  
+  
   const onSubmit = async (values, { setSubmitting }) => {
     console.log("Form submitted with values:", values)
     console.log(values)
@@ -408,7 +411,7 @@ const RecipientProfileForm = ({ navigation }) => {
                                 onValueChange={(itemValue) => setFieldValue("class", itemValue)}
                                 style={styles.picker1}
                               >
-                                <Picker.Item label="Selectjhhj Year of Study" value="" />
+                                <Picker.Item label="Select Year of Study" value="" />
                                 {uniYearOption.map((status) => (
                                   <Picker.Item key={status} label={status} value={status} />
                                 ))}

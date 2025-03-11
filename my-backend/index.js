@@ -416,7 +416,7 @@ app.get('/api/all-food-donations', (req, res) => {
         // Check for parent match based on item category and clothing category
         const parentMatch = (() => {
           // Gender must match in all cases
-          if (userProfile.gender && item.gender !== userProfile.gender) {
+          if (userProfile.gender && item.gender !== userProfile.gender && item.gender !== "Unisex") {
             return false;
           }
   
@@ -438,7 +438,7 @@ app.get('/api/all-food-donations', (req, res) => {
         // Check if any child matches based on item category and clothing category
         const childMatch = childrenProfiles.some(child => {
           // Gender must match in all cases
-          if (child.gender && item.gender !== child.gender) {
+          if (child.gender && item.gender !== child.gender && item.gender !== "Unisex") {
             return false;
           }
   

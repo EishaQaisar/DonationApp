@@ -11,7 +11,7 @@ import firestore from "@react-native-firebase/firestore"
 import { UserProfileContext } from "../context/UserProfileContext"
 
 
-const Notifications = ({ route,navigation }) => {
+const Notifications = ({ route }) => {
   const { role } = route.params
   const [notifications, setNotifications] = useState([])
   const [message, setMessage] = useState("")
@@ -24,15 +24,20 @@ const Notifications = ({ route,navigation }) => {
 
 
   // Function to update khair points for a user
-  const updateKhairPoints = async (uid, newPoints) => {
+  const updateKhairPoints = async (uid, newPoints, profileCollection) => {
     if (isUpdating) return false
 
     setIsUpdating(true)
     try {
       // Update in Firestore
-      await firestore().collection("individual_profiles").doc(uid).update({
-        khairPoints: newPoints,
-      })
+      
+        await firestore().collection(profileCollection).doc(uid).update({
+          khairPoints: newPoints,
+        })
+
+      
+     
+      
 
       console.log("Khair points updated successfully to", newPoints)
       return true
@@ -47,62 +52,85 @@ const Notifications = ({ route,navigation }) => {
   const updataKhairPoints = async (item) => {
     try {
       // Get the recipient's username
-      const recipientUsername = item.claimerUsername
-
+      const recipientUsername = item.claimerUsername;
+  
       // Get the item quantity and category for khair points calculation
-      const itemQuantity = item.quantity || 1 // Default to 1 if not specified
-      const itemCategory = item.donationType
-   
-      let totalKhairPointsToRefund=item.khairPoints
-
-     
-
-      console.log(`Attempting to refund ${totalKhairPointsToRefund} khair points to ${recipientUsername}`)
-
-      // Find the recipient's UID in Firestore
-      const recipientQuery = await firestore().collection("recipients").where("username", "==", recipientUsername).get()
-
-      if (recipientQuery.empty) {
-        console.error(`Recipient with username ${recipientUsername} not found`)
-        setMessage("Recipient not found, but claim was declined.")
-        return
+      const itemQuantity = item.quantity || 1; // Default to 1 if not specified
+      const itemCategory = item.donationType;
+  
+      let totalKhairPointsToRefund = item.khairPoints;
+  
+      console.log(`Attempting to refund ${totalKhairPointsToRefund} khair points to ${recipientUsername}`);
+  
+      // First, check if the recipient exists in the "recipients" collection
+      let recipientQuery = await firestore()
+        .collection("recipients")
+        .where("username", "==", recipientUsername)
+        .get();
+  
+      let recipientUid = null;
+      let profileCollection = null;
+  
+      if (!recipientQuery.empty) {
+        // Found in "recipients" collection
+        const recipientDoc = recipientQuery.docs[0];
+        recipientUid = recipientDoc.id;
+        profileCollection = "individual_profiles";
+      } else {
+        // Not found in "recipients", check in "ngo"
+        console.log(`Recipient not found in "recipients", checking in "ngo" database...`);
+        recipientQuery = await firestore()
+          .collection("ngos")
+          .where("username", "==", recipientUsername)
+          .get();
+  
+        if (!recipientQuery.empty) {
+          // Found in "ngo" collection
+          const recipientDoc = recipientQuery.docs[0];
+          recipientUid = recipientDoc.id;
+          profileCollection = "ngo_profiles";
+        } else {
+          console.error(`Recipient with username ${recipientUsername} not found in both databases.`);
+          setMessage("Recipient not found, but claim was declined.");
+          return;
+        }
       }
-
-      // Get the recipient's UID
-      const recipientDoc = recipientQuery.docs[0]
-      const recipientUid = recipientDoc.id
-
-      // Get current khair points
-      const individualDoc = await firestore().collection("individual_profiles").doc(recipientUid).get()
-
-      if (!individualDoc.exists) {
-        console.error(`Individual profile for UID ${recipientUid} not found`)
-        setMessage("Claim declined successfully but couldn't refund khair points.")
-        return
+  
+      // Get the recipient's profile document
+      const profileDoc = await firestore()
+        .collection(profileCollection)
+        .doc(recipientUid)
+        .get();
+  
+      if (!profileDoc.exists) {
+        console.error(`Profile for UID ${recipientUid} not found in ${profileCollection}`);
+        setMessage("Claim declined successfully but couldn't refund khair points.");
+        return;
       }
-
-      const currentKhairPoints = individualDoc.data().khairPoints || 0
-      const newKhairPoints = currentKhairPoints + totalKhairPointsToRefund
-
-      // Update the khair points using your method
-      const success = await updateKhairPoints(recipientUid, newKhairPoints)
-
+  
+      // Get current khair points and update
+      const currentKhairPoints = profileDoc.data().khairPoints || 0;
+      const newKhairPoints = currentKhairPoints + totalKhairPointsToRefund;
+  
+      // Update khair points in the correct profile collection
+      const success = await updateKhairPoints(recipientUid, newKhairPoints,profileCollection);
+  
       if (success) {
-        console.log(`Updated khair points for ${recipientUsername}: ${currentKhairPoints} -> ${newKhairPoints}`)
+        console.log(`Updated khair points for ${recipientUsername}: ${currentKhairPoints} -> ${newKhairPoints}`);
         setUserProfile((prevProfile) => ({
           ...prevProfile, // This preserves ALL existing properties
           khairPoints: newKhairPoints,
-        }))
-        setMessage("Claim declined successfully and khair points refunded.")
-
+        }));
+        setMessage("Claim declined successfully and khair points refunded.");
       } else {
-        setMessage("Claim declined but failed to refund khair points.")
+        setMessage("Claim declined but failed to refund khair points.");
       }
     } catch (error) {
-      console.error("Error updating khair points:", error)
-      setMessage("Claim declined but error refunding khair points.")
+      console.error("Error updating khair points:", error);
+      setMessage("Claim declined but error refunding khair points.");
     }
-  }
+  };
+  
 
   const changingStatus = async (category, id ) => {
     try {
@@ -202,8 +230,6 @@ const Notifications = ({ route,navigation }) => {
 
       // Also refresh in the background to ensure data consistency
       fetchNotifications()
-      console.log("the is to be sent to the Sdelivery page",id);
-      navigation.navigate('ScheduleRDeliveryScreen', { id });
     } catch (error) {
       console.error("Error approving claim:", error)
       setMessage("Failed to approve the claim.")
@@ -364,4 +390,3 @@ const styles = StyleSheet.create({
 })
 
 export default Notifications
-

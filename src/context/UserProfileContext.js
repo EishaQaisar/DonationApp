@@ -29,10 +29,18 @@ export const UserProfileProvider = ({ children }) => {
   const calculateKhairPoints = ( childrenCount) => {
     // Base points for the parent
     let totalPoints = BASE_KHAIR_POINTS
+    
 
     // Add points for children
     if (childrenCount && childrenCount > 0) {
-      totalPoints += BASE_KHAIR_POINTS * childrenCount
+      if (user.recipientType==='individual'){
+        totalPoints += BASE_KHAIR_POINTS * childrenCount
+
+      }
+      else if(user.recipientType==='ngo'){
+        totalPoints=totalPoints*childrenCount
+      }
+      
     }
     // If membersCount is provided and different from children+1, use that instead
     
@@ -46,15 +54,30 @@ export const UserProfileProvider = ({ children }) => {
       const now = new Date()
 
       // Calculate the number of family members
-      const childrenCount = childrenProfiles?.length || userData.children || 0
+      let childrenCount 
+      childrenCount= childrenProfiles?.length || userData.children || 0
+      if (user.recipientType==='ngo'){
+        childrenCount=userProfile.membersCount;
+      }
 
       // Calculate khair points based on family members
       const newKhairPoints = calculateKhairPoints( childrenCount)
 
-      await firestore().collection("individual_profiles").doc(userId).update({
-        khairPoints: newKhairPoints,
-        lastPointsReassignmentDate: now,
-      })
+      if (user.recipientType==='individual'){
+        await firestore().collection("individual_profiles").doc(userId).update({
+          khairPoints: newKhairPoints,
+          lastPointsReassignmentDate: now,
+        })
+
+      }
+      else if (user.recipientType==='ngo'){
+        await firestore().collection("ngo_profiles").doc(userId).update({
+          khairPoints: newKhairPoints,
+          lastPointsReassignmentDate: now,
+        })
+
+      }
+     
 
       console.log("Monthly khair points reassigned successfully:", newKhairPoints)
       return newKhairPoints
@@ -74,8 +97,16 @@ export const UserProfileProvider = ({ children }) => {
 
       console.log("Fetching user profile for:", user.uid)
       try {
+        let userDoc
         // Fetch parent profile
-        const userDoc = await firestore().collection("individual_profiles").doc(user.uid).get()
+        if (user.recipientType==='individual'){
+          userDoc = await firestore().collection("individual_profiles").doc(user.uid).get()
+        }
+        else {
+          userDoc = await firestore().collection("ngo_profiles").doc(user.uid).get()
+
+          
+        }
 
         if (userDoc.exists) {
           let userData = userDoc.data()
@@ -125,10 +156,21 @@ export const UserProfileProvider = ({ children }) => {
     if (!user) return false
 
     try {
+      if (user.recipientType==='individual'){
+        await firestore().collection("individual_profiles").doc(user.uid).update({
+          khairPoints: newPoints,
+        })
+
+      }
+
+      else if (user.recipientType==='ngo'){
+        await firestore().collection("ngo_profiles").doc(user.uid).update({
+          khairPoints: newPoints,
+        })
+
+      }
       // Update in Firestore
-      await firestore().collection("individual_profiles").doc(user.uid).update({
-        khairPoints: newPoints,
-      })
+     
 
       // Update local state using functional update
       setUserProfile((prevProfile) => {
@@ -161,4 +203,3 @@ export const UserProfileProvider = ({ children }) => {
 }
 
 export const useUserProfile = () => useContext(UserProfileContext)
-

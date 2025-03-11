@@ -50,6 +50,10 @@ const ChildrenProfiles = ({ navigation, route }) => {
       if (!child.age) childErrors.age = "Age is required"
       if (isNaN(child.age)) childErrors.age = "Age must be a number"
       if (child.age>=18)childErrors.age="Child older than 18 can not be registered"
+      if (child.age>=18)childErrors.age="Child older than 18 can not be registered"
+      if (child.age && child.age<1)childErrors.age="Child younger than 1 year can not be registered"
+
+
       if (!child.gender) childErrors.gender = "Gender is required"
       if (!child.enrollmentStatus) childErrors.enrollmentStatus = "Enrollment status is required"
       

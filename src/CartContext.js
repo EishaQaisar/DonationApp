@@ -66,9 +66,18 @@ const [isUpdating, setIsUpdating] = useState(false)
     try {
       // Update in Firestore
       console.log("here");
-      await firestore().collection("individual_profiles").doc(user.uid).update({
-        khairPoints: newPoints,
-      })
+      if (user.recipientType=='individual'){
+        await firestore().collection("individual_profiles").doc(user.uid).update({
+          khairPoints: newPoints,
+        })
+
+      }
+      if (user.recipientType==='ngo'){
+        await firestore().collection("ngo_profiles").doc(user.uid).update({
+          khairPoints: newPoints,
+        })
+      }
+      
 
       // Update local state in context using functional update pattern
       setUserProfile((prevProfile) => ({
