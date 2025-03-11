@@ -39,6 +39,7 @@ import * as DB from './src/database/setupTables'
 import { useDrizzleStudio} from 'expo-drizzle-studio-plugin';
 import { AuthProvider } from "./src/context/AuthContext"; // Adjust the path as necessary
 import { UserProfileProvider } from "./src/context/UserProfileContext"; // Adjust the path as necessary
+import 'react-native-get-random-values';
 
 const Stack= createStackNavigator();
 DB.setupTables();

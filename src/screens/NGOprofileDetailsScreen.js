@@ -6,6 +6,7 @@ import { theme } from "../core/theme"
 import ImagePickerComponent from "../components/ImagePickerComponent"
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete"
 import { AuthContext } from "../context/AuthContext"
+import firestore from "@react-native-firebase/firestore"
 
 
 // You would replace this with your actual API key
@@ -41,7 +42,7 @@ const NGOProfileDetailsScreen = ({ navigation }) => {
       errors.membersCount = "Number of recipients must be a number"
     } else if (values.membersCount < 0) {
       errors.membersCount = "Number of recipients cannot be negative"
-    } else if (values.membersCount > 100) {
+    } else if (values.membersCount > 500) {
       errors.membersCount = "Number of recipients should be less than 100"
     } else if (!Number.isInteger(Number(values.membersCount))) {
       errors.membersCount = "Number of recipients must be a whole number"
@@ -60,6 +61,7 @@ const NGOProfileDetailsScreen = ({ navigation }) => {
 
     // Here you would typically save the NGO profile to your database
     // For example:
+    console.log(user.uid)
     
     try {
       await firestore()
@@ -207,7 +209,7 @@ const NGOProfileDetailsScreen = ({ navigation }) => {
                   }}
                   onBlur={handleBlur("membersCount")}
                   value={values.membersCount}
-                  placeholder="Enter number of recipients (max 100)"
+                  placeholder="Enter number of recipients (max 500)"
                   placeholderTextColor={theme.colors.ivory}
                   keyboardType="numeric"
                   maxLength={3} // Limit to 3 digits (max 100)
@@ -235,7 +237,7 @@ const NGOProfileDetailsScreen = ({ navigation }) => {
               {/* Submit Button */}
               <TouchableOpacity
                 onPress={() => {
-                  console.log("Submit button pressed")
+                  console.log("Submit butefwefton pressed")
                   handleSubmit()
                 }}
                 style={styles.submitButton}
