@@ -1,3 +1,5 @@
+import DonationsHistory from "./DonationsHistory";
+
 export { default as LoginScreen } from "./LoginScreen";
 export { default as DonorHomeScreen } from "./DonorHomeScreen";
 export { default as ScheduleDelivery } from "./ScheduleDelivery";
@@ -19,6 +21,7 @@ export{default as RecipientProfileForm} from "./RecipientProfileForm";
 export{default as ChildrenProfiles} from "./ChildrenProfiles";
 
 export{default as RiderFinalHomeScreen} from './RiderFinalHomeScreen';
+export {default as DonationsHistory} from './DonationsHistory'
 
 
 

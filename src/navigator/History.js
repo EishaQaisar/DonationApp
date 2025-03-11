@@ -1,10 +1,15 @@
 import { createStackNavigator } from "@react-navigation/stack"
-import { ClaimsHistory, Profile } from "../screens"
+import { ClaimsHistory, Profile , DonationsHistory} from "../screens"
+import { useEffect } from "react";
+import { theme } from '../core/theme'
+
 
 const Stack = createStackNavigator()
 
 const History = ({ route }) => {
-  console.log("History navigator received params:", route.params)
+  useEffect(() => {
+    console.log("History component mounted with params:", route.params);
+  }, []);
 
   return (
     <Stack.Navigator>
@@ -15,9 +20,17 @@ const History = ({ route }) => {
         initialParams={{ ...route.params }}
       />
       <Stack.Screen name="ClaimsHistory" component={ClaimsHistory} options={{ title: "ClaimsHistory" }} />
+       <Stack.Screen
+              name="DonationsHistory"
+              component={DonationsHistory}
+              options={{
+                title: 'Donation History', headerTitleStyle: { textAlign: 'center' },
+                headerTitleAlign: 'center', headerStyle: { backgroundColor: theme.colors.charcoalBlack, height: 70 },
+                headerTintColor: theme.colors.ivory
+              }} // Optional: Customize header title
+            />
     </Stack.Navigator>
-  )
-}
-
+  );
+};
 export default History
 

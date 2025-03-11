@@ -110,7 +110,7 @@ const Profile = ({ route }) => {
     <AnimatedButton
       icon="gift"
       text="My Donations"
-      onPress={() => navigation.navigate("ClaimsHistory")}
+      onPress={() => navigation.navigate("DonationsHistory")}
     />
   ) : role === "recipient" ? (
     <AnimatedButton

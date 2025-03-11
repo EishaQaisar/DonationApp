@@ -782,3 +782,37 @@ app.get('/api/claimed-items', (req, res) => {
 });
 
 
+app.get("/api/user-food-donations", (req, res) => {
+  const userId = req.query.userId
+console.log(userId)
+  if (!userId) {
+    return res.status(400).json({ error: "User ID is required" })
+  }
+
+  const query = "SELECT * FROM fooddonations WHERE donorUsername = ? ORDER BY createdAt DESC"
+
+  db.query(query, [userId], (err, results) => {
+    if (err) {
+      console.error("Error fetching data:", err)
+      return res.status(500).send("Error fetching data")
+    }
+    res.json(results)
+  })
+})
+app.get("/api/user-clothes-donations", (req, res) => {
+  const userId = req.query.userId
+
+  if (!userId) {
+    return res.status(400).json({ error: "User ID is required" })
+  }
+
+  const query = "SELECT * FROM clothesdonations WHERE donorUsername = ? ORDER BY createdAt DESC"
+
+  db.query(query, [userId], (err, results) => {
+    if (err) {
+      console.error("Error fetching data:", err)
+      return res.status(500).send("Error fetching data")
+    }
+    res.json(results)
+  })
+})
