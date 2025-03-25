@@ -1,7 +1,7 @@
 "use client"
 import firestore from "@react-native-firebase/firestore"
-import { useState, useContext } from "react"
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput } from "react-native"
+import { useState, useContext, useRef } from "react"
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Modal, Alert } from "react-native"
 import { Formik } from "formik"
 import { Picker } from "@react-native-picker/picker"
 import { theme } from "../core/theme"
@@ -10,13 +10,21 @@ import { validateAge } from "../helpers/ageValidator"
 import { addressValidator } from "../helpers/addressValidator"
 import { AuthContext } from "../context/AuthContext"
 import { UserProfileContext } from "../context/UserProfileContext"
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete"
+import axios from 'axios'
 
+// You would replace this with your actual API key
+const GOOGLE_API_KEY = "AIzaSyB9irjntPHdEJf024h7H_XKpS11OeW1Nh8";
 
 const RecipientProfileForm = ({ navigation }) => {
-    const [khairPoints] = useState({value:100});
+  const [khairPoints] = useState({value:100});
   
   const { user } = useContext(AuthContext)
   const [image, setImage] = useState(null)
+  const [showLocationModal, setShowLocationModal] = useState(false)
+  const [currentField, setCurrentField] = useState(null)
+  const googlePlacesRef = useRef(null)
+  const [addressCoordinates, setAddressCoordinates] = useState(null)
 
   const genderOptions = ["Male", "Female", "Other"]
   const maritalStatusOptions = ["Single", "Married", "Divorced", "Widowed"]
@@ -29,6 +37,41 @@ const RecipientProfileForm = ({ navigation }) => {
   const gradeOption = ["Nursery", "KG", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"]
   const uniYearOption = ["1st", "2nd", "3rd", "4th"]
   const collegeYearOption = ["1st Year", "2nd Year"]
+
+  // Validate address and get coordinates using Google Maps API
+  const validateAndGetCoordinates = async (address) => {
+    if (!address) return null;
+
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_API_KEY}`
+      );
+
+      if (response.data.status === 'OK' && response.data.results.length > 0) {
+        const location = response.data.results[0].geometry.location;
+        const coordinates = {
+          latitude: location.lat,
+          longitude: location.lng
+        };
+
+        // Format the address
+        const formattedAddress = response.data.results[0].formatted_address;
+        console.log("Formatted address:", formattedAddress);
+        console.log("Coordinates:", coordinates);
+
+        setAddressCoordinates(coordinates);
+        return coordinates;
+      } else {
+        console.error("Address validation failed:", response.data.status);
+        Alert.alert('Invalid Address', 'Please enter a valid address');
+        return null;
+      }
+    } catch (error) {
+      console.error("Error validating address:", error);
+      Alert.alert('Error', 'Failed to validate address');
+      return null;
+    }
+  };
 
   const validate = (values) => {
     console.log("HFEE")
@@ -67,9 +110,11 @@ const RecipientProfileForm = ({ navigation }) => {
       }
     }
   
-    const addressError = addressValidator(values.address)
-    if (addressError) errors.address = addressError
+    // Address validation
     if (!values.address) errors.address = "Address is required"
+    if (!addressCoordinates && values.address) {
+      errors.address = "Please select a valid address from the suggestions"
+    }
   
     // Only validate education-related fields if occupation is "Student"
     if (values.occupation === "Student") {
@@ -95,46 +140,10 @@ const RecipientProfileForm = ({ navigation }) => {
     return errors
   }
   
-  
   const onSubmit = async (values, { setSubmitting }) => {
     console.log("Form submitted with values:", values)
     console.log(values)
-    // Handle form submission
-    /*
-    setSubmitting(false);
-    try {
-      await firestore()
-        .collection("individual_profiles")
-        .doc(user.uid)
-        .set({
-        name: values.name,
-        age: parseInt(values.age), // Convert to integer
-        gender: values.gender,
-        maritalStatus: values.maritalStatus,
-        children: parseInt(values.children) || 0, // Convert to integer, default to 0
-        occupation: values.occupation,
-        income: parseFloat(values.income) || 0, // Convert to decimal
-        educationLevel: values.educationLevel,
-        institution: values.institution,
-        class: values.class,
-        shoeSize: values.shoeSize,
-        clothingSize: values.clothingSize,
-        shirtSize: values.shirtSize,
-        trouserSize: values.trouserSize,
-        address: values.address,
-        profileImage: values.profileImage || "", // Ensure string (or default empty)
-        createdAt: firestore.FieldValue.serverTimestamp(), // Timestamp for when the profile is created
-          
-        });
-
-
-        
-    } catch (error) {
-      console.log("Error saving details", error);
-    }
-      
-    navigation.navigate('WaitForApprovalScreen');
-    */
+    
     if (Number.parseInt(values.children) > 0) {
       navigation.navigate("ChildrenProfiles", { ParentValues: values })
     } else {
@@ -158,13 +167,12 @@ const RecipientProfileForm = ({ navigation }) => {
             shirtSize: values.shirtSize,
             trouserSize: values.trouserSize,
             address: values.address,
+            addressCoordinates: addressCoordinates, // Add coordinates
             profileImage: values.profileImage || "", // Ensure string (or default empty)
             createdAt: firestore.FieldValue.serverTimestamp(), // Timestamp for when the profile is created
             membersCount: Number.parseInt(values.membersCount) || 0, // Convert to integer, default to 0
-            khairPoints:khairPoints.value,
-            lastPointsReassignmentDate:firestore.FieldValue.serverTimestamp(),
-
-            
+            khairPoints: khairPoints.value,
+            lastPointsReassignmentDate: firestore.FieldValue.serverTimestamp(),
           })
       } catch (error) {
         console.log("Error saving details", error)
@@ -173,6 +181,109 @@ const RecipientProfileForm = ({ navigation }) => {
       navigation.navigate("WaitForApprovalScreen")
     }
   }
+
+  // Location search modal component
+  const LocationSearchModal = () => (
+    <Modal
+      visible={showLocationModal}
+      animationType="slide"
+      transparent={false}
+      onRequestClose={() => setShowLocationModal(false)}
+    >
+      <View style={styles.modalContainer}>
+        <View style={styles.modalHeader}>
+          <Text style={styles.modalTitle}>Search Location</Text>
+          <TouchableOpacity onPress={() => setShowLocationModal(false)} style={styles.closeButton}>
+            <Text style={styles.closeButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+
+        <GooglePlacesAutocomplete
+          ref={googlePlacesRef}
+          placeholder="Enter your address"
+          minLength={2}
+          fetchDetails={true}
+          onPress={(data, details = null) => {
+            if (details && currentField) {
+              const location = details.geometry.location;
+              currentField.setFieldValue("address", details.formatted_address);
+              setAddressCoordinates({
+                latitude: location.lat,
+                longitude: location.lng
+              });
+              setShowLocationModal(false);
+            }
+          }}
+          query={{
+            key: GOOGLE_API_KEY,
+            language: "en",
+          }}
+          styles={{
+            container: {
+              flex: 1,
+              zIndex: 1,
+            },
+            textInputContainer: {
+              backgroundColor: theme.colors.TaupeBlack,
+              borderTopWidth: 0,
+              borderBottomWidth: 0,
+            },
+            textInput: {
+              backgroundColor: theme.colors.TaupeBlack,
+              color: theme.colors.ivory,
+              height: 50,
+              borderWidth: 1,
+              borderRadius: 10,
+              borderColor: theme.colors.ivory,
+              fontSize: 16,
+              marginLeft: 0,
+              marginRight: 0,
+            },
+            listView: {
+              backgroundColor: theme.colors.TaupeBlack,
+              borderWidth: 1,
+              borderColor: theme.colors.ivory,
+              borderRadius: 5,
+              marginTop: 5,
+            },
+            row: {
+              backgroundColor: theme.colors.TaupeBlack,
+              padding: 13,
+              height: 'auto',
+              flexDirection: 'row',
+              borderBottomWidth: 1,
+              borderColor: theme.colors.ivory,
+            },
+            separator: {
+              height: 1,
+              backgroundColor: theme.colors.ivory,
+            },
+            description: {
+              color: theme.colors.ivory,
+              fontSize: 14,
+            },
+            predefinedPlacesDescription: {
+              color: theme.colors.ivory,
+            },
+            poweredContainer: {
+              backgroundColor: theme.colors.TaupeBlack,
+              borderBottomLeftRadius: 5,
+              borderBottomRightRadius: 5,
+              borderColor: theme.colors.ivory,
+              borderTopWidth: 0.5,
+            },
+            powered: {
+              tintColor: theme.colors.ivory,
+            },
+          }}
+          enablePoweredByContainer={false}
+          keyboardShouldPersistTaps="handled"
+          listViewDisplayed={true}
+          debounce={300}
+        />
+      </View>
+    </Modal>
+  )
 
   const [selectedOption, setSelectedOption] = useState("option1")
   const [inputValue, setInputValue] = useState("")
@@ -239,20 +350,36 @@ const RecipientProfileForm = ({ navigation }) => {
                 {errors.gender && touched.gender && <Text style={styles.errorText}>{errors.gender}</Text>}
               </View>
 
-              {/* Address Input */}
+              {/* Address Input with Location Search */}
               <View style={styles.inputContainer}>
                 <Text style={styles.label}>Address</Text>
-                <TextInput
-                  style={styles.textArea}
-                  onChangeText={handleChange("address")}
-                  onBlur={handleBlur("address")}
-                  value={values.address}
-                  placeholder="Enter your full address"
-                  placeholderTextColor={theme.colors.ivory}
-                  multiline
-                  numberOfLines={3}
-                />
+                <View style={styles.addressContainer}>
+                  <TextInput
+                    style={[
+                      styles.addressInput,
+                      errors.address && touched.address && styles.errorBorder
+                    ]}
+                    value={values.address}
+                    placeholder="Search your address"
+                    placeholderTextColor={theme.colors.ivory}
+                    editable={false}
+                  />
+                  <TouchableOpacity
+                    style={styles.searchButton}
+                    onPress={() => {
+                      setCurrentField({ setFieldValue })
+                      setShowLocationModal(true)
+                    }}
+                  >
+                    <Text style={styles.searchButtonText}>Search</Text>
+                  </TouchableOpacity>
+                </View>
                 {errors.address && touched.address && <Text style={styles.errorText}>{errors.address}</Text>}
+                {addressCoordinates && (
+                  <Text style={styles.coordinatesText}>
+                    Address validated ✓
+                  </Text>
+                )}
               </View>
 
               {/* Number of Family Members Input */}
@@ -539,6 +666,9 @@ const RecipientProfileForm = ({ navigation }) => {
           )}
         </Formik>
       </ScrollView>
+
+      {/* Location Search Modal */}
+      <LocationSearchModal />
     </View>
   )
 }
@@ -650,7 +780,67 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginTop: 5,
   },
+  errorBorder: {
+    borderColor: "red",
+  },
+  // New styles for address autocomplete
+  addressContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  addressInput: {
+    backgroundColor: theme.colors.TaupeBlack,
+    height: 40,
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: theme.colors.ivory,
+    paddingHorizontal: 15,
+    color: theme.colors.ivory,
+    fontSize: 16,
+    flex: 1,
+  },
+  searchButton: {
+    backgroundColor: theme.colors.sageGreen,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 10,
+    marginLeft: 10,
+    paddingHorizontal: 15,
+  },
+  searchButtonText: {
+    color: theme.colors.ivory,
+    fontWeight: "bold",
+  },
+  coordinatesText: {
+    color: theme.colors.sageGreen,
+    fontSize: 12,
+    marginTop: 5,
+  },
+  // Modal styles
+  modalContainer: {
+    flex: 1,
+    backgroundColor: theme.colors.charcoalBlack,
+    padding: 20,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: theme.colors.ivory,
+  },
+  closeButton: {
+    padding: 10,
+  },
+  closeButtonText: {
+    color: theme.colors.sageGreen,
+    fontWeight: "bold",
+  },
 })
 
 export default RecipientProfileForm
-

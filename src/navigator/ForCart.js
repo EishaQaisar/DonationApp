@@ -21,6 +21,8 @@ import {
 
 import { theme } from '../core/theme';
 import { CartProvider } from '../CartContext'; // Import CartProvider
+import {t} from "../i18n"
+
 
 const Stack = createStackNavigator();
 
@@ -33,7 +35,7 @@ const ForCart = ({ navigation, route }) => {
         name="Cart"
         component={Cart}
         options={{
-          title: 'Cart',
+          title: t("titles.your_cart"),
           headerTitleStyle: { textAlign: 'center' },
           headerTitleAlign: 'center',
           headerStyle: { backgroundColor: theme.colors.charcoalBlack, height: 70 },
@@ -45,7 +47,7 @@ const ForCart = ({ navigation, route }) => {
         name="Clothes"
         component={Clothes}
         options={{
-          title: 'Clothes Donations',
+          title: t("titles.clothes_donations"),
           headerTitleStyle: { textAlign: 'center' },
           headerTitleAlign: 'center',
           headerStyle: { backgroundColor: theme.colors.charcoalBlack, height: 70 },
@@ -57,7 +59,7 @@ const ForCart = ({ navigation, route }) => {
         name="Education"
         component={Education}
         options={{
-          title: 'Education Donations',
+          title:t("titles.education_donations"),
           headerTitleStyle: { textAlign: 'center' },
           headerTitleAlign: 'center',
           headerStyle: { backgroundColor: theme.colors.charcoalBlack, height: 70 },
@@ -69,7 +71,7 @@ const ForCart = ({ navigation, route }) => {
         name="Food"
         component={Food}
         options={{
-          title: 'Food Donations',
+          title:  t("titles.food_donations"),
           headerTitleStyle: { textAlign: 'center' },
           headerTitleAlign: 'center',
           headerStyle: { backgroundColor: theme.colors.charcoalBlack, height: 70 },

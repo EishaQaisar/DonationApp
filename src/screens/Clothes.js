@@ -11,6 +11,8 @@ import { getBaseUrl } from "../helpers/deviceDetection"
 import { AuthContext } from "../context/AuthContext"
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
 import { UserProfileContext } from "../context/UserProfileContext"
+import { t } from "../i18n" // Import the translation function
+
 
 const Clothes = ({ route }) => {
   const navigation = useNavigation()
@@ -20,6 +22,9 @@ const Clothes = ({ route }) => {
   const { isInCart } = useContext(CartContext)
   const { user } = useContext(AuthContext)
   const { userProfile } = useContext(UserProfileContext)
+
+  // Detect language by comparing a known translation
+  const isUrdu = t("clothes.item_category_options.Clothes") !== "Clothes"
 
   const [clothesItems, setClothesItems] = useState({
     recommended: [],
@@ -80,6 +85,16 @@ const Clothes = ({ route }) => {
     }
   }, [userProfile, isDonor]) //Fixed useEffect dependencies
 
+  // Dynamic styles based on language
+  const dynamicStyles = {
+    itemDetails: {
+      fontSize: isUrdu ? 18 : 16, // Increase font size for Urdu
+      color: theme.colors.ivory,
+      textAlign: "center",
+      marginBottom: 5,
+    }
+  }
+
   /** Render each item */
   const renderItem = ({ item }) => (
     <TouchableOpacity
@@ -88,36 +103,37 @@ const Clothes = ({ route }) => {
     >
       <Image source={item.images[0]} style={styles.itemImage} />
        {item.itemCategory === "Shoes" && (
-                                  <Text style={styles.item}> {item.itemCategory}</Text>
-                              )}
-                              {item.itemCategory === "Clothes" && (
-                                  <Text style={styles.item}>{item.clothesCategory}</Text>
-                              )}
+          <Text style={styles.item}> {t(`clothes.item_category_options.${item.itemCategory}`, { defaultValue: item.itemCategory })}</Text>
+       )}
+       {item.itemCategory === "Clothes" && (
+          <Text style={styles.item}> {t(`clothes.clothes_category_options.${item.clothesCategory}`, { defaultValue: item.clothesCategory })}</Text>
+       )}
   
       
-      <Text style={styles.itemDetails}>
-        {`Size: ${
-          item.itemCategory === "Clothes" 
-            ? (
-                item.clothesCategory === "Upper Wear" 
-                  ? item.upperWearSize 
-                  : item.clothesCategory === "Bottom Wear" 
-                    ? item.bottomWearSize 
-                    : item.clothesCategory === "Full Outfit" 
-                      ? item.clothingSize 
-                      : "N/A"
-              ) 
-            : item.itemCategory === "Shoes" 
-              ? item.shoeSize 
-              : "N/A"
-        }`}
+      <Text style={dynamicStyles.itemDetails}>
+      {`${t("clothes.size")}: ${
+        item.itemCategory === "Clothes"
+          ? item.clothesCategory === "Upper Wear"
+            ? t(`clothes.size_options.${item.upperWearSize}`, { defaultValue: item.upperWearSize })
+            : item.clothesCategory === "Bottom Wear"
+            ? t(`clothes.size_options.${item.bottomWearSize}`, { defaultValue: item.bottomWearSize })
+            : item.clothesCategory === "Full Outfit"
+            ? t(`clothes.size_options.${item.clothingSize}`, { defaultValue: item.clothingSize })
+            : "N/A"
+          : item.itemCategory === "Shoes"
+          ? t(`clothes.size_options.${item.shoeSize}`, { defaultValue: item.shoeSize })
+          : "N/A"
+      }`}
       </Text>
-      <Text style={styles.itemDetails}>{`Gender: ${item.gender}`}</Text>
+
+      <Text style={dynamicStyles.itemDetails}>{`${t("clothes.gender")}: ${
+          t(`clothes.gender_options.${item.gender}`, { defaultValue: item.gender })
+        }`}</Text>
       <TouchableOpacity
         style={styles.claimButton}
         onPress={() => navigation.navigate("ItemDetail", { item, category: "Clothes" })}
       >
-        <Text style={styles.claimButtonText}>{isDonor ? "View" : "Claim"}</Text>
+        <Text style={styles.claimButtonText}>{isDonor ? t("general.view") : t("general.claim")}</Text>
       </TouchableOpacity>
     </TouchableOpacity>
   )
@@ -145,13 +161,13 @@ const Clothes = ({ route }) => {
 
       {/* Page Title */}
       <View style={styles.header}>
-        <Text style={styles.title}>Clothes Donations</Text>
+        <Text style={styles.title}>{t("clothes.donations_title", { defaultValue: "Clothes Donations" })}</Text>
       </View>
 
       {/* Donor View - All Donations */}
       {(isDonor || user.recipientType === "ngo")&& (
         <View>
-          <Text style={styles.sectionHeaderText}>All Available Donations</Text>
+          <Text style={styles.sectionHeaderText}>{t("general.allAvailableDonations", { defaultValue: "All Available Donations" })}</Text>
           <FlatList
             data={clothesItems.allDonations.filter((item) => !isInCart(item))}
             renderItem={renderItem}
@@ -166,7 +182,7 @@ const Clothes = ({ route }) => {
       {/* Recipient View - Recommended Donations */}
       {!isDonor && clothesItems.recommended.length > 0 && (
         <View>
-          <Text style={styles.sectionHeaderText}>Recommended for You</Text>
+          <Text style={styles.sectionHeaderText}>{t("general.recommendedForYou", { defaultValue: "Recommended for You" })}</Text>
           <FlatList
             data={clothesItems.recommended.filter((item) => !isInCart(item))}
             renderItem={renderItem}
@@ -181,7 +197,7 @@ const Clothes = ({ route }) => {
       {/* Recipient View - Other Donations */}
       {!isDonor && clothesItems.others.length > 0 && (
         <View>
-          <Text style={styles.sectionHeaderText}>Others</Text>
+          <Text style={styles.sectionHeaderText}>{t("general.others", { defaultValue: "Others" })}</Text>
           <FlatList
             data={clothesItems.others.filter((item) => !isInCart(item))}
             renderItem={renderItem}
@@ -246,12 +262,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 5,
   },
-  itemDetails: {
-    fontSize: 16,
-    color: theme.colors.ivory,
-    textAlign: "center",
-    marginBottom: 5,
-  },
+  // itemDetails style moved to dynamicStyles
   claimButton: {
     backgroundColor: theme.colors.charcoalBlack,
     paddingVertical: 10,
@@ -295,4 +306,3 @@ const styles = StyleSheet.create({
 })
 
 export default Clothes
-

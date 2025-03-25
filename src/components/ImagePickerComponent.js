@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { theme } from "../core/theme";
+import {t} from '../i18n'
+
 
 const ImagePickerComponent = ({ maxImages = 3, selectedImages = [], onImagesChange }) => {
   const [images, setImages] = useState(selectedImages);
@@ -18,7 +20,8 @@ const ImagePickerComponent = ({ maxImages = 3, selectedImages = [], onImagesChan
 
       // Check if selected images exceed the maxImages limit
       if (selectedImages.length + images.length > maxImages) {
-        alert(`Please select a maximum of ${maxImages} images.`);
+        alert(t("imagePicker.max_images_alert", { max: maxImages }));
+
       } else {
         // Append selected images to the existing ones
         const updatedImages = [...images, ...selectedImages.map(asset => asset.uri)];
@@ -51,7 +54,7 @@ const ImagePickerComponent = ({ maxImages = 3, selectedImages = [], onImagesChan
 
   return (
     <View style={{ marginTop: 20 }}>
-      <Text style={styles.headings}>Select Images</Text>
+      <Text style={styles.headings}>{t("imagePicker.select_images")}</Text>
       <TouchableOpacity style={styles.imageContainer}  onPress={images.length < maxImages ? pickImage : null} >
         {images.length > 0 ? (
           images.map((uri, index) => (

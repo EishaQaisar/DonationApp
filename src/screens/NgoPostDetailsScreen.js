@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { SafeAreaView, StyleSheet, Text, Image, TouchableOpacity, ScrollView, View, Alert, ActivityIndicator } from 'react-native';
 import { theme } from '../core/theme';
 import BackButton from "../components/BackButton";
 import Button from "../components/Button";
 import axios from 'axios';
 import { getBaseUrl } from "../helpers/deviceDetection";
+import { AuthContext } from "../context/AuthContext";
+import { t } from "../i18n";
 
 export default function NgoPostDetailsScreen({ route, navigation }) {
   // Get the campaign details from route params
@@ -25,6 +27,9 @@ export default function NgoPostDetailsScreen({ route, navigation }) {
   const [showButton, setShowButton] = useState(true);
   const [showContactInfo, setShowContactInfo] = useState(false);
   const [loading, setLoading] = useState(false); // Changed to false since we have route params
+  const { isRTL, language } = useContext(AuthContext);
+  const isUrdu = language === "ur";
+  
   const [campaignDetails, setCampaignDetails] = useState({
     title: title || '',
     description: description || '',
@@ -94,7 +99,9 @@ export default function NgoPostDetailsScreen({ route, navigation }) {
   };
 
   // Format date if createdAt exists
-  const formattedDate = campaignDetails.createdAt ? new Date(campaignDetails.createdAt).toLocaleDateString() : '';
+  const formattedDate = campaignDetails.createdAt ? new Date(campaignDetails.createdAt).toLocaleDateString(
+    isUrdu ? 'ur-PK' : 'en-US'
+  ) : '';
 
   const handleSupportNow = () => {
     console.log("Support Now button clicked");
@@ -110,9 +117,9 @@ export default function NgoPostDetailsScreen({ route, navigation }) {
     // If there's no contact information available, show an alert
     if (!campaignDetails.phoneNumber && !campaignDetails.email && !campaignDetails.bankAccount) {
       Alert.alert(
-        "Contact Information Unavailable",
-        "Sorry, no contact information is available for this campaign.",
-        [{ text: "OK" }]
+        t("ngoPost.contactUnavailableTitle", "Contact Information Unavailable"),
+        t("ngoPost.contactUnavailableMessage", "Sorry, no contact information is available for this campaign."),
+        [{ text: t("common.ok", "OK") }]
       );
     }
   };
@@ -121,7 +128,9 @@ export default function NgoPostDetailsScreen({ route, navigation }) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={theme.colors.sageGreen} />
-        <Text style={{ color: theme.colors.ivory }}>Loading campaign details...</Text>
+        <Text style={{ color: theme.colors.ivory }}>
+          {t("ngoPost.loading", "Loading campaign details...")}
+        </Text>
       </SafeAreaView>
     );
   }
@@ -140,48 +149,108 @@ export default function NgoPostDetailsScreen({ route, navigation }) {
         />
         
         {/* Displaying the title of the campaign */}
-        <Text style={styles.detailsTitle}>{campaignDetails.title}</Text>
+        <Text style={[
+          styles.detailsTitle,
+          isUrdu && styles.urduTitle
+        ]}>
+          {campaignDetails.title}
+        </Text>
 
         {/* Display NGO name if available */}
         {campaignDetails.ngoName && (
-          <Text style={styles.ngoName}>By NGO: {campaignDetails.ngoName}</Text>
+          <Text style={[
+            styles.ngoName,
+            isUrdu && styles.urduText
+          ]}>
+            {t("ngoPost.byNgo", "By NGO:")} {campaignDetails.ngoName}
+          </Text>
         )}
 
         {/* Display creation date if available */}
         {formattedDate && (
-          <Text style={styles.dateText}>Posted on: {formattedDate}</Text>
+          <Text style={[
+            styles.dateText,
+            isUrdu && styles.urduSmallText
+          ]}>
+            {t("ngoPost.postedOn", "Posted on:")} {formattedDate}
+          </Text>
         )}
 
         {/* Displaying the full description */}
-        <Text style={styles.detailsDescription}>{campaignDetails.description}</Text>
+        <Text style={[
+          styles.detailsDescription,
+          isUrdu && styles.urduText
+        ]}>
+          {campaignDetails.description}
+        </Text>
 
         {/* Display contact information if button is clicked */}
         {showContactInfo && (
-          <View style={styles.contactContainer}>
-            <Text style={styles.contactTitle}>Contact Information:</Text>
+          <View style={[
+            styles.contactContainer,
+          ]}>
+            <Text style={[
+              styles.contactTitle,
+              isUrdu && styles.urduText
+            ]}>
+              {t("ngoPost.contactInfo", "Contact Information:")}
+            </Text>
             {campaignDetails.phoneNumber ? (
-              <Text style={styles.contactText}>Phone: {campaignDetails.phoneNumber}</Text>
+              <Text style={[
+                styles.contactText,
+                isUrdu && styles.urduSmallText
+              ]}>
+                {t("ngoPost.phone", "Phone:")} {campaignDetails.phoneNumber}
+              </Text>
             ) : (
-              <Text style={styles.contactTextUnavailable}>Phone: Not available</Text>
+              <Text style={[
+                styles.contactTextUnavailable,
+                isUrdu && styles.urduSmallText
+              ]}>
+                {t("ngoPost.phone", "Phone:")} {t("ngoPost.notAvailable", "Not available")}
+              </Text>
             )}
             
             {campaignDetails.email ? (
-              <Text style={styles.contactText}>Email: {campaignDetails.email}</Text>
+              <Text style={[
+                styles.contactText,
+                isUrdu && styles.urduSmallText
+              ]}>
+                {t("ngoPost.email", "Email:")} {campaignDetails.email}
+              </Text>
             ) : (
-              <Text style={styles.contactTextUnavailable}>Email: Not available</Text>
+              <Text style={[
+                styles.contactTextUnavailable,
+                isUrdu && styles.urduSmallText
+              ]}>
+                {t("ngoPost.email", "Email:")} {t("ngoPost.notAvailable", "Not available")}
+              </Text>
             )}
             
             {campaignDetails.bankAccount ? (
-              <Text style={styles.contactText}>Bank Account: {campaignDetails.bankAccount}</Text>
+              <Text style={[
+                styles.contactText,
+                isUrdu && styles.urduSmallText
+              ]}>
+                {t("ngoPost.bankAccount", "Bank Account:")} {campaignDetails.bankAccount}
+              </Text>
             ) : (
-              <Text style={styles.contactTextUnavailable}>Bank Account: Not available</Text>
+              <Text style={[
+                styles.contactTextUnavailable,
+                isUrdu && styles.urduSmallText
+              ]}>
+                {t("ngoPost.bankAccount", "Bank Account:")} {t("ngoPost.notAvailable", "Not available")}
+              </Text>
             )}
           </View>
         )}
 
         {/* A poetic line for better engagement */}
-        <Text style={styles.poeticLine}>
-          "Extend your hand, where hope begins, and kindness wins."
+        <Text style={[
+          styles.poeticLine,
+          isUrdu && styles.urduPoetic
+        ]}>
+          {t("ngoPost.poeticLine", "\"Extend your hand, where hope begins, and kindness wins.\"")}
         </Text>
         
         {/* Support Now button that shows contact information when clicked */}
@@ -191,7 +260,9 @@ export default function NgoPostDetailsScreen({ route, navigation }) {
             style={styles.button}
             onPress={handleSupportNow}
           >
-            {showContactInfo ? "Hide Contact Info" : "Support Now"}
+            {showContactInfo 
+              ? t("ngoPost.hideContactInfo", "Hide Contact Info") 
+              : t("ngoPost.supportNow", "Support Now")}
           </Button>
         </View>
       </ScrollView>
@@ -224,6 +295,10 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     color: theme.colors.ivory,
   },
+  urduTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+  },
   ngoName: {
     fontSize: 16,
     textAlign: 'center',
@@ -244,6 +319,13 @@ const styles = StyleSheet.create({
     textAlign: 'justify',
     marginVertical: 8,
     color: theme.colors.ivory,
+  },
+  urduText: {
+    fontSize: 18,
+    lineHeight: 28,
+  },
+  urduSmallText: {
+    fontSize: 16,
   },
   contactContainer: {
     marginTop: 16,
@@ -292,5 +374,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 16,
     color: theme.colors.ivory,
+  },
+  urduPoetic: {
+    fontSize: 22,
+    fontStyle: 'normal',
   },
 });

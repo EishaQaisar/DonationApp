@@ -2,6 +2,7 @@ import { createStackNavigator } from "@react-navigation/stack"
 import { ClaimsHistory, Profile , DonationsHistory} from "../screens"
 import { useEffect } from "react";
 import { theme } from '../core/theme'
+import {t} from '../i18n'
 
 
 const Stack = createStackNavigator()
@@ -23,7 +24,7 @@ const History = ({ route }) => {
               name="ClaimsHistory"
               component={ClaimsHistory}
               options={{
-                title: 'Claims History', headerTitleStyle: { textAlign: 'center' },
+                title:  t('titles.claims_history'), headerTitleStyle: { textAlign: 'center' },
                 headerTitleAlign: 'center', headerStyle: { backgroundColor: theme.colors.charcoalBlack, height: 70 },
                 headerTintColor: theme.colors.ivory
               }} // Optional: Customize header title
@@ -32,7 +33,7 @@ const History = ({ route }) => {
               name="DonationsHistory"
               component={DonationsHistory}
               options={{
-                title: 'Donation History', headerTitleStyle: { textAlign: 'center' },
+                title:  t('titles.donations_history'), headerTitleStyle: { textAlign: 'center' },
                 headerTitleAlign: 'center', headerStyle: { backgroundColor: theme.colors.charcoalBlack, height: 70 },
                 headerTintColor: theme.colors.ivory
               }} // Optional: Customize header title

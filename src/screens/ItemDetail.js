@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useContext } from "react"
@@ -22,6 +21,7 @@ import firestore from "@react-native-firebase/firestore"
 import { AuthContext } from "../context/AuthContext"
 import { getBaseUrl } from "../helpers/deviceDetection"
 import axios from 'axios';
+import { t } from "../i18n" // Import the translation function
 
 
 const ItemDetail = ({ route }) => {
@@ -34,6 +34,29 @@ const ItemDetail = ({ route }) => {
   const [requiredKhairPoints, setRequiredKhairPoints] = useState(0)
   const { user } = useContext(AuthContext)
   const [not, setNot] = useState([]);
+
+  // Detect language by comparing a known translation
+  const isUrdu = t("food.donations_title") !== "Food Donations"
+
+  // Dynamic styles based on language
+  const dynamicStyles = {
+    detailLabel: {
+      fontSize: isUrdu ? 18 : 16, // Increase font size for Urdu
+      color: theme.colors.ivory,
+      marginBottom: 2,
+    },
+    detailValue: {
+      fontSize: isUrdu ? 20 : 18, // Increase font size for Urdu
+      color: theme.colors.pearlWhite,
+      fontWeight: "500",
+    },
+    modalMessage: {
+      fontSize: isUrdu ? 20 : 18, // Increase font size for Urdu
+      color: theme.colors.ivory,
+      textAlign: "center",
+      marginBottom: 25,
+    }
+  }
 
   const isClaimed = isInCart(item)
   const khairPointsPerCategory = {
@@ -99,10 +122,10 @@ const ItemDetail = ({ route }) => {
           <View>
             <Text style={styles.title}>{item.foodName}</Text>
             <View style={styles.detailsCard}>
-              <DetailItem icon="food" label="Meal" value={item.mealType} />
-              <DetailItem icon="silverware-fork-knife" label="Food Type" value={item.foodType} />
-              <DetailItem icon="numeric" label="Quantity" value={item.quantity.toString()} />
-              <DetailItem icon="text-short" label="Description" value={item.description} />
+              <DetailItem icon="food" label={t("itemDetail.meal")} value={t(`food.meal_options.${item.mealType}`, { defaultValue: item.mealType })} />
+              <DetailItem icon="silverware-fork-knife" label={t("itemDetail.foodType")} value={t(`food.food_type_options.${item.foodType}`, { defaultValue: item.foodType })} />
+              <DetailItem icon="numeric" label={t("itemDetail.quantity")} value={item.quantity.toString()} />
+              <DetailItem icon="text-short" label={t("itemDetail.description")} value={item.description} />
             </View>
           </View>
         )
@@ -110,25 +133,25 @@ const ItemDetail = ({ route }) => {
         return (
           <View>
             {/* Display clothes category only when item category is Clothes */}
-            {item.itemCategory === "Shoes" && <Text style={styles.title}> {item.itemCategory}</Text>}
-            {item.itemCategory === "Clothes" && <Text style={styles.title}>{item.clothesCategory}</Text>}
+            {item.itemCategory === "Shoes" && <Text style={styles.title}>{t(`clothes.item_category_options.${item.itemCategory}`, { defaultValue: item.itemCategory })}</Text>}
+            {item.itemCategory === "Clothes" && <Text style={styles.title}>{t(`clothes.clothes_category_options.${item.clothesCategory}`, { defaultValue: item.clothesCategory })}</Text>}
 
             <View style={styles.detailsCard}>
               {/* Conditionally display size with appropriate value based on category */}
               <DetailItem
                 icon="tshirt-crew"
-                label="Size"
+                label={t("clothes.size")}
                 value={
                   item.itemCategory === "Clothes"
                     ? item.clothesCategory === "Upper Wear"
-                      ? item.upperWearSize
+                      ? t(`clothes.size_options.${item.upperWearSize}`, { defaultValue: item.upperWearSize })
                       : item.clothesCategory === "Bottom Wear"
-                        ? item.bottomWearSize
+                        ? t(`clothes.size_options.${item.bottomWearSize}`, { defaultValue: item.bottomWearSize })
                         : item.clothesCategory === "Full Outfit"
-                          ? item.clothingSize
+                          ? t(`clothes.size_options.${item.clothingSize}`, { defaultValue: item.clothingSize })
                           : "N/A"
                     : item.itemCategory === "Shoes"
-                      ? item.shoeSize
+                      ? t(`clothes.size_options.${item.shoeSize}`, { defaultValue: item.shoeSize })
                       : "N/A"
                 }
               />
@@ -137,13 +160,13 @@ const ItemDetail = ({ route }) => {
               {!(
                 item.itemCategory === "Shoes" ||
                 (item.itemCategory === "Clothes" && item.clothesCategory === "Accessories")
-              ) && <DetailItem icon="texture-box" label="Fabric" value={item.fabric} />}
+              ) && <DetailItem icon="texture-box" label={t("itemDetail.fabric")} value={item.fabric} />}
 
-              <DetailItem icon="weather-sunny" label="Season" value={item.season} />
-              <DetailItem icon="human-male-child" label="Age" value={item.age_category} />
-              <DetailItem icon="gender-male-female" label="Gender" value={item.gender} />
-              <DetailItem icon="star-outline" label="Condition" value={item.c_condition} />
-              <DetailItem icon="numeric" label="Quantity" value={item.quantity.toString()} />
+              <DetailItem icon="weather-sunny" label={t("itemDetail.season")} value={t(`clothes.season_options.${item.season}`, { defaultValue: item.season })} />
+              <DetailItem icon="human-male-child" label={t("itemDetail.age")} value={t(`clothes.age_categories.${item.age_category}`, { defaultValue: item.age_category })} />
+              <DetailItem icon="gender-male-female" label={t("clothes.gender")} value={t(`clothes.gender_options.${item.gender}`, { defaultValue: item.gender })} />
+              <DetailItem icon="star-outline" label={t("itemDetail.condition")} value={t(`clothes.condition_options.${item.c_condition}`, { defaultValue: item.c_condition })} />
+              <DetailItem icon="numeric" label={t("itemDetail.quantity")} value={item.quantity.toString()} />
             </View>
           </View>
         )
@@ -153,23 +176,23 @@ const ItemDetail = ({ route }) => {
             <Text style={styles.title}>{item.itemName}</Text>
             <View style={styles.detailsCard}>
               {item.type !== "Stationary" && (
-                <DetailItem icon="book-open-variant" label="Subject" value={item.subject} />
+                <DetailItem icon="book-open-variant" label={t("itemDetail.subject")} value={t(`education.subjects.${item.subject}`, { defaultValue: item.subject })} />
               )}
-              {item.type === "Books" && <DetailItem icon="school" label="Grade" value={item.grade} />}
-              {item.type === "Books" && <DetailItem icon="school" label="Institute" value={item.institution} />}
-              <DetailItem icon="school" label="Level" value={item.level} />
-              <DetailItem icon="shape-outline" label="Type" value={item.type} />
-              <DetailItem icon="star-outline" label="Condition" value={item.c_condition} />
-              <DetailItem icon="numeric" label="Quantity" value={item.quantity.toString()} />
-              <DetailItem icon="text-short" label="Description" value={item.description} />
-              <DetailItem icon="account" label="Donor Username" value={item.donorUsername} />
+              {item.type === "Books" && <DetailItem icon="school" label={t("itemDetail.grade")} value={t(`education.grades.${item.grade}`, { defaultValue: item.grade })} />}
+              {item.type === "Books" && <DetailItem icon="school" label={t("itemDetail.institute")} value={item.institution} />}
+              <DetailItem icon="school" label={t("education.level")} value={t(`education.levels.${item.level}`, { defaultValue: item.level })} />
+              <DetailItem icon="shape-outline" label={t("itemDetail.type")} value={t(`education.types.${item.type}`, { defaultValue: item.type })} />
+              <DetailItem icon="star-outline" label={t("itemDetail.condition")} value={t(`education.conditions.${item.c_condition}`, { defaultValue: item.c_condition })} />
+              <DetailItem icon="numeric" label={t("itemDetail.quantity")} value={item.quantity.toString()} />
+              <DetailItem icon="text-short" label={t("itemDetail.description")} value={item.description} />
+              <DetailItem icon="account" label={t("itemDetail.donorUsername")} value={item.donorUsername} />
             </View>
           </View>
         )
       default:
         return (
           <View style={styles.detailsCard}>
-            <Text style={styles.noDetailsText}>No additional details available.</Text>
+            <Text style={styles.noDetailsText}>{t("itemDetail.noDetails")}</Text>
           </View>
         )
     }
@@ -310,7 +333,7 @@ const changingStatus = async (category,id) => {
           onPress={() => !isClaimed && handleClaim()}
           disabled={isClaimed}
         >
-          <Text style={styles.claimButtonText}>{isClaimed ? "Claimed" : "Claim Item"}</Text>
+          <Text style={styles.claimButtonText}>{isClaimed ? t("itemDetail.claimed") : t("itemDetail.claimItem")}</Text>
         </TouchableOpacity>
       )}
 
@@ -320,18 +343,18 @@ const changingStatus = async (category,id) => {
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={styles.modalContent}>
-                <Text style={styles.modalTitle}>Confirm Claim</Text>
-                <Text style={styles.modalMessage}>
-                  Are you sure you want to claim this item?
-                  {"\n"} {requiredKhairPoints} Khair Points will be deducted.
+                <Text style={styles.modalTitle}>{t("itemDetail.confirmClaim")}</Text>
+                <Text style={dynamicStyles.modalMessage}>
+                  {t("itemDetail.confirmClaimMessage")}
+                  {"\n"} {requiredKhairPoints} {t("itemDetail.khairPoints")}
                 </Text>
 
                 <View style={styles.modalButtons}>
                   <TouchableOpacity style={[styles.modalButton, styles.cancelButton]} onPress={hideConfirmationModal}>
-                    <Text style={styles.modalButtonText}>No</Text>
+                    <Text style={styles.modalButtonText}>{t("itemDetail.no")}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[styles.modalButton, styles.confirmButton]} onPress={confirmClaimItem}>
-                    <Text style={styles.modalButtonText}>Yes</Text>
+                    <Text style={styles.modalButtonText}>{t("itemDetail.yes")}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -346,12 +369,12 @@ const changingStatus = async (category,id) => {
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={styles.modalContent}>
-                <Text style={styles.modalTitle}>Insufficient Khair Points</Text>
-                <Text style={styles.modalMessage}>You do not have enough Khair Points to claim this item.</Text>
+                <Text style={styles.modalTitle}>{t("itemDetail.insufficientPoints")}</Text>
+                <Text style={dynamicStyles.modalMessage}>{t("itemDetail.insufficientPointsMessage")}</Text>
 
                 <View style={styles.modalButtons}>
                   <TouchableOpacity style={[styles.modalButton, styles.confirmButton]} onPress={hideErrorModal}>
-                    <Text style={styles.modalButtonText}>OK</Text>
+                    <Text style={styles.modalButtonText}>{t("itemDetail.ok")}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -363,15 +386,34 @@ const changingStatus = async (category,id) => {
   )
 }
 
-const DetailItem = ({ icon, label, value }) => (
-  <View style={styles.detailItem}>
-    <MaterialIcon name={icon} size={24} color={theme.colors.sageGreen} style={styles.detailIcon} />
-    <View style={styles.detailTextContainer}>
-      <Text style={styles.detailLabel}>{label}</Text>
-      <Text style={styles.detailValue}>{value}</Text>
+const DetailItem = ({ icon, label, value }) => {
+  // Detect language by comparing a known translation
+  const isUrdu = t("food.donations_title") !== "Food Donations"
+  
+  // Dynamic styles based on language
+  const dynamicStyles = {
+    detailLabel: {
+      fontSize: isUrdu ? 18 : 16, // Increase font size for Urdu
+      color: theme.colors.ivory,
+      marginBottom: 2,
+    },
+    detailValue: {
+      fontSize: isUrdu ? 20 : 18, // Increase font size for Urdu
+      color: theme.colors.pearlWhite,
+      fontWeight: "500",
+    }
+  }
+  
+  return (
+    <View style={styles.detailItem}>
+      <MaterialIcon name={icon} size={24} color={theme.colors.sageGreen} style={styles.detailIcon} />
+      <View style={styles.detailTextContainer}>
+        <Text style={dynamicStyles.detailLabel}>{label}</Text>
+        <Text style={dynamicStyles.detailValue}>{value}</Text>
+      </View>
     </View>
-  </View>
-)
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -418,16 +460,7 @@ const styles = StyleSheet.create({
   detailTextContainer: {
     flex: 1,
   },
-  detailLabel: {
-    fontSize: 16,
-    color: theme.colors.ivory,
-    marginBottom: 2,
-  },
-  detailValue: {
-    fontSize: 18,
-    color: theme.colors.pearlWhite,
-    fontWeight: "500",
-  },
+  // detailLabel and detailValue moved to dynamicStyles
   noDetailsText: {
     fontSize: 16,
     color: theme.colors.ivory,
@@ -470,12 +503,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 15,
   },
-  modalMessage: {
-    fontSize: 18,
-    color: theme.colors.ivory,
-    textAlign: "center",
-    marginBottom: 25,
-  },
+  // modalMessage moved to dynamicStyles
   modalButtons: {
     flexDirection: "row",
     justifyContent: "space-between",

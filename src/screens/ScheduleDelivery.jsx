@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { useRoute } from '@react-navigation/native';
 import Background from "../components/Background";
@@ -27,7 +26,7 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
  pickupLocation: false,
  dropOffLocation: false
  });
- const { id = 6 } = route.params || {};
+ const { id = 0 } = route.params || {};
  const [showLocationModal, setShowLocationModal] = useState(false);
 
  // State for claimed item data
@@ -58,7 +57,7 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
 
  const fetchClaimedItem = async () => {
  if (!id) {
- setError("No item ID provided");
+ setError("No item to Schedule");
  setLoading(false);
  return;
  }
@@ -90,7 +89,7 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
 
  } else {
  console.log("No matching item found for ID:", id);
- setError("Item not found");
+ // Don't set error state, just log the message
  }
  } else {
  console.error("Unexpected API response format:", response.data);
@@ -387,6 +386,8 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
  <Text style={styles.loadingText}>Loading item details...</Text>
  ) : error ? (
  <Text style={styles.errorText}>{error}</Text>
+ ) : !claimedItem ? (
+ <Text style={styles.loadingText}>NO deliveries to Schedule</Text>
  ) : (
  <>
  {/* Item Details Section */}

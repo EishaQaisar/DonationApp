@@ -9,9 +9,10 @@ import { theme } from "../core/theme"
 import { useFocusEffect } from "@react-navigation/native"
 import firestore from "@react-native-firebase/firestore"
 import { UserProfileContext } from "../context/UserProfileContext"
+import ScheduleRDeliveryScreen from "./ScheduleRDeliveryScreen"
+import i18n, { t } from "../i18n" // Import the translation function
 
-
-const Notifications = ({ route }) => {
+const Notifications = ({ route, navigation }) => {
   const { role } = route.params
   const [notifications, setNotifications] = useState([])
   const [message, setMessage] = useState("")
@@ -22,6 +23,11 @@ const Notifications = ({ route }) => {
   const [isUpdating, setIsUpdating] = useState(false)
   const { userProfile, setUserProfile } = useContext(UserProfileContext)
 
+  const isUrdu = i18n.locale === "ur";
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString()
+  }
+
 
   // Function to update khair points for a user
   const updateKhairPoints = async (uid, newPoints, profileCollection) => {
@@ -30,14 +36,9 @@ const Notifications = ({ route }) => {
     setIsUpdating(true)
     try {
       // Update in Firestore
-      
-        await firestore().collection(profileCollection).doc(uid).update({
-          khairPoints: newPoints,
-        })
-
-      
-     
-      
+      await firestore().collection(profileCollection).doc(uid).update({
+        khairPoints: newPoints,
+      })
 
       console.log("Khair points updated successfully to", newPoints)
       return true
@@ -91,7 +92,7 @@ const Notifications = ({ route }) => {
           profileCollection = "ngo_profiles";
         } else {
           console.error(`Recipient with username ${recipientUsername} not found in both databases.`);
-          setMessage("Recipient not found, but claim was declined.");
+          setMessage(t("notifications.recipientNotFound", "Recipient not found, but claim was declined."));
           return;
         }
       }
@@ -104,7 +105,7 @@ const Notifications = ({ route }) => {
   
       if (!profileDoc.exists) {
         console.error(`Profile for UID ${recipientUid} not found in ${profileCollection}`);
-        setMessage("Claim declined successfully but couldn't refund khair points.");
+        setMessage(t("notifications.claimDeclinedNoRefund", "Claim declined successfully but couldn't refund khair points."));
         return;
       }
   
@@ -113,7 +114,7 @@ const Notifications = ({ route }) => {
       const newKhairPoints = currentKhairPoints + totalKhairPointsToRefund;
   
       // Update khair points in the correct profile collection
-      const success = await updateKhairPoints(recipientUid, newKhairPoints,profileCollection);
+      const success = await updateKhairPoints(recipientUid, newKhairPoints, profileCollection);
   
       if (success) {
         console.log(`Updated khair points for ${recipientUsername}: ${currentKhairPoints} -> ${newKhairPoints}`);
@@ -121,21 +122,20 @@ const Notifications = ({ route }) => {
           ...prevProfile, // This preserves ALL existing properties
           khairPoints: newKhairPoints,
         }));
-        setMessage("Claim declined successfully and khair points refunded.");
+        setMessage(t("notifications.claimDeclinedRefunded", "Claim declined successfully and khair points refunded."));
       } else {
-        setMessage("Claim declined but failed to refund khair points.");
+        setMessage(t("notifications.claimDeclinedRefundFailed", "Claim declined but failed to refund khair points."));
       }
     } catch (error) {
       console.error("Error updating khair points:", error);
-      setMessage("Claim declined but error refunding khair points.");
+      setMessage(t("notifications.claimDeclinedRefundError", "Claim declined but error refunding khair points."));
     }
   };
   
-
-  const changingStatus = async (category, id ) => {
+  const changingStatus = async (category, id) => {
     try {
       const BASE_URL = await getBaseUrl() // If you're using a base URL helper function
-      const itemId=id
+      const itemId = id
 
       await axios.post(`${BASE_URL}/api/reverse-claim-status`, { itemId, category }) // Pass the id in the request body
       console.log("done")
@@ -161,7 +161,7 @@ const Notifications = ({ route }) => {
             console.log("Fetched notifications for donor")
             setNotifications(filteredItems)
           } else {
-            setMessage("No items claimed for this donor.")
+            setMessage(t("notifications.noItemsClaimedDonor", "No items claimed for this donor."))
           }
         } else if (isRecipient) {
           console.log("Fetched items for recipient:", responses.data.data)
@@ -173,14 +173,14 @@ const Notifications = ({ route }) => {
           if (filteredItems.length > 0) {
             setNotifications(filteredItems)
           } else {
-            setMessage("No approved items found for this recipient.")
+            setMessage(t("notifications.noApprovedItemsRecipient", "No approved items found for this recipient."))
           }
         }
       } else {
-        setMessage("No claimed items found.")
+        setMessage(t("notifications.noClaimedItems", "No claimed items found."))
       }
-       // Reset notification count after viewing
-       await axios.get(`${BASE_URL}/api/reset-notification-count`, {
+      // Reset notification count after viewing
+      await axios.get(`${BASE_URL}/api/reset-notification-count`, {
         params: {
           username: user.username,
           role: role
@@ -190,7 +190,7 @@ const Notifications = ({ route }) => {
       setRefreshing(false)
     } catch (error) {
       console.error("Error fetching notifications:", error)
-      setMessage("Failed to load notifications.")
+      setMessage(t("notifications.failedToLoad", "Failed to load notifications."))
       setRefreshing(false)
     }
   }
@@ -234,13 +234,16 @@ const Notifications = ({ route }) => {
 
       // Immediately remove the notification from the UI
       setNotifications(notifications.filter((item) => item.id !== id))
-      setMessage("Claim approved successfully.")
+      setMessage(t("notifications.claimApproved", "Claim approved successfully."))
 
       // Also refresh in the background to ensure data consistency
       fetchNotifications()
+      navigation.navigate("ScheduleRDeliveryScreen", { id: id })
+
+      console.log(id)
     } catch (error) {
       console.error("Error approving claim:", error)
-      setMessage("Failed to approve the claim.")
+      setMessage(t("notifications.approvalFailed", "Failed to approve the claim."))
     }
   }
 
@@ -254,7 +257,7 @@ const Notifications = ({ route }) => {
       if (response.data.status === "success") {
         // Immediately remove the notification from the UI
         setNotifications(notifications.filter((notItem) => notItem.id !== id))
-        setMessage("Claim declined successfully.")
+        setMessage(t("notifications.claimDeclined", "Claim declined successfully."))
 
         // Process khair points refund
         await updataKhairPoints(item)
@@ -262,21 +265,23 @@ const Notifications = ({ route }) => {
         // Also refresh in the background to ensure data consistency
         fetchNotifications()
       } else {
-        setMessage("Failed to decline the claim.")
+        setMessage(t("notifications.declineFailed", "Failed to decline the claim."))
       }
     } catch (error) {
       console.error("Error declining claim:", error)
-      setMessage("Failed to decline the claim.")
+      setMessage(t("notifications.declineFailed", "Failed to decline the claim."))
     }
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isUrdu && styles.rtlContainer]}>
       <View style={styles.header}>
-        <Text style={styles.title}>Notifications</Text>
+        <Text style={[styles.title, isUrdu && styles.urduText]}>
+          {t("notifications.title", "Notifications")}
+        </Text>
       </View>
 
-      {message && <Text style={styles.message}>{message}</Text>}
+      {message && <Text style={[styles.message, isUrdu && styles.urduText]}>{message}</Text>}
       <ScrollView
         contentContainerStyle={styles.scrollViewContent}
         refreshControl={
@@ -291,27 +296,44 @@ const Notifications = ({ route }) => {
         {notifications.length > 0 ? (
           notifications.map((item) => (
             <View key={item.id} style={styles.notificationItem}>
-              <Text style={styles.itemText}>Date of Claim: {item.claimDate}</Text>
-              <Text style={styles.itemText}>Item type: {item.donationType}</Text>
-              <Text style={styles.itemText}>Claimed by: {item.claimerUsername}</Text>
-              <Text style={styles.itemText}>Item name: {item.itemName}</Text>
+              <Text style={[styles.itemText, isUrdu && styles.urduText]}>
+                {t("notifications.dateOfClaim", "Date of Claim")}: {formatDate(item.claimDate)}
+              </Text>
+              <Text style={[styles.itemText, isUrdu && styles.urduText]}>
+                {t("notifications.itemType", "Item type")}: {t(`titles.${item.donationType.toLowerCase()}`, item.donationType)}
+              </Text>
+              <Text style={[styles.itemText, isUrdu && styles.urduText]}>
+                {t("notifications.claimedBy", "Claimed by")}: {item.claimerUsername}
+              </Text>
+              <Text style={[styles.itemText, isUrdu && styles.urduText]}>
+                {t("notifications.itemName", "Item name")}: {t(`clothes.item_category_options.${item.itemName}`, { defaultValue: item.itemName })}
+
+              </Text>
 
               {isDonor ? (
-                <View style={styles.buttonContainer}>
+                <View style={[styles.buttonContainer, isUrdu && styles.rtlButtonContainer]}>
                   <TouchableOpacity style={styles.approveButton} onPress={() => handleApprove(item.id)}>
-                    <Text style={styles.buttonText}>Approve</Text>
+                    <Text style={[styles.buttonText, isUrdu && styles.urduText]}>
+                      {t("notifications.approve", "Approve")}
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.declineButton} onPress={() => declineClaim(item)}>
-                    <Text style={styles.buttonText}>Decline</Text>
+                    <Text style={[styles.buttonText, isUrdu && styles.urduText]}>
+                      {t("notifications.decline", "Decline")}
+                    </Text>
                   </TouchableOpacity>
                 </View>
               ) : (
-                <Text style={styles.approvedText}>Your item has been APPROVED.</Text>
+                <Text style={[styles.approvedText, isUrdu && styles.urduText]}>
+                  {t("notifications.itemApproved", "Your item has been APPROVED.")}
+                </Text>
               )}
             </View>
           ))
         ) : (
-          <Text style={styles.noNotificationText}>No new notifications.</Text>
+          <Text style={[styles.noNotificationText, isUrdu && styles.urduText]}>
+            {t("notifications.noNewNotifications", "No new notifications.")}
+          </Text>
         )}
       </ScrollView>
     </View>
@@ -323,6 +345,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.charcoalBlack,
     padding: 10,
+  },
+  rtlContainer: {
+    direction: 'rtl',
   },
   header: {
     padding: 20,
@@ -368,6 +393,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginTop: 10,
   },
+  rtlButtonContainer: {
+    flexDirection: "row-reverse",
+  },
   approveButton: {
     backgroundColor: theme.colors.sageGreen,
     padding: 10,
@@ -394,6 +422,10 @@ const styles = StyleSheet.create({
     color: theme.colors.ivory,
     textAlign: "center",
     marginTop: 20,
+  },
+  urduText: {
+    fontSize: 20, // Increase font size for Urdu
+    fontFamily: 'System', // You might want to use a specific Urdu font if available
   },
 })
 

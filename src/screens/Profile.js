@@ -7,12 +7,50 @@ import { theme } from "../core/theme"
 import { useNavigation, useFocusEffect } from "@react-navigation/native"
 import { AuthContext } from "../context/AuthContext"
 import { UserProfileContext } from "../context/UserProfileContext"
+import { t } from "../i18n" // Import the translation function
 
 const Profile = ({ route }) => {
   const navigation = useNavigation()
   const { user } = useContext(AuthContext)
   const { role } = route.params || {}
   const { userProfile, setUserProfile } = useContext(UserProfileContext)
+
+  // Detect language by comparing a known translation
+  const isUrdu = t("food.donations_title") !== "Food Donations"
+
+  // Dynamic styles based on language
+  const dynamicStyles = {
+    headerTitle: {
+      fontSize: 28,
+      fontWeight: "700",
+      color: theme.colors.ivory,
+      marginVertical: 20,
+      textAlign: "center",
+    },
+    username: {
+      fontSize: isUrdu ? 26 : 24,
+      fontWeight: "700",
+      color: theme.colors.ivory,
+      marginBottom: 8,
+    },
+    khairPoints: {
+      fontSize: isUrdu ? 20 : 18,
+      color: theme.colors.sageGreen,
+      marginLeft: 5,
+    },
+    info: {
+      fontSize: isUrdu ? 18 : 16,
+      color: theme.colors.ivory,
+    },
+    buttonText: {
+      fontSize: isUrdu ? 20 : 18,
+      color: theme.colors.ivory,
+      fontWeight: "600",
+    },
+    logoutText: {
+      color: theme.colors.sageGreen,
+    }
+  }
 
   const [isReady, setIsReady] = useState(false)
 
@@ -70,14 +108,14 @@ const Profile = ({ route }) => {
     // Show a loading state or placeholder while waiting for data
     return (
       <View style={[styles.container, { justifyContent: "center" }]}>
-        <Text style={styles.headerTitle}>Loading profile...</Text>
+        <Text style={dynamicStyles.headerTitle}>{t("profile.loading")}</Text>
       </View>
     )
   }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.headerTitle}>My Profile</Text>
+      <Text style={dynamicStyles.headerTitle}>{t("profile.myProfile")}</Text>
 
       <Animated.View style={[styles.profileContainer, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
         <View style={styles.patternOverlay} />
@@ -85,67 +123,89 @@ const Profile = ({ route }) => {
           <Image source={{ uri: "https://via.placeholder.com/120" }} style={styles.profileImage} />
         </Animated.View>
 
-        <Text style={styles.username}>{user?.name || "User"}</Text>
+        <Text style={dynamicStyles.username}>{user?.name || t("profile.user")}</Text>
 
         {role === "recipient" && (
           <View style={styles.khairPointsContainer}>
             <MaterialCommunityIcons name="star" size={24} color={theme.colors.sageGreen} />
-            <Text style={styles.khairPoints}>{userProfile?.khairPoints || 0} Khair Points</Text>
+            <Text style={dynamicStyles.khairPoints}>{userProfile?.khairPoints || 0} {t("profile.khairPoints")}</Text>
           </View>
         )}
 
         <View style={styles.infoContainer}>
-          <InfoItem icon="phone" text={user?.phone || "No phone"} />
-          <InfoItem icon="account" text={user?.username || "No username"} />
+          <InfoItem icon="phone" text={user?.phone || t("profile.noPhone")} isUrdu={isUrdu} />
+          <InfoItem icon="account" text={user?.username || t("profile.noUsername")} isUrdu={isUrdu} />
           {role === "donor" ? (
-            <InfoItem icon="clipboard-check" text="Total Donations: 3" />
+            <InfoItem icon="clipboard-check" text={`${t("profile.totalDonations")}: 3`} isUrdu={isUrdu} />
           ) : (
-            <InfoItem icon="clipboard-check" text="Total Claims: 3" />
+            <InfoItem icon="clipboard-check" text={`${t("profile.totalClaims")}: 3`} isUrdu={isUrdu} />
           )}
         </View>
       </Animated.View>
 
       <View style={styles.buttonsContainer}>
       {role === "donor" ? (
-    <AnimatedButton
-      icon="gift"
-      text="My Donations"
-      onPress={() => navigation.navigate("DonationsHistory")}
-    />
-  ) : role === "recipient" ? (
-    <AnimatedButton
-      icon="history"
-      text="My Claims"
-      onPress={() => navigation.navigate("ClaimsHistory")}
-    />
-  ) : role === "rider" ? (
-    <AnimatedButton
-      icon="truck-delivery"
-      text="My Deliveries"
-      onPress={() => navigation.navigate("DeliveryHistory")}
-    />
-  ) : null}
+        <AnimatedButton
+          icon="gift"
+          text={t("profile.myDonations")}
+          onPress={() => navigation.navigate("DonationsHistory")}
+          isUrdu={isUrdu}
+        />
+      ) : role === "recipient" ? (
+        <AnimatedButton
+          icon="history"
+          text={t("profile.myClaims")}
+          onPress={() => navigation.navigate("ClaimsHistory")}
+          isUrdu={isUrdu}
+        />
+      ) : role === "rider" ? (
+        <AnimatedButton
+          icon="truck-delivery"
+          text={t("profile.myDeliveries")}
+          onPress={() => navigation.navigate("DeliveryHistory")}
+          isUrdu={isUrdu}
+        />
+      ) : null}
         <AnimatedButton
           icon="logout"
-          text="Logout"
+          text={t("profile.logout")}
           onPress={handleLogout}
           style={styles.logoutButton}
           textStyle={styles.logoutText}
+          isUrdu={isUrdu}
         />
       </View>
     </ScrollView>
   )
 }
 
-const InfoItem = ({ icon, text }) => (
-  <View style={styles.infoItem}>
-    <MaterialCommunityIcons name={icon} size={20} color={theme.colors.sageGreen} style={styles.infoIcon} />
-    <Text style={styles.info}>{text}</Text>
-  </View>
-)
+const InfoItem = ({ icon, text, isUrdu }) => {
+  const dynamicStyles = {
+    info: {
+      fontSize: isUrdu ? 18 : 16,
+      color: theme.colors.ivory,
+    }
+  }
+  
+  return (
+    <View style={styles.infoItem}>
+      <MaterialCommunityIcons name={icon} size={20} color={theme.colors.sageGreen} style={styles.infoIcon} />
+      <Text style={dynamicStyles.info}>{text}</Text>
+    </View>
+  )
+}
 
-const AnimatedButton = ({ icon, text, onPress, style, textStyle }) => {
+const AnimatedButton = ({ icon, text, onPress, style, textStyle, isUrdu }) => {
   const scaleAnim = new Animated.Value(1)
+  
+  const dynamicStyles = {
+    buttonText: {
+      fontSize: isUrdu ? 20 : 18,
+      color: theme.colors.ivory,
+      fontWeight: "600",
+      ...(textStyle || {})
+    }
+  }
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
@@ -167,7 +227,7 @@ const AnimatedButton = ({ icon, text, onPress, style, textStyle }) => {
     <TouchableOpacity onPress={onPress} onPressIn={handlePressIn} onPressOut={handlePressOut} activeOpacity={1}>
       <Animated.View style={[styles.button, style, { transform: [{ scale: scaleAnim }] }]}>
         <MaterialCommunityIcons name={icon} size={24} color={theme.colors.ivory} style={styles.buttonIcon} />
-        <Text style={[styles.buttonText, textStyle]}>{text}</Text>
+        <Text style={dynamicStyles.buttonText}>{text}</Text>
       </Animated.View>
     </TouchableOpacity>
   )
@@ -180,13 +240,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     alignItems: "center",
   },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: theme.colors.ivory,
-    marginVertical: 20,
-    textAlign: "center",
-  },
+  // headerTitle moved to dynamicStyles
   profileContainer: {
     alignItems: "center",
     backgroundColor: theme.colors.TaupeBlack,
@@ -221,23 +275,14 @@ const styles = StyleSheet.create({
     height: "100%",
     resizeMode: "cover",
   },
-  username: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: theme.colors.ivory,
-    marginBottom: 8,
-  },
+  // username moved to dynamicStyles
   khairPointsContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 15,
     backgroundColor: "transparent", // Ensure this is transparent
   },
-  khairPoints: {
-    fontSize: 18,
-    color: theme.colors.sageGreen,
-    marginLeft: 5,
-  },
+  // khairPoints moved to dynamicStyles
   infoContainer: {
     alignItems: "flex-start",
     width: "100%",
@@ -253,10 +298,7 @@ const styles = StyleSheet.create({
   infoIcon: {
     marginRight: 10,
   },
-  info: {
-    fontSize: 16,
-    color: theme.colors.ivory,
-  },
+  // info moved to dynamicStyles
   buttonsContainer: {
     flexDirection: "row",
     justifyContent: "center",
@@ -285,15 +327,8 @@ const styles = StyleSheet.create({
   logoutButton: {
     backgroundColor: theme.colors.outerSpace,
   },
-  buttonText: {
-    fontSize: 18,
-    color: theme.colors.ivory,
-    fontWeight: "600",
-  },
-  logoutText: {
-    color: theme.colors.sageGreen,
-  },
+  // buttonText moved to dynamicStyles
+  // logoutText moved to dynamicStyles
 })
 
 export default Profile
-

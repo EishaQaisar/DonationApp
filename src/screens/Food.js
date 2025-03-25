@@ -11,6 +11,7 @@ import { getBaseUrl } from "../helpers/deviceDetection"
 import { AuthContext } from "../context/AuthContext"
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
 import { UserProfileContext } from "../context/UserProfileContext"
+import i18n ,{ t } from "../i18n" // Import only the translation function
 
 const Food = ({ route }) => {
   const navigation = useNavigation()
@@ -26,6 +27,11 @@ const Food = ({ route }) => {
     others: [],
     allDonations: [], // For donor view
   })
+
+  // Detect language by comparing a known translation
+  // If the translation for "food.donations_title" is not "Food Donations", 
+  // we assume it's Urdu (or another non-English language)
+  const isUrdu = i18n.locale === "ur";
 
   const isDonor = user.role === "donor"
 
@@ -80,6 +86,16 @@ const Food = ({ route }) => {
     }
   }, [userProfile, isDonor])
 
+  // Dynamic styles based on language
+  const dynamicStyles = {
+    itemDetails: {
+      fontSize: isUrdu ? 18 : 16, // Increase font size for Urdu
+      color: theme.colors.ivory,
+      textAlign: "center",
+      marginBottom: 5,
+    }
+  }
+
   /** Render each item */
   const renderItem = ({ item }) => (
     <TouchableOpacity
@@ -88,14 +104,14 @@ const Food = ({ route }) => {
     >
       <Image source={item.images[0]} style={styles.itemImage} />
       <Text style={styles.item}>{item.foodName}</Text>
-      <Text style={styles.itemDetails}>{`Servings: ${item.quantity} people`}</Text>
-      <Text style={styles.itemDetails}>{`Type: ${item.foodType} `}</Text>
+      <Text style={dynamicStyles.itemDetails}>{`${t("food.servings")}: ${item.quantity} ${t("food.people")}`}</Text>
+      <Text style={dynamicStyles.itemDetails}>{`${t("food.type")}: ${t(`food.food_type_options.${item.foodType}`, { defaultValue: item.foodType })} `}</Text>
 
       <TouchableOpacity
         style={styles.claimButton}
         onPress={() => navigation.navigate("ItemDetail", { item, category: "Food" })}
       >
-        <Text style={styles.claimButtonText}>{isDonor ? "View" : "Claim"}</Text>
+        <Text style={styles.claimButtonText}>{isDonor ? t("general.view") : t("general.claim")}</Text>
       </TouchableOpacity>
     </TouchableOpacity>
   )
@@ -124,13 +140,13 @@ const Food = ({ route }) => {
 
       {/* Page Title */}
       <View style={styles.header}>
-        <Text style={styles.title}>Food Donations</Text>
+        <Text style={styles.title}>{t("food.donations_title")}</Text>
       </View>
 
       {/* Donor View - All Donations */}
       {(isDonor || user.recipientType === "ngo") && (
         <View>
-          <Text style={styles.sectionHeaderText}>All Available Donations</Text>
+          <Text style={styles.sectionHeaderText}>{t("food.allAvailableDonations")}</Text>
           <FlatList
             data={foodItems.allDonations.filter((item) => !isInCart(item))}
             renderItem={renderItem}
@@ -145,7 +161,7 @@ const Food = ({ route }) => {
       {/* Recipient View - Recommended Donations */}
       {(!isDonor && user.recipientType != "ngo") && foodItems.recommended.length > 0 && (
         <View>
-          <Text style={styles.sectionHeaderText}>Recommended for You</Text>
+          <Text style={styles.sectionHeaderText}>{t("general.recommendedForYou")}</Text>
           <FlatList
             data={foodItems.recommended.filter((item) => !isInCart(item))}
             renderItem={renderItem}
@@ -160,7 +176,7 @@ const Food = ({ route }) => {
       {/* Recipient View - Other Donations */}
       {!isDonor && user.recipientType != "ngo" && foodItems.others.length > 0 && (
         <View>
-          <Text style={styles.sectionHeaderText}>Others</Text>
+          <Text style={styles.sectionHeaderText}>{t("general.others")}</Text>
           <FlatList
             data={foodItems.others.filter((item) => !isInCart(item))}
             renderItem={renderItem}
@@ -225,12 +241,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 5,
   },
-  itemDetails: {
-    fontSize: 16,
-    color: theme.colors.ivory,
-    textAlign: "center",
-    marginBottom: 5,
-  },
+  // itemDetails style moved to dynamicStyles
   claimButton: {
     backgroundColor: theme.colors.charcoalBlack,
     paddingVertical: 10,
@@ -274,4 +285,3 @@ const styles = StyleSheet.create({
 })
 
 export default Food
-

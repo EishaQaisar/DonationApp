@@ -10,6 +10,10 @@ import { emailValidator } from "../helpers/emailValidator";
 import { passwordValidator } from "../helpers/passwordValidator";
 import { AuthContext } from "../context/AuthContext";
 import CryptoJS from "crypto-js";
+import i18n,{t} from "../i18n";
+const isUrdu = i18n.language === "ur"; // Check if Urdu is selected
+
+
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -67,11 +71,11 @@ export default function LoginScreen({ navigation, route }) {
           setUser({ ...userData, uid: userId, role:role});
           return { success: true, message: "Login successful!" };
         } else {
-          setPassword({ ...password, error: "Incorrect password" });
+          setPassword({ ...password, error: t("errors.incorrect_password") });
           return { success: false, message: "Invalid password" };
         }
       } else {
-        setInput({ ...input, error: "User not found" });
+        setInput({ ...input, error: t("errors.user_not_found")  });
         return { success: false, message: "User not found" };
       }
     } catch (error) {
@@ -82,8 +86,8 @@ export default function LoginScreen({ navigation, route }) {
 
   const LoginInPressed = async () => {
     if (!input.value || !password.value) {
-      if (!input.value) setInput({ ...input, error: "This field is required." });
-      if (!password.value) setPassword({ ...password, error: "This field is required." });
+      if (!input.value) setInput({ ...input, error: t("errors.required") });
+      if (!password.value) setPassword({ ...password, error: t("errors.required")});
       return;
     }
     
@@ -144,44 +148,53 @@ export default function LoginScreen({ navigation, route }) {
       </View>
 
       <View style={styles.container}>
-        <Text style={styles.header}>Hello.</Text>
+        <Text style={styles.header}>{t("login_screen.title")}</Text>
         <View style={styles.inputContainer}>
           <TextInput
-            label="Username / Phone Number"
+             label={t("login_screen.username_phone")}
             mode="outlined"
-            style={styles.input}
+            style={[styles.input, { fontSize: i18n.locale === "ur" ? 16 : 15 }]} 
+
             value={input.value}
             onChangeText={(text) => setInput({ value: text, error: "" })}
             error={!!input.error}
-            errorText={input.error ? <Text style={styles.errorText}>{input.error}</Text> : null}
+            errorText={input.error ? <Text style={[styles.errorText, { fontSize: i18n.locale === "ur" ? 14 : 12 }]}>{input.error}</Text> : null}
           />
         </View>
 
         <View style={styles.inputContainer}>
           <TextInput
-            label="Password"
+            label={t("login_screen.password")}
             mode="outlined"
-            style={styles.input}
+            style={[styles.input, { fontSize: i18n.locale === "ur" ? 16 : 15 }]} 
+
             value={password.value}
             onChangeText={(text) => setPassword({ value: text, error: "" })}
             error={!!password.error}
-            errorText={password.error ? <Text style={styles.errorText}>{password.error}</Text> : null}
+            errorText={password.error ? <Text style={[styles.errorText, { fontSize: i18n.locale === "ur" ? 14 : 12 }]} 
+>{password.error}</Text> : null}
             secureTextEntry
           />
         </View>
 
         <TouchableOpacity onPress={() => navigation.navigate("ResetPasswordScreen", { role: role })}>
-          <Text style={styles.forgotPassword}>Forgot your password?</Text>
+          <Text style={[styles.forgotPassword, { fontSize: i18n.locale === "ur" ? 15 : 13 }]} >{t("login_screen.forgot_password")}</Text>
         </TouchableOpacity>
 
-        <Button mode="contained" onPress={LoginInPressed} style={styles.button}>
-          Log in
-        </Button>
+        <Button 
+        mode="contained" 
+        onPress={LoginInPressed}  
+        style={styles.button}
+        labelStyle={{ fontSize: i18n.locale === "ur" ? 18: 14 }} 
+      >
+        {t("login_screen.login_button")}
+      </Button>
+
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Don't have an account yet?</Text>
+          <Text  style={[styles.footerText, { fontSize: i18n.locale === "ur" ? 15 : 13 }]} >{t("login_screen.no_account")}</Text>
           <TouchableOpacity onPress={navigateToRegister}>
-            <Text style={styles.link}>Create one!</Text>
+            <Text style={styles.link}>{t("login_screen.create_account")}</Text>
           </TouchableOpacity>
         </View>
       </View>

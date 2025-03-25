@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, ImageBackground } from "react-native";
 import {theme} from "../core/theme"; // Ensure theme is imported correctly
+import{t}from '../i18n'
 
 
 const RecepientStartScreen = ({ navigation }) => {
@@ -23,7 +24,7 @@ const RecepientStartScreen = ({ navigation }) => {
             onMouseEnter={() => setHoveredCategory('education')}
             onMouseLeave={() => setHoveredCategory(null)}
           >
-            <Text style={styles.categoryText}>Education</Text>
+            <Text style={styles.categoryText}>{t("chooseCategory.education", "Education")}</Text>
           </TouchableOpacity>
 
           {/* Food Category */}
@@ -33,7 +34,7 @@ const RecepientStartScreen = ({ navigation }) => {
             onMouseEnter={() => setHoveredCategory('food')}
             onMouseLeave={() => setHoveredCategory(null)}
           >
-            <Text style={styles.categoryText}>Food</Text>
+            <Text style={styles.categoryText}>{t("chooseCategory.food", "Food")}</Text>
           </TouchableOpacity>
 
           {/* Clothing Category */}
@@ -43,7 +44,7 @@ const RecepientStartScreen = ({ navigation }) => {
             onMouseEnter={() => setHoveredCategory('clothes')}
             onMouseLeave={() => setHoveredCategory(null)}
           >
-            <Text style={styles.categoryText}>Clothing</Text>
+            <Text style={styles.categoryText}>{t("chooseCategory.clothing", "Clothing")}</Text>
           </TouchableOpacity>
         </ScrollView>
       </ImageBackground>

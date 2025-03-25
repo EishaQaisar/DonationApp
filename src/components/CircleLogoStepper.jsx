@@ -1,103 +1,100 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
-import { theme } from '../core/theme';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import Ionicons from '@expo/vector-icons/Ionicons';
+"use client"
+
+import React, { useContext } from "react"
+import { View, Text, StyleSheet } from "react-native"
+import { theme } from "../core/theme"
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons"
+import MaterialIcons from "@expo/vector-icons/MaterialIcons"
+import Ionicons from "@expo/vector-icons/Ionicons"
+import { AuthContext } from "../context/AuthContext"
+import { t } from "../i18n"
+import RTLText from "./RTLText"
 
 const CircleLogoStepper = () => {
+  const { isRTL } = useContext(AuthContext)
+
+  // Create the steps
+  const steps = [
+    {
+      icon: <MaterialCommunityIcons name="cursor-default-click-outline" size={30} color="black" />,
+      text: t("circleLogoStepper.selectCategory", "Select Category"),
+      active: true,
+    },
+    {
+      icon: <MaterialIcons name="add" size={30} color="black" />,
+      text: t("circleLogoStepper.addDetails", "Add Details"),
+      active: false,
+    },
+    {
+      icon: <Ionicons name="checkmark-done" size={30} color="black" />,
+      text: t("circleLogoStepper.confirm", "Confirm"),
+      active: false,
+    },
+  ]
+
+  // Reverse steps if RTL
+  const displaySteps = isRTL ? [...steps].reverse() : steps
+
   return (
-    
-    <View style={styles.container}>
-      <View style={styles.step}>
-        <View style={styles.circleContainer}>
-          <View style={[styles.circle,{ backgroundColor:theme.colors.pearlWhite}]}>
-            <MaterialCommunityIcons name="cursor-default-click-outline" size={30} color="black" />
+    <View style={[styles.container, { flexDirection: isRTL ? "row-reverse" : "row" }]}>
+      {displaySteps.map((step, index) => (
+        <React.Fragment key={index}>
+          {/* Step */}
+          <View style={styles.step}>
+            <View style={styles.circleContainer}>
+              <View style={[styles.circle, step.active && { backgroundColor: theme.colors.pearlWhite }]}>
+                {step.icon}
+              </View>
+              <RTLText style={styles.circleText}>{step.text}</RTLText>
+            </View>
           </View>
-          <Text style={styles.circleText}>Select Category</Text>
-        </View>
-        
-      </View>
-      <View>
-        <Text style={styles.arrow}>{'--------->'}</Text>
-        </View>
 
-      <View style={styles.step}>
-        <View style={styles.circleContainer}>
-          <View style={styles.circle}>
-            <MaterialIcons name="add" size={30} color="black" />
-          </View>
-          <Text style={styles.circleText}>Add Details</Text>
-        </View>
-       
-      </View>
-      <View>
-        <Text style={[styles.arrow, {marginLeft:12, marginRight:6}]}>{'--------->'}</Text>
-        </View>
-
-      <View style={styles.step}>
-        <View style={styles.circleContainer}>
-          <View style={styles.circle}>
-          <Ionicons name="checkmark-done" size={30} color="black" />
-          </View>
-          <Text style={styles.circleText}>Confirm </Text>
-        </View>
-      </View>
-
-
-
-      
-
-
-
+          {/* Arrow - only show between steps, not after the last one */}
+          {index < displaySteps.length - 1 && <Text style={styles.arrow}>{isRTL ? "<---------" : "--------->"}</Text>}
+        </React.Fragment>
+      ))}
     </View>
-
-
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-evenly',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: 10,
+    width: "100%",
+    paddingHorizontal: 10,
   },
   step: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderColor:theme.colors.copper,
-    justifyContent:'center'
+    alignItems: "center",
+    justifyContent: "center",
   },
   circleContainer: {
-    alignItems: 'center',
-    justifyContent:'center'
+    alignItems: "center",
+    justifyContent: "center",
   },
   circle: {
     width: 60,
     height: 60,
     borderRadius: 30,
     backgroundColor: theme.colors.sageGreen,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  categories: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: theme.colors.sageGreen,
+    justifyContent: "center",
+    alignItems: "center",
   },
   circleText: {
     marginTop: 5,
     fontSize: 14,
-    color: theme.colors.ivory, // Change color as needed
+    color: theme.colors.ivory,
+    textAlign: "center",
+    maxWidth: 80,
   },
   arrow: {
     fontSize: 20,
-    color: '#ccc',
-    marginLeft: 0,
+    color: "#ccc",
+    marginHorizontal: 5,
   },
- 
-});
+})
 
-export default CircleLogoStepper;
+export default CircleLogoStepper
+

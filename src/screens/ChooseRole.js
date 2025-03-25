@@ -7,6 +7,9 @@ import BackButton from "../components/BackButton";
 import { StyleSheet, View, Text } from "react-native";
 
 import { theme } from "../core/theme";
+import i18n,{ t } from "../i18n" // Import only the translation function
+console.log(i18n.locale)
+
 
 export default function ChooseRole({ navigation }) {
   return (
@@ -15,7 +18,7 @@ export default function ChooseRole({ navigation }) {
 
       <View style={styles.container}>
         {/* Header text */}
-        <Text style={styles.header}>Start by telling us who you are</Text>
+        <Text style={styles.header}>{t("chooseRole.chooseRole")}</Text>
 
         {/* Button container placed under the header in a vertical layout */}
         <View style={styles.buttonContainer}>
@@ -23,21 +26,28 @@ export default function ChooseRole({ navigation }) {
             onPress={() => navigation.navigate("LoginScreen",{ role: "recipient" })}
             source={require("../../assets/items/desktop-wallpaper-child-african-bl-african-kids.jpg")}
             imageStyle={styles.image}
-            text="Recipient"
+            text={t("chooseRole.recipient")}
+            textStyle={{ fontSize: i18n.locale === "ur" ? 20 : 16 }} // Adjust size based on language
+
             
           />
 
         <ImageButton
-            onPress={() => navigation.navigate("LoginScreen",{ role: "donor" })}
-            source={require("../../assets/items/illustration-about-helping-poor-needy-with-concept-giving-charity_882884-955.jpg")} // Replace with your image path
-            imageStyle={styles.image}
-            text="Donor"
-          />  
+          onPress={() => navigation.navigate("LoginScreen", { role: "donor" })}
+          source={require("../../assets/items/illustration-about-helping-poor-needy-with-concept-giving-charity_882884-955.jpg")}
+          imageStyle={styles.image}
+          textStyle={{ fontSize: i18n.locale === "ur" ? 20 : 16 }} // Adjust size based on language
+          text={t("chooseRole.donor")}
+        />
+
+ 
         <ImageButton
             onPress={() => navigation.navigate("LoginScreen",{role:"rider"})}
             source={require("../../assets/items/testinglogo.jpg")} 
             imageStyle={styles.image}
-            text="Rider"
+            text={t("chooseRole.rider")}
+            textStyle={{ fontSize: i18n.locale === "ur" ? 20 : 16 }} // Adjust size based on language
+
           />
 
 

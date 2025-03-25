@@ -85,7 +85,7 @@ export async function getBaseUrl(): Promise<string> {
   
   */
  
-  return isEmulator() ? EMULATOR_IP : '  http://10.54.17.116:3000';
+  return isEmulator() ? EMULATOR_IP : 'http://192.168.1.9:3000';
   
   
 }

@@ -1,0 +1,571 @@
+{
+  "titles": {
+    "food": "Food",
+    "clothes": "Clothes",
+    "education": "Education",
+    "schedule_delivery": "Schedule Delivery",
+    "clothes_donations": "Clothes Donations",
+    "education_donations": "Education Donations",
+    "food_donations": "Food Donations",
+    "item_details": "Item Details",
+    "categories": "Categories",
+    "donation_history": "Donation History",
+    "ngo_campaigns": "NGO Campaigns",
+    "claims_history": "Claims History",
+  "donations_history": "Donation History",
+  "your_cart":"Your Cart"
+  },
+  
+  "chooseRole":{
+      "chooseRole": "Start by telling us who you are",
+      "recipient": "Recipient",
+      "donor": "Donor",
+      "rider": "Rider"
+
+    },
+    "donorHome": {
+      "greeting": "Welcome,",
+      "donations": "Donations",
+      "hero": {
+        "title": "Make a difference today",
+        "button": "Donate Now"
+      },
+      "features": {
+        "title": "Features",
+        "scheduleDelivery": "Schedule Delivery",
+        "monitorDelivery": "Monitor Delivery",
+        "viewAnalytics": "View Analytics"
+      },
+      "campaigns": {
+        "title": "Campaigns",
+        "viewAll": "View All",
+        "loading": "Loading campaigns...",
+        "noCampaigns": "No campaigns available"
+      }
+    },
+    "recipientScreen": {
+      "greeting": "Hi \nRecipient!",
+      "availableDonations": "Available Donations",
+      "motivational_text": "Your journey to a\nbetter\ntomorrow starts here\nClaim now!",
+      "claimNow": "Claim Now",
+      "campaigns": "Campaigns",
+      "viewAll": "View All",
+      "loadingCampaigns": "Loading campaigns...",
+      "noCampaigns": "No campaigns available",
+      "postCampaign": "Post Campaign"
+    },
+  
+    "languageSwitcher": {
+      "restartTitle": "Restart Required",
+      "restartMessage": "Please restart the app for the language change to take full effect.",
+      "ok": "OK"
+    },
+    "general": {
+      "selectLanguage": "Select Language",
+        "view": "View",
+    "claim": "Claim",
+    "remove": "Remove"
+    },
+    "settings": {
+      "language": "Language"
+    },
+    "startScreen": {
+      "appName": "Dast-e-khair",
+      "catchline": "Helping Communities,\nOne Donation at a time",
+      "getStarted": "Get Started"
+    },
+    "chooseCategory": {
+      "title": "Donation Categories",
+      "education": "Education",
+      "food": "Food",
+      "clothing": "Clothing"
+    },
+    "circleLogoStepper": {
+      "selectCategory": "Select Category",
+      "addDetails": "Add Details",
+      "confirm": "Confirm"
+    },
+    "uploadEdu": {
+      "type": "Type",
+      "level": "Level",
+      "institute": "Institute",
+      "institutePlaceholder": "e.g Punjab College",
+      "classGrade": "Class / Grade",
+      "year": "Year",
+      "program": "Program",
+      "selectGrade": "Select Class/Grade",
+      "selectYear": "Select Year",
+      "selectProgram": "Select Program",
+      "subject": "Subject",
+      "selectSubject": "Select Subject",
+      "condition": "Condition",
+      "quantity": "Quantity",
+      "numberOfItems": "Number of Items:",
+      "itemName": "Item Name",
+      "itemNamePlaceholder": "e.g Punjab Textbook",
+      "description": "Description",
+      "descriptionPlaceholder": "Enter description here..",
+      "submit": "Submit",
+      "selectLevel": "Select Education Level",
+      "specialEducation": "Special Education",
+      "errors": {
+        "typeRequired": "Type is required",
+        "institutionRequired": "Institution is required",
+        "gradeRequired": "Grade is required",
+        "subjectRequired": "Subject is required",
+        "levelRequired": "Level is required",
+        "conditionRequired": "Condition is required",
+        "quantityPositive": "Quantity must be greater than 0",
+        "quantityTooLarge": "Max limit exceeded",
+        "quantityNumeric": "Quantity must be a numeric value",
+        "itemNameRequired": "Item name is required",
+        "itemNameTooLong": "Too long",
+        "itemNameTooShort": "Too short",
+        "descriptionRequired": "Description is required",
+        "descriptionTooLong": "Too long",
+        "descriptionTooShort": "Too short",
+        "imageRequired": "At least one image is required"
+      }
+    },
+    "education": {
+        "donations": "Education Donations",
+        "allAvailableDonations": "All Available Donations",
+        "recommendedForYou": "Recommended for You",
+        "others": "Others",
+        "level": "Level",
+        "levels": {
+          "primary": "Primary",
+          "School": "School",
+          "College": "College",
+          "University": "University",
+          "Special Education": "Special Education"
+        },
+        "types": {
+          "Books": "Books",
+          "Stationary": "Stationary",
+          "Other": "Other"
+        },
+        "conditions": {
+          "New": "New",
+          "Gently Used": "Gently Used",
+          "Well Used": "Well Used",
+          "Heavily Used":"Heavily Used"
+        },
+        "subjects": {
+          "English": "English",
+          "Urdu": "Urdu",
+          "Mathematics": "Mathematics",
+          "Science": "Science",
+          "Islamiyat": "Islamiyat",
+          "History": "History",
+          "Physics": "Physics",
+          "Shemistry": "Chemistry",
+          "Business Studies": "Business Studies",
+          "Economics": "Economics",
+          "Accounting": "Accounting",
+          "Chemistry":"Chemistry"
+        },
+        "grades": {
+          "Nursery": "Nursery",
+          "KG": "KG",
+          "1st Year": "1st Year",
+          "2nd Year": "2nd Year",
+          "3rd Year": "3rd Year",
+          "4th Year": "4th Year",
+          "1st": "1st Year",
+          "2nd": "2nd Year",
+          "3rd": "3rd Year",
+          "4th": "4th Year",
+         
+          "1": "1",
+          "2": "2",
+          "3": "3",
+          "4": "4",
+          "5": "5",
+          "6": "6",
+          "7": "7",
+          "8": "8",
+          "9": "9",
+          "10": "10",
+          "11": "11",
+          "Special Education":"Special Education"
+
+        }
+      },
+      "uploadFood": {
+    "meal": "Meal",
+    "foodName": "Food Name",
+    "foodNamePlaceholder": "Rice",
+    "foodType": "Food Type",
+    "servings": "Servings",
+    "numberOfPeople": "Number of People:",
+    "description": "Description",
+    "descriptionPlaceholder": "Enter description here...",
+    "submit": "Submit",
+    "errors": {
+      "nameRequired": "Food Name is required",
+      "nameTooShort": "Too short",
+      "nameTooLong": "Too long",
+      "descriptionRequired": "Description is required",
+      "descriptionTooShort": "Too short",
+      "descriptionTooLong": "Too long",
+      "mealRequired": "Meal Type is required",
+      "foodTypeRequired": "Food Type is required",
+      "quantityPositive": "Quantity must be greater than 0",
+      "quantityTooLarge": "Max limit exceeded",
+      "quantityNumeric": "Quantity must be a numeric value",
+      "imageRequired": "At least one image is required"
+    }
+  },
+  "uploadClothes": {
+    "season": "Season",
+    "gender": "Gender",
+    "age": "Age",
+    "itemCategory": "Item Category",
+    "clothesCategory": "Clothes Category",
+    "size": "Size",
+    "condition": "Condition",
+    "quantity": "Quantity",
+    "numberOfItems": "Number of Items:",
+    "fabric": "Fabric",
+    "fabricPlaceholder": "e.g Lawn",
+    "description": "Description",
+    "descriptionPlaceholder": "Enter description here..",
+    "submit": "Submit",
+    "selectAge": "Select an age category",
+    "selectItemCategory": "Select Item Category",
+    "selectClothesCategory": "Select Clothes Category",
+    "selectSize": "Select Size",
+    "errors": {
+      "seasonRequired": "Season is required",
+      "genderRequired": "Gender is required",
+      "ageRequired": "Age category is required",
+      "itemCategoryRequired": "Item Category is required",
+      "clothesCategoryRequired": "Clothes Category is required",
+      "sizeRequired": "Size is required",
+      "conditionRequired": "Condition is required",
+      "quantityPositive": "Quantity must be greater than 0",
+      "quantityTooLarge": "Max limit exceeded",
+      "quantityNumeric": "Quantity must be a numeric value",
+      "fabricRequired": "Fabric is required",
+      "fabricTooLong": "Too long",
+      "fabricTooShort": "Too short",
+      "descriptionRequired": "Description is required",
+      "descriptionTooLong": "Too long",
+      "descriptionTooShort": "Too short",
+      "imageRequired": "At least one image is required"
+    }
+  },
+  
+    "clothes": {
+      "title": "Clothes",
+      "description": "Donate clothes to help those in need.",
+      "select_category": "Select Category",
+      "men": "Men",
+      "women": "Women",
+      "kids": "Kids",
+      "other": "Other",
+      "donate": "Donate Now",
+      "gender":"Gender",
+      "season_options": {
+        "Summers": "Summers",
+        "Spring": "Spring",
+        "Autumn": "Autumn",
+        "Winter": "Winter"
+      },
+      "gender_options": {
+        "Male": "Male",
+        "Female": "Female",
+        "Unisex": "Unisex"
+      },
+      "condition_options": {
+        "New": "New",
+        "Used Once/twice": "Used Once/Twice",
+        "Heavily Used": "Heavily Used",
+        "Gentrly Used":"Gently Used"
+      },
+      "item_category_options": {
+        "Clothes": "Clothes",
+        "Shoes": "Shoes"
+      },
+      "clothes_category_options": {
+        "Upper Wear": "Upper Wear",
+        "Bottom Wear": "Bottom Wear",
+        "Full Outfit": "Full Outfit",
+        "Accessories": "Accessories"
+      },
+      "age_categories": {
+        "0-6_months": "0-6 months",
+        "6-9_months": "6-9 months",
+        "9-12_months": "9-12 months",
+        "1 year": "1 year",
+        "2 years": "2 years",
+        "3 years": "3 years",
+        "4 years": "4 years",
+        "5 years": "5 years",
+        "6-8 years": "6-8 years",
+        "8-12 years": "8-12 years",
+        "12-18 years": "12-18 years",
+        "18-25 years": "18-25 years",
+        "25 year onwards": "25 year onwards"
+      },
+      "clothing_sizes": {
+        "S": "S",
+        "M": "M",
+        "L": "L",
+        "XL": "XL",
+        "XXL": "XXL"
+      },
+      "shirt_sizes": ["36", "38", "40", "42", "44", "46", "48"],
+      "shoe_sizes": ["34", "36", "38", "40", "42", "44", "46"],
+      "trouser_sizes": ["28", "30", "32", "34", "36", "38", "40", "42"]
+    },
+    "food": {
+      "allAvailableDonations": "All Available Donations",
+      "donations_title": "Food Donations",
+      "servings": "Servings",
+      "people": "people",
+      "type": "Type",
+      "meal_options": {
+        "Breakfast": "Breakfast",
+        "Brunch": "Brunch",
+        "Lunch": "Lunch",
+        "Dinner": "Dinner"
+      },
+      "food_type_options": {
+        "Raw": "Raw",
+        "Cooked": "Cooked",
+        "Packaged": "Packaged"
+      }
+    },
+    "itemDetail": {
+      "meal": "Meal",
+      "foodType": "Food Type",
+      "quantity": "Quantity",
+      "description": "Description",
+      "fabric": "Fabric",
+      "season": "Season",
+      "age": "Age",
+      "condition": "Condition",
+      "subject": "Subject",
+      "grade": "Grade",
+      "institute": "Institute",
+      "type": "Type",
+      "donorUsername": "Donor Username",
+      "noDetails": "No additional details available.",
+      "claimed": "Claimed",
+      "claimItem": "Claim Item",
+      "confirmClaim": "Confirm Claim",
+      "confirmClaimMessage": "Are you sure you want to claim this item?",
+      "khairPoints": "Khair Points will be deducted.",
+      "yes": "Yes",
+      "no": "No",
+      "insufficientPoints": "Insufficient Khair Points",
+      "insufficientPointsMessage": "You do not have enough Khair Points to claim this item.",
+      "ok": "OK"
+    },
+    "profile": {
+    "myProfile": "My Profile",
+    "loading": "Loading profile...",
+    "user": "User",
+    "khairPoints": "Khair Points",
+    "noPhone": "No phone",
+    "noUsername": "No username",
+    "totalDonations": "Total Donations",
+    "totalClaims": "Total Claims",
+    "myDonations": "My Donations",
+    "myClaims": "My Claims",
+    "myDeliveries": "My Deliveries",
+    "logout": "Logout"
+  },
+  "cart": {
+    "emptyCart": "Your cart is empty.",
+    "title": "Cart"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "dateOfClaim": "Date of Claim",
+    "itemType": "Item type",
+    "claimedBy": "Claimed by",
+    "itemName": "Item name",
+    "approve": "Approve",
+    "decline": "Decline",
+    "itemApproved": "Your item has been APPROVED.",
+    "noNewNotifications": "No new notifications.",
+    "recipientNotFound": "Recipient not found, but claim was declined.",
+    "claimDeclinedNoRefund": "Claim declined successfully but couldn't refund khair points.",
+    "claimDeclinedRefunded": "Claim declined successfully and khair points refunded.",
+    "claimDeclinedRefundFailed": "Claim declined but failed to refund khair points.",
+    "claimDeclinedRefundError": "Claim declined but error refunding khair points.",
+    "noItemsClaimedDonor": "No items claimed for this donor.",
+    "noApprovedItemsRecipient": "No approved items found for this recipient.",
+    "noClaimedItems": "No claimed items found.",
+    "failedToLoad": "Failed to load notifications.",
+    "claimApproved": "Claim approved successfully.",
+    "approvalFailed": "Failed to approve the claim.",
+    "claimDeclined": "Claim declined successfully.",
+    "declineFailed": "Failed to decline the claim."
+  },
+  "claimsHistory": {
+    "loading": "Loading your claims history...",
+    "errorLoadingItems": "Failed to load claimed items",
+    "errorConnecting": "Failed to connect to server",
+    "unnamedItem": "Unnamed Item",
+    "category": "Category",
+    "type": "Type",
+    "upperWearSize": "Upper Wear Size",
+    "bottomWearSize": "Bottom Wear Size",
+    "clothingSize": "Clothing Size",
+    "shoeSize": "Shoe Size",
+    "donatedBy": "Donated by",
+    "anonymous": "Anonymous",
+    "claimedOn": "Claimed on",
+    "expiresOn": "Expires on",
+    "gradeLevel": "Grade/Level",
+    "noClothesItems": "You haven't claimed any clothes items yet",
+    "noFoodItems": "You haven't claimed any food items yet",
+    "noEducationItems": "You haven't claimed any education items yet"
+  },
+  "scheduleDelivery":{
+    "scheduleDelivery": "Schedule Delivery",
+    "missingInfo": "Missing Information",
+    "selectDate": "Select a pickup date",
+    "enterPickupLocation": "Enter a pickup location",
+    "enterDropoffLocation": "Enter a drop-off location",
+    "invalidAddress": "Invalid Address",
+    "enterValidAddress": "Please enter a valid address",
+    "deliveryScheduled": "Delivery Scheduled",
+    "successMessage": "Your delivery has been successfully scheduled!",
+    "ok": "OK",
+    "error": "Error",
+    "failedSchedule": "Failed to schedule delivery. Please try again.",
+    "loadingItem": "Loading item details...",
+    "noDeliveries": "No deliveries to schedule",
+    "item": "Item",
+    "claimedBy": "Claimed by",
+    "itemId": "Item ID",
+    "selectPickupTime": "Select Pickup Time",
+    "setPickupTime": "Set Pickup Time",
+    "pickupLocation": "Pickup Location",
+    "pickupPlaceholder": "Tap to search for pickup location",
+    "dropoffLocation": "Drop-off Location",
+    "dropoffPlaceholder": "Drop-off Location (Auto-filled)",
+    "pickupDate": "Pickup Date",
+     "searchPickupLocation": "Search Pickup Location",
+    "close": "Close",
+    "noItemToSchedule": "No item to Schedule"
+
+  },
+  "login_screen": {
+    "title": "Hello.",
+    "username_phone": "Username / Phone Number",
+    "password": "Password",
+    "forgot_password": "Forgot your password?",
+    "login_button": "Log in",
+    "no_account": "Don't have an account yet?",
+    "create_account": "Create one!"
+  },
+  "errors": {
+    "required": "This field is required.",
+    "incorrect_password": "Incorrect password",
+    "user_not_found": "User not found"
+  },
+  "messages": {
+    "login_success": "Login successful!",
+    "password_reset_sent": "Password reset link sent to your email."
+  },
+  "donationsHistory": {
+    "loading": "Loading your donation history...",
+    "errorLoadingClothes": "Failed to load clothes donations",
+    "errorLoadingFood": "Failed to load food donations",
+    "errorLoadingEducation": "Failed to load education donations",
+    "errorConnecting": "Failed to connect to server",
+    "unnamedItem": "Unnamed Item",
+    "category": "Category",
+    "type": "Type",
+    "mealType": "Meal Type",
+    "donatedOn": "Donated on",
+    "statusClaimed": "Claimed",
+    "statusUnclaimed": "Unclaimed",
+    "statusUnknown": "Unknown",
+    "noClothes": "You haven't made any clothes donations yet",
+    "noFood": "You haven't made any food donations yet",
+    "noEducation": "You haven't made any education donations yet"
+  },
+  "donation_success":{
+    
+      "donation_success": "You have uploaded the donation successfully!",
+      "campaign_success": "You have uploaded the campaign successfully!",
+      "continue": "Continue"
+    
+  },
+  "ngoCampaign": {
+    "createCampaign": "Create Campaign",
+    "ngoName": "NGO Name",
+    "ngoNamePlaceholder": "Enter NGO name",
+    "email": "Email (Gmail only)",
+    "emailPlaceholder": "Enter Gmail address",
+    "phoneNumber": "Phone Number",
+    "phonePlaceholder": "Enter phone number (e.g., +92485255947)",
+    "bankAccount": "Bank Account Number (16 digits)",
+    "bankPlaceholder": "Enter 16-digit bank account number",
+    "campaignTitle": "Campaign Title (max 30 characters)",
+    "titlePlaceholder": "Enter campaign title",
+    "shortDescription": "Short Description (max 50 characters)",
+    "shortDescPlaceholder": "Enter short description",
+    "fullDescription": "Full Description (max 200 characters)",
+    "fullDescPlaceholder": "Enter full description",
+    "campaignImage": "Campaign Image",
+    "createCampaignButton": "Create Campaign",
+    "errors": {
+      "ngoNameRequired": "NGO name is required",
+      "emailRequired": "Email is required",
+      "invalidGmail": "Invalid Gmail address",
+      "phoneRequired": "Phone number is required",
+      "invalidPhone": "Invalid phone number format. Use \"+92485255947\"",
+      "bankRequired": "Bank account number is required",
+      "invalidBank": "Invalid bank account number (16 digits required)",
+      "titleRequired": "Campaign title is required",
+      "titleTooLong": "Campaign title must be 30 characters or less",
+      "titleTooFewWords": "Campaign title must contain at least 2 words",
+      "shortDescRequired": "Short description is required",
+      "shortDescTooLong": "Short description must be 50 characters or less",
+      "shortDescTooShort": "Short description must be at least 10 characters",
+      "fullDescRequired": "Full description is required",
+      "fullDescTooLong": "Full description must be 200 characters or less",
+      "fullDescTooShort": "Full description must be at least 30 characters",
+      "imageRequired": "Campaign image is required"
+    }
+  },
+  "ngoPost": {
+    "donateNow": "Donate Now",
+    "supportNow": "Support Now",
+    "hideContactInfo": "Hide Contact Info",
+    "poeticLine": "\"Extend your hand, where hope begins, and kindness wins.\"",
+    "byNgo": "By NGO:",
+    "postedOn": "Posted on:",
+    "contactInfo": "Contact Information:",
+    "phone": "Phone:",
+    "email": "Email:",
+    "bankAccount": "Bank Account:",
+    "notAvailable": "Not available",
+    "loading": "Loading campaign details...",
+    "contactUnavailableTitle": "Contact Information Unavailable",
+    "contactUnavailableMessage": "Sorry, no contact information is available for this campaign.",
+    "viewDetails": "View Details",
+    "noCampaigns": "No campaigns available",
+    "checkLater": "Check back later for new campaigns"
+  
+  },
+  "common": {
+    "ok": "OK"
+  },
+  "imagePicker":{
+      "select_images": "Select Images",
+      "max_images_alert": "Please select a maximum of {{max}} images."
+  }
+      
+      
+  }
+  
+  

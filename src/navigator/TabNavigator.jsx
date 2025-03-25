@@ -12,6 +12,7 @@ import Ionicons from "@expo/vector-icons/Ionicons"
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons"
 import History from "./History"
 import ForCart from "./ForCart"
+import {t} from "../i18n"
 
 
 import { CartProvider } from "../CartContext" // Import CartProvider
@@ -104,7 +105,9 @@ function TabNavigator({ navigation, route }) {
             name="ForCart"
             component={ForCart}
             options={{
-              headerShown: false,
+            headerShown:false,
+              
+               
               tabBarIcon: ({ color }) => <Ionicons name="cart" size={24} color={color} />,
             }}
             initialParams={{ role }}

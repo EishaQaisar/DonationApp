@@ -64,6 +64,9 @@ export default function RegisterIndividualScreen({ navigation }) {
     const passwordError=passwordValidator(password.value);
     const idCardError = idCardValidator(idCard.value);
     console.log("hererwe2");
+    console.log("hererwdfdfe2");
+
+    console.log(idCard.value)
     if (nameError || idCardError || passwordError || usernameError || numberError ) {
       setName({ ...name, error: nameError });
       setidCard({ ...idCard, error: idCardError });

@@ -4,6 +4,7 @@ import { theme } from '../core/theme';
 import { useCart } from '../CartContext'; // Import useCart
 import { useNavigation, useRoute } from '@react-navigation/native'; // Import useNavigation hook
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Import Icon for back arrow
+import i18n, { t } from '../i18n'; // Import the translation function
 
 // Optional BackButton component
 const BackButton = ({ goBack }) => (
@@ -15,49 +16,72 @@ const BackButton = ({ goBack }) => (
 const Cart = ({route}) => {
   const { cartItems, removeFromCart } = useCart(); // Access cart context
   const navigation = useNavigation(); // Access navigation object
-  // const route = useRoute();
-const {role}=route.params;
-
-  // Set the header options to include a back button
-  useEffect(() => {
-    navigation.setOptions({
-      headerLeft: () => (
-        <BackButton goBack={navigation.goBack} />
-      ),
-      headerStyle: {
-        backgroundColor: theme.colors.charcoalBlack,
-      },
-      headerTitle: () => (
-        <Text style={styles.headerTitle}>Your Cart</Text>
-      ),
-      headerTintColor: theme.colors.ivory, // Ensures that header text (like title) is white
-    });
-  }, [navigation]);
+  const {role} = route.params;
+  
+  const isUrdu = i18n.locale === "ur";
 
   // Check if the current route name is "Cart"
   const isCartPage = route.name === 'Cart';
 
-  const renderItem = ({ item }) => (
+  const renderItem = ({ item }) => {
+    // Get the appropriate title based on item category
+    let title = '';
+    let description = '';
+    let category = '';
+    let quantity = item.quantity ? item.quantity.toString() : '1';
+    
+    // Use the item.category to determine what to display
+    switch (item.category) {
+      case "Food":
+        title = item.foodName || '';
+        description = item.description || '';
+        category = t("titles.food", "Food");
+        break;
+      case "Clothes":
+        if (item.itemCategory === "Shoes") {
+          title = t(`clothes.item_category_options.${item.itemCategory}`, { defaultValue: item.itemCategory });
+        } else {
+          title = t(`clothes.clothes_category_options.${item.clothesCategory}`, { defaultValue: item.clothesCategory });
+        }
+        description = item.description || '';
+        category = t("titles.clothes", "Clothes");
+        break;
+      case "Education":
+        title = item.itemName || '';
+        description = item.description || '';
+        category = t("titles.education", "Education");
+        break;
+      default:
+        title = item.itemName || item.title || '';
+        description = item.description || '';
+        category = item.category || '';
+    }
   
-    <View style={styles.itemRow}>
-      <Image source={item.images[0]} style={styles.image} />
-      <View style={styles.detailsContainer}>
-        <Text style={styles.title}>{item.itemName || item.title}</Text>
-        <Text style={styles.description}>{item.description}</Text>
-        <Text style={styles.description}>{item.category}</Text>
-
+    return (
+      <View style={[styles.itemRow, isUrdu && styles.rtlContainer]}>
+        <Image source={item.images[0]} style={styles.image} />
+        <View style={styles.detailsContainer}>
+          <Text style={[styles.title, isUrdu && styles.urduText]}>{title}</Text>
+          <Text style={[styles.description, isUrdu && styles.urduText]}>{description}</Text>
+          <Text style={[styles.description, isUrdu && styles.urduText]}>{category}</Text>
+          <Text style={[styles.quantity, isUrdu && styles.urduText]}>
+            {t("itemDetail.quantity", "Quantity")}: {quantity}
+          </Text>
+        </View>
+        <TouchableOpacity
+          style={styles.removeButton}
+          onPress={() => removeFromCart(item)} // Pass the item to removeFromCart
+        >
+          <Text style={[styles.removeButtonText, isUrdu && styles.urduText]}>
+            {t("general.remove", "Remove")}
+          </Text>
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity
-        style={styles.removeButton}
-        onPress={() => removeFromCart(item)} // Pass the item id to removeFromCart
-      >
-        <Text style={styles.removeButtonText}>Remove</Text>
-      </TouchableOpacity>
-    </View>
-  );
+    );
+  };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isUrdu && styles.rtlContainer]}>
       {/* Fixed header with icons */}
       <View style={styles.iconContainer}>
         <TouchableOpacity onPress={() => navigation.navigate('Education')}>
@@ -89,7 +113,9 @@ const {role}=route.params;
       {/* Display cart items or empty cart message */}
       {cartItems.length === 0 ? (
         <View style={styles.emptyCartContainer}>
-          <Text style={styles.noItemText}>Your cart is empty.</Text>
+          <Text style={[styles.noItemText, isUrdu && styles.urduText]}>
+            {t("cart.emptyCart", "Your cart is empty.")}
+          </Text>
         </View>
       ) : (
         <FlatList
@@ -108,6 +134,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.charcoalBlack,
     padding: 20,
+  },
+  rtlContainer: {
+    direction: 'rtl',
   },
   list: {
     paddingBottom: 20,
@@ -163,10 +192,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: theme.colors.pearlWhite,
     fontWeight: 'bold',
+    marginBottom: 2,
   },
   description: {
     fontSize: 14,
     color: theme.colors.pearlWhite,
+    marginBottom: 2,
+  },
+  quantity: {
+    fontSize: 14,
+    color: theme.colors.pearlWhite,
+    fontWeight: '500',
+    marginTop: 2,
   },
   removeButton: {
     backgroundColor: theme.colors.sageGreen,
@@ -188,6 +225,10 @@ const styles = StyleSheet.create({
     color: theme.colors.ivory,
     fontSize: 18,
     textAlign: 'center',
+  },
+  urduText: {
+    fontSize: 16, // Increase font size for Urdu
+    fontFamily: 'System', // You might want to use a specific Urdu font if available
   },
 });
 

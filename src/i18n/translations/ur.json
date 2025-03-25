@@ -1,0 +1,588 @@
+{
+  "titles": {
+    "food": "خوراک",
+    "clothes": "کپڑے",
+    "education": "تعلیم",
+    "schedule_delivery": "ترسیل کا شیڈول",
+    "clothes_donations": "کپڑوں کے عطیات",
+    "education_donations": "تعلیمی عطیات",
+    "food_donations": "کھانے کے عطیات",
+    "item_details": "آئٹم کی تفصیلات",
+    "categories": "اقسام",
+    "donation_history": "عطیہ کی تاریخ",
+    "ngo_campaigns": "این جی او مہمات",
+     "claims_history": "دعویٰ کی تاریخ",
+  "donations_history": "عطیہ کی تاریخ",
+  "your_cart":"آپ کی ٹوکری"
+  },
+  
+  "chooseRole":{
+    "chooseRole": "ہمیں بتائیں کہ آپ کون ہیں",
+    "recipient": "وصول کنندہ",
+    "donor": "عطیہ دہندہ",
+    "rider": "رائڈر"
+   },
+  "donorHome": {
+      "greeting": "خوش آمدید،",
+      "donations": "عطیات",
+      "hero": {
+        "title": "آج ہی فرق پیدا کریں",
+        "button": "ابھی عطیہ کریں"
+      },
+      "features": {
+        "title": "خصوصیات",
+        "scheduleDelivery": "ڈیلیوری شیڈول کریں",
+        "monitorDelivery": "ڈیلیوری کی نگرانی کریں",
+        "viewAnalytics": "تجزیات دیکھیں"
+      },
+      "campaigns": {
+        "title": "مہمات",
+        "viewAll": "سب دیکھیں",
+        "loading": "مہمات لوڈ ہو رہی ہیں...",
+        "noCampaigns": "کوئی مہم دستیاب نہیں ہے"
+      }
+    },
+    "recipientScreen": {
+      "greeting": "ہیلو \nوصول کنندہ!",
+      "availableDonations": "دستیاب عطیات",
+      "motivational_text": "آپ کا بہتر مستقبل\nیہیں سے شروع ہوتا ہے",
+
+      "claimNow": " دعوی کریں",
+      "campaigns": "مہمات",
+      "viewAll": "سب دیکھیں",
+      "loadingCampaigns": "مہمات لوڈ ہو رہی ہیں...",
+      "noCampaigns": "کوئی مہم دستیاب نہیں",
+      "postCampaign": "مہم پوسٹ کریں"
+    },
+    "languageSwitcher": {
+      "restartTitle": "دوبارہ شروع کرنے کی ضرورت ہے",
+      "restartMessage": "زبان کی تبدیلی کو مکمل طور پر لاگو کرنے کے لیے براہ کرم ایپ کو دوبارہ شروع کریں۔",
+      "ok": "ٹھیک ہے"
+    },
+    "general": {
+      "selectLanguage": "زبان منتخب کریں",
+       "view": "دیکھیں",
+    "claim": "حاصل کریں",
+    "recommendedForYou": "آپ کے لیے تجویز کردہ",
+  "others": "دیگر",
+  "remove": "ہٹائیں",
+  "allAvailableDonations": "تمام دستیاب عطیات"
+    },
+    "settings": {
+      "language": "زبان"
+    },
+    "startScreen": {
+      "appName": "دست خیر",
+      "catchline": "برادریوں کی مدد،\nایک عطیہ کے ساتھ",
+      "getStarted": "شروع کریں"
+    },
+    "chooseCategory": {
+      "title": "عطیہ کی اقسام",
+      "education": "تعلیم",
+      "food": "کھانا",
+      "clothing": "لباس"
+    },
+    "circleLogoStepper": {
+      "selectCategory": "قسم منتخب کریں",
+      "addDetails": "تفصیلات شامل کریں",
+      "confirm": "تصدیق کریں"
+    },
+    "uploadEdu": {
+      "type": "قسم",
+      "level": "سطح",
+      "institute": "ادارہ",
+      "institutePlaceholder": "مثال پنجاب کالج",
+      "classGrade": "کلاس / گریڈ",
+      "year": "سال",
+      "program": "پروگرام",
+      "selectGrade": "کلاس/گریڈ منتخب کریں",
+      "selectYear": "سال منتخب کریں",
+      "selectProgram": "پروگرام منتخب کریں",
+      "subject": "مضمون",
+      "selectSubject": "مضمون منتخب کریں",
+      "condition": "حالت",
+      "quantity": "تعداد",
+      "numberOfItems": "اشیاء کی تعداد:",
+      "itemName": "آئٹم کا نام",
+      "itemNamePlaceholder": "مثال پنجاب ٹیکسٹ بک",
+      "description": "تفصیل",
+      "descriptionPlaceholder": "یہاں تفصیل درج کریں..",
+      "submit": "جمع کرائیں",
+      "selectLevel": "تعلیمی سطح منتخب کریں",
+      "Special Education": "خصوصی تعلیم",
+      "errors": {
+        "typeRequired": "قسم درکار ہے",
+        "institutionRequired": "ادارہ درکار ہے",
+        "gradeRequired": "گریڈ درکار ہے",
+        "subjectRequired": "مضمون درکار ہے",
+        "levelRequired": "سطح درکار ہے",
+        "conditionRequired": "حالت درکار ہے",
+        "quantityPositive": "تعداد صفر سے زیادہ ہونی چاہیے",
+        "quantityTooLarge": "زیادہ سے زیادہ حد سے تجاوز",
+        "quantityNumeric": "تعداد عددی ہونی چاہیے",
+        "itemNameRequired": "آئٹم کا نام درکار ہے",
+        "itemNameTooLong": "بہت لمبا",
+        "itemNameTooShort": "بہت چھوٹا",
+        "descriptionRequired": "تفصیل درکار ہے",
+        "descriptionTooLong": "بہت لمبی",
+        "descriptionTooShort": "بہت چھوٹی",
+        "imageRequired": "کم از کم ایک تصویر درکار ہے"
+      }
+      
+    },
+   "education": {
+  "donations": "تعلیمی عطیات",
+  "allAvailableDonations": "تمام دستیاب عطیات",
+  "recommendedForYou": "آپ کے لیے تجویز کردہ",
+  "others": "دیگر",
+  "level": "سطح",
+  "levels": {
+    "School": "اسکول",
+    "College": "کالج",
+    "University": "یونیورسٹی",
+    "Special Education": "خصوصی تعلیم"
+  },
+  "types": {
+    "Books": "کتابیں",
+    "Stationary": "اسٹیشنری",
+    "Other": "دیگر"
+  },
+  "conditions": {
+    "New": "نیا",
+    "Gently Used": "ہلکا استعمال شدہ",
+    "Well Used": "اچھی طرح استعمال شدہ"
+  },
+  "subjects": {
+    "English": "انگریزی",
+    "Urdu": "اردو",
+    "Mathematics": "ریاضی",
+    "Science": "سائنس",
+    "Islamiyat": "اسلامیات",
+    "History": "تاریخ",
+    "Physics": "طبیعیات",
+    "Chemistry": "کیمیا",
+    "BusinessStudies": "بزنس اسٹڈیز",
+    "Economics": "معاشیات",
+    "Accounting": "اکاؤنٹنگ",
+    "Other": "دیگر",
+    "Special Education": "خصوصی تعلیم" 
+
+
+  },
+  "grades": {
+    "Nursery": "نرسری",
+    "KG": "کے جی",
+    "1": "1",
+    "2": "2",
+    "3": "3",
+    "4": "4",
+    "5": "5",
+    "6": "6",
+    "7": "7",
+    "8": "8",
+    "9": "9",
+    "10": "10",
+    "11": "11",
+     "1st Year": "پہلا سال",
+    "2nd Year": "دوسرا سال",
+    "1st": " پہلا سال",
+    "2nd": "دوسرا سال",
+    "3rd": "تیسرا سال",
+    "4th": "چوتھا  سال",
+    "Special Education": "خصوصی تعلیم" 
+
+  },
+  "collegeYears": {
+    "First Year": "پہلا سال",
+    "Second Year": "دوسرا سال"
+  },
+  "universityYears": {
+    "1st": "پہلا",
+    "2nd": "دوسرا",
+    "3rd": "تیسرا",
+    "4th": "چوتھا"
+  }
+}
+,
+  "uploadFood": {
+    "meal": "کھانا",
+    "foodName": "کھانے کا نام",
+    "foodNamePlaceholder": "چاول",
+    "foodType": "کھانے کی قسم",
+    "servings": "سرونگز",
+    "numberOfPeople": "افراد کی تعداد:",
+    "description": "تفصیل",
+    "descriptionPlaceholder": "یہاں تفصیل درج کریں...",
+    "submit": "جمع کرائیں",
+    "errors": {
+      "nameRequired": "کھانے کا نام درکار ہے",
+      "nameTooShort": "بہت چھوٹا",
+      "nameTooLong": "بہت لمبا",
+      "descriptionRequired": "تفصیل درکار ہے",
+      "descriptionTooShort": "بہت چھوٹا",
+      "descriptionTooLong": "بہت لمبا",
+      "mealRequired": "کھانے کی قسم درکار ہے",
+      "foodTypeRequired": "کھانے کی قسم درکار ہے",
+      "quantityPositive": "مقدار 0 سے زیادہ ہونی چاہیے",
+      "quantityTooLarge": "زیادہ سے زیادہ حد سے تجاوز",
+      "quantityNumeric": "مقدار عددی ہونی چاہیے",
+      "imageRequired": "کم از کم ایک تصویر درکار ہے"
+    }
+  },
+  "uploadClothes": {
+    "season": "موسم",
+    "gender": "جنس",
+    "age": "عمر",
+    "itemCategory": "آئٹم کی قسم",
+    "clothesCategory": "کپڑوں کی قسم",
+    "size": "سائز",
+    "condition": "حالت",
+    "quantity": "تعداد",
+    "numberOfItems": "اشیاء کی تعداد:",
+    "fabric": "کپڑا",
+    "fabricPlaceholder": "مثال لان",
+    "description": "تفصیل",
+    "descriptionPlaceholder": "یہاں تفصیل درج کریں..",
+    "submit": "جمع کرائیں",
+    "selectAge": "عمر کی قسم منتخب کریں",
+    "selectItemCategory": "آئٹم کی قسم منتخب کریں",
+    "selectClothesCategory": "کپڑوں کی قسم منتخب کریں",
+    "selectSize": "سائز منتخب کریں",
+    "errors": {
+      "seasonRequired": "موسم درکار ہے",
+      "genderRequired": "جنس درکار ہے",
+      "ageRequired": "عمر کی قسم درکار ہے",
+      "itemCategoryRequired": "آئٹم کی قسم درکار ہے",
+      "clothesCategoryRequired": "کپڑوں کی قسم درکار ہے",
+      "sizeRequired": "سائز درکار ہے",
+      "conditionRequired": "حالت درکار ہے",
+      "quantityPositive": "مقدار 0 سے زیادہ ہونی چاہیے",
+      "quantityTooLarge": "زیادہ سے زیادہ حد سے تجاوز",
+      "quantityNumeric": "مقدار عددی ہونی چاہیے",
+      "fabricRequired": "کپڑا درکار ہے",
+      "fabricTooLong": "بہت لمبا",
+      "fabricTooShort": "بہت چھوٹا",
+      "descriptionRequired": "تفصیل درکار ہے",
+      "descriptionTooLong": "بہت لمبا",
+      "descriptionTooShort": "بہت چھوٹا",
+      "imageRequired": "کم از کم ایک تصویر درکار ہے"
+    }
+  },
+  
+    "clothes": {
+      "donations_title": "کپڑوں کے عطیات",
+
+      "allAvailableDonations": "تمام دستیاب عطیات",
+      "recommendedForYou": "آپ کے لیے تجویز کردہ",
+      "others": "دیگر",
+      "description": "ضرورت مندوں کی مدد کے لیے کپڑے عطیہ کریں۔",
+      "select_category": "زمرہ منتخب کریں",
+      "gender": "جنس",
+      "size": "سائز",
+
+      "donate": "ابھی عطیہ کریں",
+      "season_options": {
+        "Summers": "موسم گرما",
+        "Spring": "بہار",
+        "Autumn": "خزاں",
+        "Winter": "سردی"
+      },
+      "gender_options": {
+        "Male": "مرد",
+        "Female": "عورت",
+        "Unisex": "دونوں کے لیے"
+      },
+      "condition_options": {
+        "New": "نیا",
+        "Gently Used": "ایک/دو بار استعمال شدہ",
+        "Heaavily Used": "زیادہ استعمال شدہ"
+      },
+      "item_category_options": {
+        "Clothes": "کپڑے",
+        "Shoes": "جوتے"
+      },
+      "clothes_category_options": {
+        "Upper Wear": "اوپری پہناوا",
+        "Bottom Wear": "نچلا پہناوا",
+        "Full Outfit": "مکمل لباس",
+        "Accessories": "اسیسریز"
+      },
+      "age_categories": {
+        "0-6 months": "0-6 مہینے",
+        "6-9 months": "6-9 مہینے",
+        "9-12 months": "9-12 مہینے",
+        "1 year": "1 سال",
+        "2 year": "2 سال",
+        "3 year": "3 سال",
+        "4 year": "4 سال",
+        "5 year": "5 سال",
+        "6-8 year": "6-8 سال",
+        "8-12 year": "8-12 سال",
+        "12-18 year": "12-18 سال",
+        "18-25 year": "18-25 سال",
+        "25 year onwards": "25 سال سے آگے"
+      },
+      "clothing_sizes": {
+        "S": "چھوٹا",
+        "M": "درمیانہ",
+        "L": "بڑا",
+        "XL": "بہت بڑا",
+        "XXL": "انتہائی بڑا"
+      },
+      "shirt_sizes": ["36", "38", "40", "42", "44", "46", "48"],
+      "shoe_sizes": ["34", "36", "38", "40", "42", "44", "46"],
+      "trouser_sizes": ["28", "30", "32", "34", "36", "38", "40", "42"]
+    },
+    "food": {
+      "allAvailableDonations": "تمام دستیاب عطیات",
+      "recommendedForYou": "آپ کے لیے تجویز کردہ",
+      "others": "دیگر",
+    "donations_title": "کھانے کے عطیات",
+    "servings": "سرونگز",
+    "people": "افراد",
+    "type": "قسم",
+    "meal_options": {
+      "Breakfast": "ناشتہ",
+      "Brunch": "برنچ",
+      "Lunch": "دوپہر کا کھانا",
+      "Dinner": "رات کا کھانا"
+    },
+    "food_type_options": {
+      "Raw": "خام",
+      "Cooked": "پکا ہوا",
+      "Packaged": "پیکیج شدہ"
+    }
+  },
+  "itemDetail": {
+    "meal": "کھانا",
+    "foodType": "کھانے کی قسم",
+    "quantity": "تعداد",
+    "description": "تفصیل",
+    "fabric": "کپڑا",
+    "season": "موسم",
+    "age": "عمر",
+    "condition": "حالت",
+    "subject": "مضمون",
+    "grade": "گریڈ",
+    "institute": "ادارہ",
+    "type": "قسم",
+    "donorUsername": "عطیہ دہندہ کا نام",
+    "noDetails": "کوئی اضافی تفصیلات دستیاب نہیں ہیں۔",
+    "claimed": "حاصل کر لیا",
+    "claimItem": "آئٹم حاصل کریں",
+    "confirmClaim": "حصول کی تصدیق کریں",
+    "confirmClaimMessage": "کیا آپ واقعی یہ آئٹم حاصل کرنا چاہتے ہیں؟",
+    "khairPoints": "خیر پوائنٹس کٹوتی ہوں گے۔",
+    "yes": "ہاں",
+    "no": "نہیں",
+    "insufficientPoints": "ناکافی خیر پوائنٹس",
+    "insufficientPointsMessage": "آپ کے پاس اس آئٹم کو حاصل کرنے کے لیے کافی خیر پوائنٹس نہیں ہیں۔",
+    "ok": "ٹھیک ہے"
+  },
+  
+  "profile": {
+    "myProfile": "میرا پروفائل",
+    "loading": "پروفائل لوڈ ہو رہا ہے...",
+    "user": "صارف",
+    "khairPoints": "خیر پوائنٹس",
+    "noPhone": "کوئی فون نہیں",
+    "noUsername": "کوئی صارف نام نہیں",
+    "totalDonations": "کل عطیات",
+    "totalClaims": "کل دعوے",
+    "myDonations": "میرے عطیات",
+    "myClaims": "میرے دعوے",
+    "myDeliveries": "میری ڈیلیوریاں",
+    "logout": "لاگ آؤٹ"
+  },
+  "cart": {
+    "emptyCart": "آپ کی ٹوکری خالی ہے۔",
+    "title": "ٹوکری"
+  },
+  "notifications": {
+    "title": "اطلاعات",
+    "dateOfClaim": "دعوی کی تاریخ",
+    "itemType": "آئٹم کی قسم",
+    "claimedBy": "دعوی کرنے والا",
+    "itemName": "آئٹم کا نام",
+    "approve": "منظور کریں",
+    "decline": "مسترد کریں",
+    "itemApproved": "آپ کا آئٹم منظور کر لیا گیا ہے۔",
+    "noNewNotifications": "کوئی نئی اطلاعات نہیں ہیں۔",
+    "recipientNotFound": "وصول کنندہ نہیں ملا، لیکن دعوی مسترد کر دیا گیا۔",
+    "claimDeclinedNoRefund": "دعوی کامیابی سے مسترد کر دیا گیا لیکن خیر پوائنٹس واپس نہیں کیے جا سکے۔",
+    "claimDeclinedRefunded": "دعوی کامیابی سے مسترد کر دیا گیا اور خیر پوائنٹس واپس کر دیے گئے۔",
+    "claimDeclinedRefundFailed": "دعوی مسترد کر دیا گیا لیکن خیر پوائنٹس واپس کرنے میں ناکامی ہوئی۔",
+    "claimDeclinedRefundError": "دعوی مسترد کر دیا گیا لیکن خیر پوائنٹس واپس کرنے میں خرابی ہوئی۔",
+    "noItemsClaimedDonor": "اس عطیہ دہندہ کے لیے کوئی آئٹم دعوی نہیں کیا گیا۔",
+    "noApprovedItemsRecipient": "اس وصول کنندہ کے لیے کوئی منظور شدہ آئٹم نہیں ملا۔",
+    "noClaimedItems": "کوئی دعوی کردہ آئٹم نہیں ملا۔",
+    "failedToLoad": "اطلاعات لوڈ کرنے میں ناکامی ہوئی۔",
+    "claimApproved": "دعوی کامیابی سے منظور کر دیا گیا۔",
+    "approvalFailed": "دعوی منظور کرنے میں ناکامی ہوئی۔",
+    "claimDeclined": "دعوی کامیابی سے مسترد کر دیا گیا۔",
+    "declineFailed": "دعوی مسترد کرنے میں ناکامی ہوئی۔"
+  }
+  ,
+  "claimsHistory": {
+    "loading": "آپ کی دعوی کی تاریخ لوڈ ہو رہی ہے...",
+    "errorLoadingItems": "دعوی کردہ آئٹمز لوڈ کرنے میں ناکامی",
+    "errorConnecting": "سرور سے رابطہ کرنے میں ناکامی",
+    "unnamedItem": "بے نام آئٹم",
+    "category": "زمرہ",
+    "type": "قسم",
+    "upperWearSize": "اوپری پہناوا سائز",
+    "bottomWearSize": "نچلا پہناوا سائز",
+    "clothingSize": "کپڑوں کا سائز",
+    "shoeSize": "جوتے کا سائز",
+    "donatedBy": "عطیہ دہندہ",
+    "anonymous": "گمنام",
+    "claimedOn": "دعوی کی تاریخ",
+    "expiresOn": "میعاد ختم ہونے کی تاریخ",
+    "gradeLevel": "گریڈ/سطح",
+    "noClothesItems": "آپ نے ابھی تک کوئی کپڑے کا آئٹم حاصل نہیں کیا",
+    "noFoodItems": "آپ نے ابھی تک کوئی کھانے کا آئٹم حاصل نہیں کیا",
+    "noEducationItems": "آپ نے ابھی تک کوئی تعلیمی آئٹم حاصل نہیں کیا"
+  },
+  "scheduleDelivery":{
+    "scheduleDelivery": "ڈلیوری شیڈول کریں",
+  "missingInfo": "نامکمل معلومات",
+  "selectDate": "براہ کرم پک اپ کی تاریخ منتخب کریں",
+  "enterPickupLocation": "پک اپ مقام درج کریں",
+  "enterDropoffLocation": "ڈراپ آف مقام درج کریں",
+  "invalidAddress": "غلط پتہ",
+  "enterValidAddress": "براہ کرم درست پتہ درج کریں",
+  "deliveryScheduled": "ڈلیوری شیڈول ہو گئی",
+  "successMessage": "آپ کی ڈلیوری کامیابی سے شیڈول ہو گئی!",
+  "ok": "ٹھیک ہے",
+  "error": "خرابی",
+  "failedSchedule": "ڈلیوری شیڈول کرنے میں ناکام، براہ کرم دوبارہ کوشش کریں۔",
+  "loadingItem": "آئٹم کی تفصیلات لوڈ ہو رہی ہیں...",
+  "noDeliveries": "شیڈول کرنے کے لیے کوئی ڈلیوری نہیں ہے",
+  "item": "آئٹم",
+  "claimedBy": "حاصل کنندہ",
+
+  "itemId": "آئٹم آئی ڈی",
+  "selectPickupTime": "پک اپ وقت منتخب کریں",
+  "setPickupTime": "پک اپ وقت مقرر کریں",
+  "pickupLocation": "پک اپ مقام",
+  "pickupPlaceholder": "پک اپ مقام تلاش کرنے کے لیے ٹیپ کریں",
+  "dropoffLocation": "ڈراپ آف مقام",
+  "dropoffPlaceholder": "ڈراپ آف مقام (خودکار بھرنا)",
+  "pickupDate": "پک اپ تاریخ",
+   "searchPickupLocation": "پک اپ مقام تلاش کریں",
+    "close": "بند کریں",
+    "noItemToSchedule": "شیڈول کرنے کے لیے کوئی آئٹم نہیں ہے"
+
+  }
+  ,
+  "login_screen": {
+    "title": "ہیلو.",
+    "username_phone": "صارف نام / فون نمبر",
+    "password": "پاس ورڈ",
+    "forgot_password": "کیا آپ اپنا پاس ورڈ بھول گئے؟",
+    "login_button": "لاگ ان کریں",
+    "no_account": "کیا آپ کا اکاؤنٹ نہیں ہے؟",
+    "create_account": "نیا بنائیں!"
+  },
+  "errors": {
+    "required": "یہ فیلڈ درکار ہے۔",
+    "incorrect_password": "غلط پاس ورڈ",
+    "user_not_found": "صارف نہیں ملا"
+  },
+  "messages": {
+    "login_success": "لاگ ان کامیاب!",
+    "password_reset_sent": "پاس ورڈ ری سیٹ لنک آپ کے ای میل پر بھیج دیا گیا ہے۔"
+  },
+  "donationsHistory": {
+    "loading": "آپ کی عطیات کی تاریخ لوڈ ہو رہی ہے...",
+    "errorLoadingClothes": "کپڑوں کے عطیات لوڈ کرنے میں ناکامی",
+    "errorLoadingFood": "کھانے کے عطیات لوڈ کرنے میں ناکامی",
+    "errorLoadingEducation": "تعلیمی عطیات لوڈ کرنے میں ناکامی",
+    "errorConnecting": "سرور سے رابطہ کرنے میں ناکامی",
+    "unnamedItem": "بے نام آئٹم",
+    "category": "زمرہ",
+    "type": "قسم",
+    "mealType": "کھانے کی قسم",
+    "donatedOn": "عطیہ کی تاریخ",
+    "statusClaimed": "حاصل کر لیا",
+    "statusUnclaimed": "غیر حاصل شدہ",
+    "statusUnknown": "نامعلوم",
+    "noClothes": "آپ نے ابھی تک کوئی کپڑے کا عطیہ نہیں کیا",
+    "noFood": "آپ نے ابھی تک کوئی کھانے کا عطیہ نہیں کیا",
+    "noEducation": "آپ نے ابھی تک کوئی تعلیمی عطیہ نہیں کیا"
+  }
+  ,
+  "donation_success":{
+    "donation_success": "آپ نے کامیابی سے عطیہ اپ لوڈ کر دیا ہے!",
+  "campaign_success": "آپ نے کامیابی سے مہم اپ لوڈ کر دی ہے!",
+  "continue": "جاری رکھیں"
+  },
+  "ngoCampaign": {
+    "createCampaign": "مہم بنائیں",
+    "ngoName": "این جی او کا نام",
+    "ngoNamePlaceholder": "این جی او کا نام درج کریں",
+    "email": "ای میل (صرف جی میل)",
+    "emailPlaceholder": "جی میل ایڈریس درج کریں",
+    "phoneNumber": "فون نمبر",
+    "phonePlaceholder": "فون نمبر درج کریں (مثال: +92485255947)",
+    "bankAccount": "بینک اکاؤنٹ نمبر (16 ہندسے)",
+    "bankPlaceholder": "16 ہندسوں کا بینک اکاؤنٹ نمبر درج کریں",
+    "campaignTitle": "مہم کا عنوان (زیادہ سے زیادہ 30 حروف)",
+    "titlePlaceholder": "مہم کا عنوان درج کریں",
+    "shortDescription": "مختصر تفصیل (زیادہ سے زیادہ 50 حروف)",
+    "shortDescPlaceholder": "مختصر تفصیل درج کریں",
+    "fullDescription": "مکمل تفصیل (زیادہ سے زیادہ 200 حروف)",
+    "fullDescPlaceholder": "مکمل تفصیل درج کریں",
+    "campaignImage": "مہم کی تصویر",
+    "createCampaignButton": "مہم بنائیں",
+    "errors": {
+      "ngoNameRequired": "این جی او کا نام درکار ہے",
+      "emailRequired": "ای میل درکار ہے",
+      "invalidGmail": "غلط جی میل ایڈریس",
+      "phoneRequired": "فون نمبر درکار ہے",
+      "invalidPhone": "غلط فون نمبر فارمیٹ۔ \"+92485255947\" استعمال کریں",
+      "bankRequired": "بینک اکاؤنٹ نمبر درکار ہے",
+      "invalidBank": "غلط بینک اکاؤنٹ نمبر (16 ہندسے درکار ہیں)",
+      "titleRequired": "مہم کا عنوان درکار ہے",
+      "titleTooLong": "مہم کا عنوان 30 حروف یا اس سے کم ہونا چاہیے",
+      "titleTooFewWords": "مہم کے عنوان میں کم از کم 2 الفاظ ہونے چاہئیں",
+      "shortDescRequired": "مختصر تفصیل درکار ہے",
+      "shortDescTooLong": "مختصر تفصیل 50 حروف یا اس سے کم ہونی چاہیے",
+      "shortDescTooShort": "مختصر تفصیل کم از کم 10 حروف ہونی چاہیے",
+      "fullDescRequired": "مکمل تفصیل درکار ہے",
+      "fullDescTooLong": "مکمل تفصیل 200 حروف یا اس سے کم ہونی چاہیے",
+      "fullDescTooShort": "مکمل تفصیل کم از کم 30 حروف ہونی چاہیے",
+      "imageRequired": "مہم کی تصویر درکار ہے"
+    }
+  },
+  "ngoPost": {
+    "donateNow": "ابھی عطیہ دیں",
+    "supportNow": "ابھی مدد کریں",
+    "hideContactInfo": "رابطہ کی معلومات چھپائیں",
+    "poeticLine": "\"اپنا ہاتھ بڑھائیں، جہاں امید شروع ہوتی ہے، اور مہربانی جیتتی ہے۔\"",
+    "byNgo": "این جی او کا نام:",
+
+    "postedOn": "شائع کردہ تاریخ:",
+    "contactInfo": "رابطے کی معلومات:",
+    "phone": "فون:",
+    "email": "ای میل:",
+    "bankAccount": "بینک اکاؤنٹ:",
+    "notAvailable": "دستیاب نہیں",
+    "loading": "مہم کی تفصیلات لوڈ ہو رہی ہیں...",
+    "contactUnavailableTitle": "رابطے کی معلومات دستیاب نہیں",
+    "contactUnavailableMessage": "معذرت، اس مہم کے لیے کوئی رابطہ معلومات دستیاب نہیں ہیں۔",
+    "viewDetails": "تفصیلات دیکھیں",
+    "noCampaigns": "کوئی مہم دستیاب نہیں",
+    "checkLater": "نئی مہمات کے لیے بعد میں چیک کریں"
+  },
+  "common": {
+    "ok": "ٹھیک ہے"
+  },
+  "imagePicker":{
+       "select_images": "تصاویر منتخب کریں",
+      "max_images_alert": "براہ کرم زیادہ سے زیادہ {{max}} تصاویر منتخب کریں۔"
+  }
+  
+  }
+  
+  

@@ -1,429 +1,602 @@
-import React, { useState , useContext} from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, Image } from 'react-native';
-import { theme } from "../core/theme";
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import CircleLogoStepper2 from '../components/CircleLogoStepper2';
-import { Picker } from "@react-native-picker/picker";
-import ImagePickerComponent from '../components/ImagePickerComponent'; // Import the new component
-import RowOptionButtons from '../components/RowOptionButtons';
-import { Formik } from 'formik';
+"use client"
 
-import { AuthContext } from "../context/AuthContext";
-import { addClothesDonation } from '../helpers/addClothesDonation';
-import { addEduDonation } from '../helpers/addEduDonations';
+import { useState, useContext } from "react"
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput } from "react-native"
+import { theme } from "../core/theme"
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
+import CircleLogoStepper2 from "../components/CircleLogoStepper2"
+import { Picker } from "@react-native-picker/picker"
+import ImagePickerComponent from "../components/ImagePickerComponent"
+import { Formik } from "formik"
+import { AuthContext } from "../context/AuthContext"
+import { addEduDonation } from "../helpers/addEduDonations"
+import { t } from "../i18n"
+
+// Translation mapping for form values
+const valueTranslations = {
+  // Education Type
+  کتابیں: "Books",
+  اسٹیشنری: "Stationary",
+  دیگر: "Other",
+
+  // Education Level
+  اسکول: "School",
+  کالج: "College",
+  یونیورسٹی: "University",
+  "خصوصی تعلیم": "Special Education",
+
+  // Condition
+  نیا: "New",
+  "ہلکا استعمال شدہ": "Gently Used",
+  "اچھی طرح استعمال شدہ": "Well Used",
+
+  // Subjects
+  انگریزی: "English",
+  اردو: "Urdu",
+  ریاضی: "Mathematics",
+  سائنس: "Science",
+  اسلامیات: "Islamiyat",
+  تاریخ: "History",
+  طبیعیات: "Physics",
+  کیمیا: "Chemistry",
+  "بزنس اسٹڈیز": "Business Studies",
+  معاشیات: "Economics",
+  اکاؤنٹنگ: "Accounting",
+
+  // Grades
+  نرسری: "Nursery",
+  "کے جی": "KG",
+  "پہلا سال": "1st Year",
+  "دوسرا سال": "2nd Year",
+  "تیسرا سال": "3rd Year",
+  "چوتھا سال": "4th Year",
+  پہلا: "1st",
+  دوسرا: "2nd",
+  تیسرا: "3rd",
+  چوتھا: "4th",
+}
+
+// Function to get English value from Urdu
+const getEnglishValue = (urduValue) => {
+  return valueTranslations[urduValue] || urduValue
+}
 
 const UploadEdu = ({ navigation }) => {
-  const { user } = useContext(AuthContext);
+  const { user, isRTL, language } = useContext(AuthContext)
+  const tabBarHeight = useBottomTabBarHeight()
+  const isUrdu = language === "ur"
 
-  const tabBarHeight = useBottomTabBarHeight();
+  // Define options with translations
   const subjectOptions = [
-    "English", "Urdu", "Mathematics", "Science", "Islamiyat",
-    "History","Physics", "Chemistry","Business Studies","Economics","Accounting", "Other"
-  ];
-  const eduTypeOptions = ['Books', 'Stationary', 'Other'];
-  const conditionOptions = ['New', 'Gently Used', 'Well Used'];
-  const eduLevelOptions = ['School', 'College', 'University', 'Special Education'];
-  const gradeOption = ['Nursery', 'KG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'];
-  const uniYearOption = ['1st', '2nd', '3rd', '4th'];
-  const collegeYearOption = ['1st Year', '2nd Year'];
- 
+    { en: "English", ur: "انگریزی" },
+    { en: "Urdu", ur: "اردو" },
+    { en: "Mathematics", ur: "ریاضی" },
+    { en: "Science", ur: "سائنس" },
+    { en: "Islamiyat", ur: "اسلامیات" },
+    { en: "History", ur: "تاریخ" },
+    { en: "Physics", ur: "طبیعیات" },
+    { en: "Chemistry", ur: "کیمیا" },
+    { en: "Business Studies", ur: "بزنس اسٹڈیز" },
+    { en: "Economics", ur: "معاشیات" },
+    { en: "Accounting", ur: "اکاؤنٹنگ" },
+    { en: "Other", ur: "دیگر" },
+  ]
 
+  const eduTypeOptions = [
+    { en: "Books", ur: "کتابیں" },
+    { en: "Stationary", ur: "اسٹیشنری" },
+    { en: "Other", ur: "دیگر" },
+  ]
+
+  const conditionOptions = [
+    { en: "New", ur: "نیا" },
+    { en: "Gently Used", ur: "ہلکا استعمال شدہ" },
+    { en: "Well Used", ur: "اچھی طرح استعمال شدہ" },
+  ]
+
+  const eduLevelOptions = [
+    { en: "School", ur: "اسکول" },
+    { en: "College", ur: "کالج" },
+    { en: "University", ur: "یونیورسٹی" },
+    { en: "Special Education", ur: "خصوصی تعلیم" },
+  ]
+
+  const gradeOption = [
+    { en: "Nursery", ur: "نرسری" },
+    { en: "KG", ur: "کے جی" },
+    { en: "1", ur: "1" },
+    { en: "2", ur: "2" },
+    { en: "3", ur: "3" },
+    { en: "4", ur: "4" },
+    { en: "5", ur: "5" },
+    { en: "6", ur: "6" },
+    { en: "7", ur: "7" },
+    { en: "8", ur: "8" },
+    { en: "9", ur: "9" },
+    { en: "10", ur: "10" },
+    { en: "11", ur: "11" },
+  ]
+
+  const uniYearOption = [
+    { en: "1st", ur: "پہلا" },
+    { en: "2nd", ur: "دوسرا" },
+    { en: "3rd", ur: "تیسرا" },
+    { en: "4th", ur: "چوتھا" },
+  ]
+
+  const collegeYearOption = [
+    { en: "1st Year", ur: "پہلا سال" },
+    { en: "2nd Year", ur: "دوسرا سال" },
+  ]
 
   // State for form fields
-  // State for form field values and errors
-  const [educType, setEducType] = useState({ value: '', error: '' });
-  const [eduLevel, setLevel] = useState({ value: '', error: '' });
-  const [subject, setSubject] = useState({ value: '', error: '' });
-  const [institution, setInstitution]=useState({value:'', error:''});
-  const [grade, setGrade]=useState({value:'', error:''});
+  const [educType, setEducType] = useState({ value: "", error: "" })
+  const [eduLevel, setLevel] = useState({ value: "", error: "" })
+  const [subject, setSubject] = useState({ value: "", error: "" })
+  const [institution, setInstitution] = useState({ value: "", error: "" })
+  const [grade, setGrade] = useState({ value: "", error: "" })
+  const [condition, setCondition] = useState({ value: "", error: "" })
+  const [quantity, setQuantity] = useState({ value: "1", error: "" })
+  const [itemName, setItemName] = useState({ value: "", error: "" })
+  const [description, setDescription] = useState({ value: "", error: "" })
+  const [images, setImages] = useState([])
+  const [imageErrors, setImageErrors] = useState("")
 
+  // Helper function to get display value based on language
+  const getDisplayValue = (options, value) => {
+    if (!value) return ""
 
-  const [condition, setCondition] = useState({ value: '', error: '' });
-  const [quantity, setQuantity] = useState({ value: '1', error: '' });
-  const [itemName, setItemName] = useState({ value: '', error: '' });
-  const [description, setDescription] = useState({ value: '', error: '' });
-  const [images, setImages] = useState([]);
+    // If we're in Urdu mode, find the option with matching English value and return its Urdu value
+    if (language === "ur") {
+      const option = options.find((opt) => opt.en === value)
+      return option ? option.ur : value
+    }
 
-  const [imageErrors, setImageErrors] = useState('');
+    return value
+  }
 
+  // Helper function to get display text for a specific option
+  const getOptionText = (option) => {
+    return language === "ur" ? option.ur : option.en
+  }
 
   const validate = () => {
-    let isValid = true;
+    let isValid = true
 
     if (!educType.value) {
-      setEducType((prev) => ({ ...prev, error: 'Type is required' }));
-
-      isValid = false;
+      setEducType((prev) => ({ ...prev, error: t("uploadEdu.errors.typeRequired", "Type is required") }))
+      isValid = false
     }
-    if (educType.value==='Books') {
-      if (!institution.value){
-        setInstitution((prev) => ({ ...prev, error: 'Institution is required' }));
-        isValid = false;
 
-
-      }
-      if (!grade.value){
-        setGrade((prev) => ({ ...prev, error: 'Grade is required' }));
-        isValid = false;
-
-
-      }
-      if (!subject.value){
-        setSubject((prev) => ({ ...prev, error: 'Subject is required' }));
-        isValid = false;
-
-
+    if (educType.value === "Books" || getEnglishValue(educType.value) === "Books") {
+      if (!institution.value) {
+        setInstitution((prev) => ({
+          ...prev,
+          error: t("uploadEdu.errors.institutionRequired", "Institution is required"),
+        }))
+        isValid = false
       }
 
-      
+      if (!grade.value) {
+        setGrade((prev) => ({ ...prev, error: t("uploadEdu.errors.gradeRequired", "Grade is required") }))
+        isValid = false
+      }
+
+      if (!subject.value) {
+        setSubject((prev) => ({ ...prev, error: t("uploadEdu.errors.subjectRequired", "Subject is required") }))
+        isValid = false
+      }
     }
-    
-   
+
     if (!eduLevel.value) {
-      setLevel((prev) => ({ ...prev, error: 'Level is required' }));
-      isValid = false;
+      setLevel((prev) => ({ ...prev, error: t("uploadEdu.errors.levelRequired", "Level is required") }))
+      isValid = false
     }
+
     if (!condition.value) {
-      setCondition((prev) => ({ ...prev, error: 'Condition is required' }));
-      isValid = false;
+      setCondition((prev) => ({ ...prev, error: t("uploadEdu.errors.conditionRequired", "Condition is required") }))
+      isValid = false
     }
-    if (parseInt(quantity.value) <= 0) {
-      setQuantity((prev) => ({ ...prev, error: 'Quantity must be greater than 0' }));
-      isValid = false;
+
+    if (Number.parseInt(quantity.value) <= 0) {
+      setQuantity((prev) => ({
+        ...prev,
+        error: t("uploadEdu.errors.quantityPositive", "Quantity must be greater than 0"),
+      }))
+      isValid = false
     }
-    if (parseInt(quantity.value) > 1000) {
-      setQuantity((prev) => ({ ...prev, error: 'Max limit exceeded' }));
-      isValid = false;
+
+    if (Number.parseInt(quantity.value) > 1000) {
+      setQuantity((prev) => ({ ...prev, error: t("uploadEdu.errors.quantityTooLarge", "Max limit exceeded") }))
+      isValid = false
     }
+
     if (!/^\d+$/.test(quantity.value)) {
-      setQuantity((prev) => ({ ...prev, error: 'Quantity must be a numeric value' }));
-      isValid = false;
+      setQuantity((prev) => ({
+        ...prev,
+        error: t("uploadEdu.errors.quantityNumeric", "Quantity must be a numeric value"),
+      }))
+      isValid = false
     }
-    
+
     if (!itemName.value) {
-      setItemName((prev) => ({ ...prev, error: 'Item name is required' }));
-      isValid = false;
+      setItemName((prev) => ({ ...prev, error: t("uploadEdu.errors.itemNameRequired", "Item name is required") }))
+      isValid = false
     }
-    if (itemName.value.length>30) {
-      setItemName((prev) => ({ ...prev, error: 'Too long' }));
-      isValid = false;
+
+    if (itemName.value.length > 30) {
+      setItemName((prev) => ({ ...prev, error: t("uploadEdu.errors.itemNameTooLong", "Too long") }))
+      isValid = false
     }
-    if (itemName.value.length<3 && itemName.value.length>0) {
-      setItemName((prev) => ({ ...prev, error: 'Too short' }));
-      isValid = false;
+
+    if (itemName.value.length < 3 && itemName.value.length > 0) {
+      setItemName((prev) => ({ ...prev, error: t("uploadEdu.errors.itemNameTooShort", "Too short") }))
+      isValid = false
     }
+
     if (!description.value) {
-      setDescription((prev) => ({ ...prev, error: 'Description is required' }));
-      isValid = false;
+      setDescription((prev) => ({
+        ...prev,
+        error: t("uploadEdu.errors.descriptionRequired", "Description is required"),
+      }))
+      isValid = false
     }
-    if (description.value.length>40) {
-      setDescription((prev) => ({ ...prev, error: 'Too long' }));
-      isValid = false;
+
+    if (description.value.length > 40) {
+      setDescription((prev) => ({ ...prev, error: t("uploadEdu.errors.descriptionTooLong", "Too long") }))
+      isValid = false
     }
-    if (description.value.length<3 && description.value.length>0) {
-      setDescription((prev) => ({ ...prev, error: 'Too short' }));
-      isValid = false;
+
+    if (description.value.length < 3 && description.value.length > 0) {
+      setDescription((prev) => ({ ...prev, error: t("uploadEdu.errors.descriptionTooShort", "Too short") }))
+      isValid = false
     }
+
     if (images.length === 0) {
-      setImageErrors('At least one image is required');
-      isValid = false;
+      setImageErrors(t("uploadEdu.errors.imageRequired", "At least one image is required"))
+      isValid = false
     } else {
-      setImageErrors('');
+      setImageErrors("")
     }
 
-
-    return isValid;
-  };
+    return isValid
+  }
 
   const onSubmitMethod = async () => {
+    const isValid = validate()
 
-    const isValid = validate();
+    if (!isValid) return
 
-
-    if (!isValid) return;
+    // Convert Urdu values to English if needed
     const eduData = {
-     
-      type: educType.value,
-      level: eduLevel.value,
-      c_condition: condition.value,
+      type: language === "ur" ? getEnglishValue(educType.value) : educType.value,
+      level: language === "ur" ? getEnglishValue(eduLevel.value) : eduLevel.value,
+      c_condition: language === "ur" ? getEnglishValue(condition.value) : condition.value,
       quantity: quantity.value,
-      itemName: itemName.value,
-      description:  description.value,
-      images:images,
-      subject:subject.value,
-      institution:institution.value,
-      grade:grade.value,
+      itemName: itemName.value, // Keep original text
+      description: description.value, // Keep original text
+      images: images,
+      subject: language === "ur" ? getEnglishValue(subject.value) : subject.value,
+      institution: institution.value, // Keep original text
+      grade: language === "ur" ? getEnglishValue(grade.value) : grade.value,
       donorUsername: user.username,
-
-    };
-
-    try {
-      await addEduDonation(eduData);
-      console.log('Education donation successfully submitted:', eduData);
-      navigation.navigate("DonationSuccessScreen")
-    } catch (error) {
-      console.error('Error submitting clothes donation:', error);
     }
 
-  };
+    try {
+      await addEduDonation(eduData)
+      console.log("Education donation successfully submitted:", eduData)
+      navigation.navigate("DonationSuccessScreen")
+    } catch (error) {
+      console.error("Error submitting education donation:", error)
+    }
+  }
 
-  
   return (
     <View style={[Styles.container, { marginBottom: tabBarHeight }]}>
       <ScrollView>
         <CircleLogoStepper2 />
         <View style={Styles.line} />
 
-        <Formik
-          initialValues={{}}
-          onSubmit={onSubmitMethod}
-        >
+        <Formik initialValues={{}} onSubmit={onSubmitMethod}>
           {({ handleSubmit }) => (
             <>
-        
-
-
-         {/* Food Type */}
-         <View style={{ marginTop: 30 }}>
-                <Text style={Styles.headings}>Type</Text>
-                <View style={Styles.radioContainer}>
+              {/* Education Type */}
+              <View style={{ marginTop: 30 }}>
+                <Text style={[Styles.headings, isUrdu && Styles.urduHeadings]}>
+                  {t("uploadEdu.type", "Type")}
+                </Text>
+                <View style={[Styles.radioContainer]}>
                   {eduTypeOptions.map((option) => (
                     <TouchableOpacity
-                      key={option}
-                      style={Styles.radioOption}
-                      onPress={() => setEducType({ value: option, error: '' })} 
+                      key={option.en}
+                      style={[Styles.radioOption]}
+                      onPress={() => setEducType({ value: option.en, error: "" })}
                     >
                       <View
                         style={[
                           Styles.radioCircle,
-                          educType.value === option && Styles.radioSelected,
+                          educType.value === option.en && Styles.radioSelected,
                         ]}
                       />
-                      <Text style={Styles.radioLabel}>{option}</Text>
+                      <Text style={[
+                        Styles.radioLabel, 
+                        isUrdu && Styles.urduRadioLabel,
+                        
+                      ]}>
+                        {getOptionText(option)}
+                      </Text>
                     </TouchableOpacity>
                   ))}
                 </View>
-                {educType.error && <Text style={Styles.errorText}>{educType.error}</Text>}
+                {educType.error && (
+                  <Text style={[Styles.errorText]}>{educType.error}</Text>
+                )}
               </View>
 
-      
-        {/* Level Selection */}
-        <View style={{ marginTop: 30 }}>
-          <Text style={Styles.headings}>Level</Text>
-          <View style={Styles.dropdownContainer}>
-            <Picker
-              selectedValue={eduLevel.value}
-              onValueChange={(itemValue) => setLevel({ value: itemValue, error: '' })}
+              {/* Level Selection */}
+              <View style={{ marginTop: 30 }}>
+                <Text style={[Styles.headings, isUrdu && Styles.urduHeadings]}>
+                  {t("uploadEdu.level", "Level")}
+                </Text>
+                <View style={Styles.dropdownContainer}>
+                  <Picker
+                    selectedValue={eduLevel.value}
+                    onValueChange={(itemValue) => setLevel({ value: itemValue, error: "" })}
+                    style={[Styles.picker, isUrdu && Styles.urduPicker]}
+                  >
+                    <Picker.Item label={t("uploadEdu.selectLevel", "Select Education Level")} value="" />
+                    {eduLevelOptions.map((level) => (
+                      <Picker.Item key={level.en} label={getOptionText(level)} value={level.en} />
+                    ))}
+                  </Picker>
+                </View>
+                {eduLevel.error && (
+                  <Text style={[Styles.errorText]}>{eduLevel.error}</Text>
+                )}
+              </View>
 
-              style={Styles.picker}
-            >
-              <Picker.Item label="Select Education Level" value="" />
-              {eduLevelOptions.map((eduLevel) => (
-                <Picker.Item key={eduLevel} label={eduLevel} value={eduLevel} />
-              ))}
-            </Picker>
-          </View>
-          {eduLevel.error && <Text style={Styles.errorText}>{eduLevel.error}</Text>}
+              {(educType.value === "Books" || getEnglishValue(educType.value) === "Books") && (
+                <>
+                  {/* Institute Name */}
+                  <View style={{ marginTop: 30 }}>
+                    <Text style={[Styles.headings, isUrdu && Styles.urduHeadings]}>
+                      {t("uploadEdu.institute", "Institute")}
+                    </Text>
+                    <TextInput
+                      placeholder={t("uploadEdu.institutePlaceholder", "e.g Punjab College")}
+                      value={institution.value}
+                      onChangeText={(text) => setInstitution({ value: text, error: "" })}
+                      style={[Styles.name, isUrdu && Styles.urduInput,]}
+                      placeholderTextColor={theme.colors.ivory}
+                      selectionColor={theme.colors.sageGreen}
+                      textAlign={isUrdu ? 'right' : 'left'} // Add this line
 
-        </View>
-        {(educType.value === 'Books' ) && (
-                    <>
-          {/* Institute Name */}
-          <View style={{ marginTop: 30 }}>
-          <Text style={Styles.headings}>Institute</Text>
-          <TextInput
-            placeholder="e.g Punjab College"
-            value={institution.value}
-            onChangeText={(text) => setInstitution({ value: text, error: '' })}
+                    />
+                    {institution.error && (
+                      <Text style={[Styles.errorText, ]}>{institution.error}</Text>
+                    )}
+                  </View>
 
-            style={Styles.name}
-            placeholderTextColor={theme.colors.ivory}
-            selectionColor={theme.colors.sageGreen}
-          />
-          {institution.error && <Text style={Styles.errorText}>{institution.error}</Text>}
+                  {/* Grade/Year */}
+                  <View style={{ marginTop: 30 }}>
+                    <Text style={[Styles.headings, isUrdu && Styles.urduHeadings, ]}>
+                      {eduLevel.value === "School" || getEnglishValue(eduLevel.value) === "School"
+                        ? t("uploadEdu.classGrade", "Class / Grade")
+                        : eduLevel.value === "College" || getEnglishValue(eduLevel.value) === "College"
+                          ? t("uploadEdu.year", "Year")
+                          : eduLevel.value === "University" || getEnglishValue(eduLevel.value) === "University"
+                            ? t("uploadEdu.year", "Year")
+                            : t("uploadEdu.program", "Program")}
+                    </Text>
+                    <View style={Styles.dropdownContainer}>
+                      <Picker
+                        selectedValue={grade.value}
+                        onValueChange={(itemValue) => setGrade({ value: itemValue, error: "" })}
+                        style={[Styles.picker, isUrdu && Styles.urduPicker,]}
+                      >
+                        <Picker.Item
+                          label={
+                            eduLevel.value === "School" || getEnglishValue(eduLevel.value) === "School"
+                              ? t("uploadEdu.selectGrade", "Select Class/Grade")
+                              : eduLevel.value === "College" || getEnglishValue(eduLevel.value) === "College"
+                                ? t("uploadEdu.selectYear", "Select Year")
+                                : eduLevel.value === "University" || getEnglishValue(eduLevel.value) === "University"
+                                  ? t("uploadEdu.selectYear", "Select Year")
+                                  : t("uploadEdu.selectProgram", "Select Program")
+                          }
+                          value=""
+                        />
+                        {(eduLevel.value === "School" || getEnglishValue(eduLevel.value) === "School") &&
+                          gradeOption.map((grade) => (
+                            <Picker.Item key={grade.en} label={getOptionText(grade)} value={grade.en} />
+                          ))}
+                        {(eduLevel.value === "College" || getEnglishValue(eduLevel.value) === "College") &&
+                          collegeYearOption.map((year) => (
+                            <Picker.Item key={year.en} label={getOptionText(year)} value={year.en} />
+                          ))}
+                        {(eduLevel.value === "University" || getEnglishValue(eduLevel.value) === "University") &&
+                          uniYearOption.map((year) => (
+                            <Picker.Item key={year.en} label={getOptionText(year)} value={year.en} />
+                          ))}
+                        {(eduLevel.value === "Special Education" ||
+                          getEnglishValue(eduLevel.value) === "Special Education") && (
+                          <Picker.Item
+                            label={t("uploadEdu.Special Education", "Special Education")}
+                            value="Special Education"
+                          />
+                        )}
+                      </Picker>
+                    </View>
+                    {grade.error && (
+                      <Text style={[Styles.errorText, ]}>{grade.error}</Text>
+                    )}
+                  </View>
 
-          </View>
-{/* Subject */}
-<View style={{ marginTop: 30 }}>
-  <Text style={Styles.headings}>
-    {eduLevel.value === "School"
-      ? "Class / Grade"
-      : eduLevel.value === "College"
-      ? "Year"
-      : eduLevel.value === "University"
-      ? "Year"
-      : "Program"}
-  </Text>
-  <View style={Styles.dropdownContainer}>
-    <Picker
-      selectedValue={grade.value}
-      onValueChange={(itemValue) => setGrade({ value: itemValue, error: "" })}
-      style={Styles.picker}
-    >
-      <Picker.Item
-        label={
-          eduLevel.value === "School"
-            ? "Select Class/Grade"
-            : eduLevel.value === "College"
-            ? "Select Year"
-            : eduLevel.value === "University"
-            ? "Select Year"
-            : "Select Program"
-        }
-        value=""
-      />
-      {eduLevel.value === "School" &&
-        gradeOption.map((grade) => <Picker.Item key={grade} label={grade} value={grade} />)}
-      {eduLevel.value === "College" &&
-        collegeYearOption.map((year) => <Picker.Item key={year} label={year} value={year} />)}
-      {eduLevel.value === "University" &&
-        uniYearOption.map((year) => <Picker.Item key={year} label={year} value={year} />)}
-      {eduLevel.value === "Special Education" && (
-        <Picker.Item label="Special Education" value="Special Education" />
-      )}
-    </Picker>
-  </View>
-  {grade.error && <Text style={Styles.errorText}>{grade.error}</Text>}
-</View>
+                  {/* Subject */}
+                  <View style={{ marginTop: 30 }}>
+                    <Text style={[Styles.headings, isUrdu && Styles.urduHeadings, ]}>
+                      {t("uploadEdu.subject", "Subject")}
+                    </Text>
+                    <View style={Styles.dropdownContainer}>
+                      <Picker
+                        selectedValue={subject.value}
+                        onValueChange={(itemValue) => setSubject({ value: itemValue, error: "" })}
+                        style={[Styles.picker, isUrdu && Styles.urduPicker, ]}
+                      >
+                        <Picker.Item label={t("uploadEdu.selectSubject", "Select Subject")} value="" />
+                        {subjectOptions.map((subject) => (
+                          <Picker.Item key={subject.en} label={getOptionText(subject)} value={subject.en} />
+                        ))}
+                      </Picker>
+                    </View>
+                    {subject.error && (
+                      <Text style={[Styles.errorText, ]}>{subject.error}</Text>
+                    )}
+                  </View>
+                </>
+              )}
 
-
-         {/* Subject */}
-         <View style={{ marginTop: 30 }}>
-          <Text style={Styles.headings}>Subject</Text>
-          <View style={Styles.dropdownContainer}>
-            <Picker
-              selectedValue={subject.value}
-              onValueChange={(itemValue) => setSubject({ value: itemValue, error: '' })}
-
-              style={Styles.picker}
-            >
-              <Picker.Item label="Select Subject" value="" />
-              {subjectOptions.map((subject) => (
-                <Picker.Item key={subject} label={subject} value={subject} />
-              ))}
-            </Picker>
-          </View>
-          {subject.error && <Text style={Styles.errorText}>{subject.error}</Text>}
-
-        </View>
-        </>
-        )}
-
-          
-         {/* Condtion */}
-         <View style={{ marginTop: 30 }}>
-                <Text style={Styles.headings}>Condtion</Text>
-                <View style={Styles.radioContainer}>
+              {/* Condition */}
+              <View style={{ marginTop: 30 }}>
+                <Text style={[Styles.headings, isUrdu && Styles.urduHeadings, ]}>
+                  {t("uploadEdu.condition", "Condition")}
+                </Text>
+                <View style={[Styles.radioContainer, ]}>
                   {conditionOptions.map((option) => (
                     <TouchableOpacity
-                      key={option}
-                      style={Styles.radioOption}
-                      onPress={() => setCondition({ value: option, error: '' })} 
+                      key={option.en}
+                      style={[Styles.radioOption, ]}
+                      onPress={() => setCondition({ value: option.en, error: "" })}
                     >
                       <View
                         style={[
                           Styles.radioCircle,
-                          condition.value === option && Styles.radioSelected,
+                          condition.value === option.en && Styles.radioSelected,
+                         
                         ]}
                       />
-                      <Text style={Styles.radioLabel}>{option}</Text>
+                      <Text style={[
+                        Styles.radioLabel, 
+                        isUrdu && Styles.urduRadioLabel,
+                       
+                      ]}>
+                        {getOptionText(option)}
+                      </Text>
                     </TouchableOpacity>
                   ))}
                 </View>
-                {condition.error && <Text style={Styles.errorText}>{condition.error}</Text>}
+                {condition.error && (
+                  <Text style={[Styles.errorText, ]}>{condition.error}</Text>
+                )}
               </View>
 
-        {/* Quantity Selector */}
-        <View style={{ marginTop: 30 }}>
-          <Text style={Styles.headings}>Quantity</Text>
-          <View style={Styles.quantityContainer}>
-          <Text style={Styles.quantityLabel}>Number of Items:</Text>
+              {/* Quantity Selector */}
+              <View style={{ marginTop: 30 }}>
+                <Text style={[Styles.headings, isUrdu && Styles.urduHeadings, ]}>
+                  {t("uploadEdu.quantity", "Quantity")}
+                </Text>
+                <View style={[Styles.quantityContainer, ]}>
+                  <Text style={[
+                    Styles.quantityLabel, 
+                    isUrdu && Styles.urduQuantityLabel,
+                   
+                  ]}>
+                    {t("uploadEdu.numberOfItems", "Number of Items:")}
+                  </Text>
 
-            <TouchableOpacity
-              onPress={() => setQuantity({ value: Math.max(parseInt(quantity.value) - 1, 1).toString(), error:""})}
-
-              style={Styles.quantityButton}
-            >
-              <Text style={Styles.quantityButtonText}>-</Text>
-            </TouchableOpacity>
-            <TextInput
-                    style={Styles.quantityInput}
+                  <TouchableOpacity
+                    onPress={() =>
+                      setQuantity({ value: Math.max(Number.parseInt(quantity.value) - 1, 1).toString(), error: "" })
+                    }
+                    style={Styles.quantityButton}
+                  >
+                    <Text style={Styles.quantityButtonText}>-</Text>
+                  </TouchableOpacity>
+                  <TextInput
+                    style={[Styles.quantityInput, ]}
                     value={quantity.value}
                     keyboardType="numeric"
-                    onChangeText={(text) => setQuantity({ value: text, error: '' })}
+                    onChangeText={(text) => setQuantity({ value: text, error: "" })}
                   />
-            <TouchableOpacity
-              onPress={() => setQuantity({ value: (parseInt(quantity.value) + 1).toString(), error: '' })}
+                  <TouchableOpacity
+                    onPress={() => setQuantity({ value: (Number.parseInt(quantity.value) + 1).toString(), error: "" })}
+                    style={Styles.quantityButton}
+                  >
+                    <Text style={Styles.quantityButtonText}>+</Text>
+                  </TouchableOpacity>
+                </View>
+                {quantity.error && (
+                  <Text style={[Styles.errorText, ]}>{quantity.error}</Text>
+                )}
+              </View>
 
-              style={Styles.quantityButton}
-            >
-              <Text style={Styles.quantityButtonText}>+</Text>
-            </TouchableOpacity>
-          </View>
-          {quantity.error && <Text style={Styles.errorText}>{quantity.error}</Text>}
+              {/* Item Name */}
+              <View style={{ marginTop: 30 }}>
+                <Text style={[Styles.headings, isUrdu && Styles.urduHeadings, ]}>
+                  {t("uploadEdu.itemName", "Item Name")}
+                </Text>
+                <TextInput
+                  placeholder={t("uploadEdu.itemNamePlaceholder", "e.g Punjab Textbook")}
+                  value={itemName.value}
+                  onChangeText={(text) => setItemName({ value: text, error: "" })}
+                  style={[Styles.name, isUrdu && Styles.urduInput,]}
+                  placeholderTextColor={theme.colors.ivory}
+                  selectionColor={theme.colors.sageGreen}
+                  textAlign={isUrdu ? 'right' : 'left'} // Add this line
 
-        </View>
-         
-       
-        {/* Item Name */}
-        <View style={{ marginTop: 30 }}>
-          <Text style={Styles.headings}>Item Name</Text>
-          <TextInput
-            placeholder="e.g Punjab Textbook"
-            value={itemName.value}
-            onChangeText={(text) => setItemName({ value: text, error: '' })}
+                />
+                {itemName.error && (
+                  <Text style={[Styles.errorText, ]}>{itemName.error}</Text>
+                )}
+              </View>
 
-            style={Styles.name}
-            placeholderTextColor={theme.colors.ivory}
-            selectionColor={theme.colors.sageGreen}
-          />
-                    {itemName.error && <Text style={Styles.errorText}>{itemName.error}</Text>}
+              {/* Description */}
+              <View style={{ marginTop: 30 }}>
+                <Text style={[Styles.headings, isUrdu && Styles.urduHeadings,]}>
+                  {t("uploadEdu.description", "Description")}
+                </Text>
+                <TextInput
+                  placeholder={t("uploadEdu.descriptionPlaceholder", "Enter description here..")}
+                  value={description.value}
+                  onChangeText={(text) => setDescription({ value: text, error: "" })}
+                  style={[Styles.descri, isUrdu && Styles.urduInput, ]}
+                  placeholderTextColor={theme.colors.ivory}
+                  selectionColor={theme.colors.sageGreen}
+                  multiline={true}
+                  textAlign={isUrdu ? 'right' : 'left'} // Add this line
 
-        </View>
+                />
+                {description.error && (
+                  <Text style={[Styles.errorText, ]}>{description.error}</Text>
+                )}
+              </View>
 
-        {/* Description */}
-        <View style={{ marginTop: 30 }}>
-          <Text style={Styles.headings}>Description</Text>
-          <TextInput
-            placeholder="Enter description here.."
-            value={description.value}
-            onChangeText={(text) => setDescription({ value: text, error: '' })}
-
-            style={Styles.descri}
-            placeholderTextColor={theme.colors.ivory}
-            selectionColor={theme.colors.sageGreen}
-            multiline={true}
-          />
-          {description.error && <Text style={Styles.errorText}>{description.error}</Text>}
-
-        </View>
-
-        {/* Image Selection */}
-        <ImagePickerComponent
+              {/* Image Selection */}
+              <ImagePickerComponent
                 maxImages={3}
                 selectedImages={images}
                 onImagesChange={(updatedImages) => {
-                  setImageErrors("");
-                  setImages(updatedImages)}}
+                  setImageErrors("")
+                  setImages(updatedImages)
+                }}
               />
-              {imageErrors && <Text style={Styles.errorText}>{imageErrors}</Text>}
-        {/* Submit Button */}
-        {/* Submit Button */}
-        <View style={{ alignItems: 'center' }}>
+              {imageErrors && <Text style={[Styles.errorText, ]}>{imageErrors}</Text>}
+
+              {/* Submit Button */}
+              <View style={{ alignItems: "center" }}>
                 <TouchableOpacity onPress={handleSubmit} style={Styles.submitButton}>
-                  <Text style={Styles.submitButtonText}>Submit</Text>
+                  <Text style={[Styles.submitButtonText, isUrdu && Styles.urduSubmitButtonText]}>
+                    {t("uploadEdu.submit", "Submit")}
+                  </Text>
                 </TouchableOpacity>
               </View>
-        </>
+            </>
           )}
         </Formik>
       </ScrollView>
     </View>
-  );
-};
-
-
-
+  )
+}
 
 const Styles = StyleSheet.create({
   container: {
@@ -437,18 +610,24 @@ const Styles = StyleSheet.create({
     padding: 10,
     marginTop: 20,
     borderRadius: 20,
-    alignItems: 'center',
-    width: '90%',
+    alignItems: "center",
+    width: "90%",
   },
   submitButtonText: {
     color: theme.colors.ivory,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     fontSize: 18,
+  },
+  urduSubmitButtonText: {
+    fontSize: 20, // Increased font size for Urdu
   },
   headings: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: theme.colors.ivory,
+  },
+  urduHeadings: {
+    fontSize: 20, // Increased font size for Urdu headings
   },
   descri: {
     backgroundColor: theme.colors.TaupeBlack,
@@ -460,8 +639,11 @@ const Styles = StyleSheet.create({
     color: theme.colors.ivory,
     fontSize: 16,
     marginTop: 10,
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
     paddingTop: 15,
+  },
+  urduInput: {
+    fontSize: 18, // Increased font size for Urdu input
   },
   name: {
     backgroundColor: theme.colors.TaupeBlack,
@@ -480,13 +662,13 @@ const Styles = StyleSheet.create({
     marginVertical: 10,
   },
   radioContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     marginTop: 10,
   },
   radioOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   radioCircle: {
     height: 20,
@@ -504,6 +686,9 @@ const Styles = StyleSheet.create({
     color: theme.colors.ivory,
     fontSize: 16,
   },
+  urduRadioLabel: {
+    fontSize: 18, // Increased font size for Urdu radio labels
+  },
   dropdownContainer: {
     borderWidth: 1,
     borderColor: theme.colors.sageGreen,
@@ -515,10 +700,13 @@ const Styles = StyleSheet.create({
     height: 50,
     color: theme.colors.ivory,
   },
+  urduPicker: {
+    fontSize: 18, // Increased font size for Urdu picker
+  },
   quantityContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: 10,
     padding: 20,
     borderRadius: 10,
@@ -530,6 +718,9 @@ const Styles = StyleSheet.create({
     fontSize: 16,
     marginRight: 10,
   },
+  urduQuantityLabel: {
+    fontSize: 18, // Increased font size for Urdu quantity label
+  },
   quantityButton: {
     backgroundColor: theme.colors.sageGreen,
     padding: 10,
@@ -539,7 +730,7 @@ const Styles = StyleSheet.create({
   quantityButtonText: {
     color: theme.colors.ivory,
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   quantityText: {
     color: theme.colors.ivory,
@@ -548,14 +739,14 @@ const Styles = StyleSheet.create({
   quantityInput: {
     color: theme.colors.ivory,
     fontSize: 18,
-    textAlign: 'center',
+    textAlign: "center",
     width: 50,
   },
   errorText: {
-    color: 'red',
+    color: "red",
     fontSize: 12,
     marginTop: 5,
   },
-});
+})
 
-export default UploadEdu;
+export default UploadEdu

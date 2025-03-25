@@ -11,8 +11,9 @@ import { getBaseUrl } from "../helpers/deviceDetection"
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
 import { UserProfileContext } from "../context/UserProfileContext"
 import { AuthContext } from "../context/AuthContext"
+import { t } from "../i18n" // Import the translation function
 
-
+// Update the Education component to handle RTL properly
 const Education = ({ route }) => {
   const navigation = useNavigation()
   const tabBarHeight = useBottomTabBarHeight()
@@ -20,9 +21,10 @@ const Education = ({ route }) => {
   const { role } = route.params
   const { isInCart } = useContext(CartContext)
   const { userProfile } = useContext(UserProfileContext)
-  const { user } = useContext(AuthContext)
+  const { user, isRTL } = useContext(AuthContext) // Get isRTL from AuthContext
 
-
+  // Detect language by comparing a known translation
+  const isUrdu = t("education.donations") !== "Education Donations"
 
   const [eduItems, setEducationItems] = useState({
     recommended: [],
@@ -34,16 +36,19 @@ const Education = ({ route }) => {
 
   const fetchEducationDonations = async () => {
     if (!userProfile && !isDonor && user.recipientType != "ngo") return // Prevent API call if userProfile is not loaded for recipients
-console.log("jere")
+
     try {
       console.log(`Fetching education donations as ${isDonor ? "donor" : "recipient"}`)
       const BASE_URL = await getBaseUrl()
 
       // Different API endpoints based on role
-      const endpoint = isDonor || user.recipientType === "ngo" ?  `${BASE_URL}/api/all-education-donations` : `${BASE_URL}/api/education-donations`
+      const endpoint =
+        isDonor || user.recipientType === "ngo"
+          ? `${BASE_URL}/api/all-education-donations`
+          : `${BASE_URL}/api/education-donations`
 
       // Different params based on role
-      const params = isDonor || user.recipientType === "ngo"? {} : { userProfile: JSON.stringify(userProfile) }
+      const params = isDonor || user.recipientType === "ngo" ? {} : { userProfile: JSON.stringify(userProfile) }
 
       const response = await axios.get(endpoint, { params })
 
@@ -63,7 +68,6 @@ console.log("jere")
           allDonations: processItems(response.data),
         })
       } else {
-        console.log("hwerwer")
         // For recipients, maintain the recommended/others structure
         setEducationItems({
           recommended: response.data.recommended ? processItems(response.data.recommended) : [],
@@ -77,10 +81,20 @@ console.log("jere")
   }
 
   useEffect(() => {
-    if (isDonor || userProfile|| user.recipientType === "ngo" ) {
+    if (isDonor || userProfile || user.recipientType === "ngo") {
       fetchEducationDonations()
     }
   }, [userProfile, isDonor]) // Added isDonor and userProfile as dependencies
+
+  // Dynamic styles based on language
+  const dynamicStyles = {
+    itemDetails: {
+      fontSize: isUrdu ? 18 : 16, // Increase font size for Urdu
+      color: theme.colors.ivory,
+      textAlign: "center",
+      marginBottom: 5,
+    }
+  }
 
   const renderItem = ({ item }) => (
     <TouchableOpacity
@@ -88,15 +102,20 @@ console.log("jere")
       onPress={() => navigation.navigate("ItemDetail", { item, category: "Education" })}
     >
       <Image source={item.images[0]} style={styles.itemImage} />
-      <Text style={styles.item}>{item.itemName}</Text>
-      <Text style={styles.itemDetails}>{`Level: ${item.level}`}</Text>
-    
+      <Text style={styles.item}> {t(`education.${item.itemName}`, { defaultValue: item.itemName })}</Text>
+      <Text
+        style={dynamicStyles.itemDetails}
+      >
+        {`${t("education.level")}: ${
+    t(`education.levels.${item.level}`, { defaultValue: item.level })
+  }`}
+      </Text>
 
       <TouchableOpacity
         style={styles.claimButton}
         onPress={() => navigation.navigate("ItemDetail", { item, category: "Education" })}
       >
-        <Text style={styles.claimButtonText}>{isDonor ? "View" : "Claim"}</Text>
+        <Text style={styles.claimButtonText}>{isDonor ? t("general.view") : t("general.claim")}</Text>
       </TouchableOpacity>
     </TouchableOpacity>
   )
@@ -105,7 +124,7 @@ console.log("jere")
 
   return (
     <ScrollView style={[styles.container, { marginBottom: tabBarHeight }]} showsVerticalScrollIndicator={false}>
-      {/* Category Icons */}
+      {/* Category Icons - No need to manually reverse, I18nManager handles it */}
       <View style={styles.iconContainer}>
         <TouchableOpacity onPress={() => navigation.navigate("Education")}>
           <Icon
@@ -125,13 +144,15 @@ console.log("jere")
 
       {/* Page Title */}
       <View style={styles.header}>
-        <Text style={styles.title}>Education Donations</Text>
+        <Text style={styles.title}>{t("education.donations")}</Text>
       </View>
 
       {/* Donor View - All Donations */}
       {(isDonor || user.recipientType === "ngo") && (
         <View>
-          <Text style={styles.sectionHeaderText}>All Available Donations</Text>
+          <Text style={[styles.sectionHeaderText, ]}>
+            {t("education.allAvailableDonations")}
+          </Text>
           <FlatList
             data={eduItems.allDonations.filter((item) => !isInCart(item))}
             renderItem={renderItem}
@@ -146,7 +167,9 @@ console.log("jere")
       {/* Recipient View - Recommended Donations */}
       {!isDonor && eduItems.recommended.length > 0 && (
         <View>
-          <Text style={styles.sectionHeaderText}>Recommended for You</Text>
+          <Text style={[styles.sectionHeaderText, ]}>
+            {t("education.recommendedForYou")}
+          </Text>
           <FlatList
             data={eduItems.recommended.filter((item) => !isInCart(item))}
             renderItem={renderItem}
@@ -161,7 +184,9 @@ console.log("jere")
       {/* Recipient View - Other Donations */}
       {!isDonor && eduItems.others.length > 0 && (
         <View>
-          <Text style={styles.sectionHeaderText}>Others</Text>
+          <Text style={[styles.sectionHeaderText, ]}>
+            {t("education.others")}
+          </Text>
           <FlatList
             data={eduItems.others.filter((item) => !isInCart(item))}
             renderItem={renderItem}
@@ -226,12 +251,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 5,
   },
-  itemDetails: {
-    fontSize: 16,
-    color: theme.colors.ivory,
-    textAlign: "center",
-    marginBottom: 5,
-  },
+  // itemDetails style moved to dynamicStyles
   claimButton: {
     backgroundColor: theme.colors.charcoalBlack,
     paddingVertical: 10,
@@ -248,7 +268,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   iconContainer: {
-    flexDirection: "row",
+    flexDirection: "row", // Don't manually set row-reverse, I18nManager handles it
     justifyContent: "center",
     paddingVertical: 7,
     backgroundColor: theme.colors.charcoalBlack,
@@ -275,4 +295,3 @@ const styles = StyleSheet.create({
 })
 
 export default Education
-

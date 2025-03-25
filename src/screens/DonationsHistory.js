@@ -6,6 +6,7 @@ import { theme } from "../core/theme"
 import { AuthContext } from "../context/AuthContext"
 import { getBaseUrl } from "../helpers/deviceDetection"
 import axios from "axios"
+import { t } from "../i18n" // Import the translation function
 
 const DonationsHistory = () => {
   const [clothesDonations, setClothesDonations] = useState([])
@@ -15,6 +16,9 @@ const DonationsHistory = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const { user } = useContext(AuthContext)
+  
+  // Detect language by comparing a known translation
+  const isUrdu = t("food.donations_title") !== "Food Donations"
 
   useEffect(() => {
     const fetchDonations = async () => {
@@ -35,7 +39,7 @@ const DonationsHistory = () => {
           setClothesDonations(clothesResponse.data)
         } catch (err) {
           console.error("Error fetching clothes donations:", err)
-          setError("Failed to load clothes donations")
+          setError(t("donationsHistory.errorLoadingClothes", "Failed to load clothes donations"))
         }
 
         // Fetch food donations
@@ -45,7 +49,7 @@ const DonationsHistory = () => {
           setFoodDonations(foodResponse.data)
         } catch (err) {
           console.error("Error fetching food donations:", err)
-          setError("Failed to load food donations")
+          setError(t("donationsHistory.errorLoadingFood", "Failed to load food donations"))
         }
 
         // Fetch education donations
@@ -55,11 +59,11 @@ const DonationsHistory = () => {
           setEducationDonations(educationResponse.data)
         } catch (err) {
           console.error("Error fetching education donations:", err)
-          setError("Failed to load education donations")
+          setError(t("donationsHistory.errorLoadingEducation", "Failed to load education donations"))
         }
       } catch (err) {
         console.error("Error getting base URL:", err)
-        setError("Failed to connect to server")
+        setError(t("donationsHistory.errorConnecting", "Failed to connect to server"))
       } finally {
         setLoading(false)
       }
@@ -74,7 +78,7 @@ const DonationsHistory = () => {
 
   // Helper function to determine status style
   const getStatusStyle = (status) => {
-    switch (status.toLowerCase()) {
+    switch (status?.toLowerCase()) {
       case "claimed":
         return styles.claimedStatus
       case "unclaimed":
@@ -84,11 +88,27 @@ const DonationsHistory = () => {
     }
   }
 
+  // Helper function to translate status
+  const translateStatus = (status) => {
+    if (!status) return t("donationsHistory.statusUnknown", "Unknown");
+    
+    switch (status.toLowerCase()) {
+      case "claimed":
+        return t("donationsHistory.statusClaimed", "Claimed");
+      case "unclaimed":
+        return t("donationsHistory.statusUnclaimed", "Unclaimed");
+      default:
+        return status;
+    }
+  }
+
   if (loading) {
     return (
       <View style={[styles.container, styles.centered]}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text style={styles.loadingText}>Loading your donation history...</Text>
+        <Text style={[styles.loadingText, isUrdu && styles.urduText]}>
+          {t("donationsHistory.loading", "Loading your donation history...")}
+        </Text>
       </View>
     )
   }
@@ -96,53 +116,95 @@ const DonationsHistory = () => {
   if (error) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <Text style={styles.errorText}>{error}</Text>
+        <Text style={[styles.errorText, isUrdu && styles.urduText]}>{error}</Text>
       </View>
     )
   }
 
   const renderClothesItem = ({ item }) => (
     <View style={styles.donationItem}>
-      <Text style={styles.donationTitle}>{item.itemName || item.itemCategory|| "Unnamed Item"}</Text>
+      <Text style={[styles.donationTitle, isUrdu && styles.urduText]}>
+        {item.itemName || item.itemCategory || t("donationsHistory.unnamedItem", "Unnamed Item")}
+      </Text>
 
       <View style={styles.donationDetails}>
-        <Text style={styles.categoryInfo}>Category: {item.clothesCategory || item.itemCategory || "Unknown"}</Text>
+        {item.clothesCategory&&(
+        <Text style={[styles.categoryInfo, isUrdu && styles.urduText]}>
+          {t("donationsHistory.category", "Category")}: {t(`clothes.clothes_category_options.${item.clothesCategory}`, item.clothesCategory || item.itemCategory || "Unknown")}
+        </Text>
+        )}
 
-        {item.gender && <Text style={styles.genderInfo}>Gender: {item.gender}</Text>}
+        {item.gender && (
+          <Text style={[styles.genderInfo, isUrdu && styles.urduText]}>
+            {t("clothes.gender", "Gender")}: {t(`clothes.gender_options.${item.gender}`, item.gender)}
+          </Text>
+        )}
 
-        {item.upperWearSize && <Text style={styles.sizeInfo}>Upper Wear Size: {item.upperWearSize}</Text>}
+        {item.upperWearSize && (
+          <Text style={[styles.sizeInfo, isUrdu && styles.urduText]}>
+            {t("claimsHistory.upperWearSize", "Upper Wear Size")}: {item.upperWearSize}
+          </Text>
+        )}
 
-        {item.bottomWearSize && <Text style={styles.sizeInfo}>Bottom Wear Size: {item.bottomWearSize}</Text>}
+        {item.bottomWearSize && (
+          <Text style={[styles.sizeInfo, isUrdu && styles.urduText]}>
+            {t("claimsHistory.bottomWearSize", "Bottom Wear Size")}: {item.bottomWearSize}
+          </Text>
+        )}
 
-        {item.clothingSize && <Text style={styles.sizeInfo}>Clothing Size: {item.clothingSize}</Text>}
+        {item.clothingSize && (
+          <Text style={[styles.sizeInfo, isUrdu && styles.urduText]}>
+            {t("claimsHistory.clothingSize", "Clothing Size")}: {item.clothingSize}
+          </Text>
+        )}
 
-        {item.shoeSize && <Text style={styles.sizeInfo}>Shoe Size: {item.shoeSize}</Text>}
+        {item.shoeSize && (
+          <Text style={[styles.sizeInfo, isUrdu && styles.urduText]}>
+            {t("claimsHistory.shoeSize", "Shoe Size")}: {item.shoeSize}
+          </Text>
+        )}
 
-        <Text style={styles.donationDate}>Donated on: {formatDate(item.createdAt)}</Text>
+        <Text style={[styles.donationDate, isUrdu && styles.urduText]}>
+          {t("donationsHistory.donatedOn", "Donated on")}: {formatDate(item.createdAt)}
+        </Text>
       </View>
 
       <View style={[styles.statusBadge, getStatusStyle(item.claimStatus)]}>
-        <Text style={styles.statusText}>{item.claimStatus}</Text>
+        <Text style={styles.statusText}>{translateStatus(item.claimStatus)}</Text>
       </View>
     </View>
   )
 
   const renderFoodItem = ({ item }) => (
     <View style={styles.donationItem}>
-      <Text style={styles.donationTitle}>{item.foodName || "Unnamed Item"}</Text>
+      <Text style={[styles.donationTitle, isUrdu && styles.urduText]}>
+        {item.foodName || t("donationsHistory.unnamedItem", "Unnamed Item")}
+      </Text>
 
       <View style={styles.donationDetails}>
-        <Text style={styles.categoryInfo}>Meal Type: {item.mealType || item.itemCategory || "Unknown"}</Text>
+        <Text style={[styles.categoryInfo, isUrdu && styles.urduText]}>
+          {t("donationsHistory.mealType", "Meal Type")}: {t(`food.meal_options.${item.mealType}`, item.mealType || item.itemCategory || "Unknown")}
+        </Text>
 
-        {item.quantity && <Text style={styles.quantityInfo}>Quantity: {item.quantity}</Text>}
+        {item.quantity && (
+          <Text style={[styles.quantityInfo, isUrdu && styles.urduText]}>
+            {t("itemDetail.quantity", "Quantity")}: {item.quantity}
+          </Text>
+        )}
 
-        {item.expiryDate && <Text style={styles.expiryInfo}>Expires on: {formatDate(item.expiryDate)}</Text>}
+        {item.expiryDate && (
+          <Text style={[styles.expiryInfo, isUrdu && styles.urduText]}>
+            {t("claimsHistory.expiresOn", "Expires on")}: {formatDate(item.expiryDate)}
+          </Text>
+        )}
 
-        <Text style={styles.donationDate}>Donated on: {formatDate(item.createdAt)}</Text>
+        <Text style={[styles.donationDate, isUrdu && styles.urduText]}>
+          {t("donationsHistory.donatedOn", "Donated on")}: {formatDate(item.createdAt)}
+        </Text>
       </View>
 
       <View style={[styles.statusBadge, getStatusStyle(item.claimStatus)]}>
-        <Text style={styles.statusText}>{item.claimStatus}</Text>
+        <Text style={styles.statusText}>{translateStatus(item.claimStatus)}</Text>
       </View>
     </View>
   )
@@ -150,55 +212,80 @@ const DonationsHistory = () => {
   // New render function for education items
   const renderEducationItem = ({ item }) => (
     <View style={styles.donationItem}>
-      <Text style={styles.donationTitle}>{item.itemName || "Unnamed Item"}</Text>
+      <Text style={[styles.donationTitle, isUrdu && styles.urduText]}>
+        {item.itemName || t("donationsHistory.unnamedItem", "Unnamed Item")}
+      </Text>
 
       <View style={styles.donationDetails}>
-        <Text style={styles.categoryInfo}>Type: {item.type|| item.itemCategory || "Unknown"}</Text>
+        <Text style={[styles.categoryInfo, isUrdu && styles.urduText]}>
+          {t("donationsHistory.type", "Type")}: {t(`education.types.${item.type}`, item.type || item.itemCategory || "Unknown")}
+        </Text>
 
-        {item.subject && <Text style={styles.subjectInfo}>Subject: {item.subject}</Text>}
+        {item.subject && (
+          <Text style={[styles.subjectInfo, isUrdu && styles.urduText]}>
+            {t("itemDetail.subject", "Subject")}: {t(`education.subjects.${item.subject}`, item.subject)}
+          </Text>
+        )}
 
-        {item.grade && <Text style={styles.gradeInfo}>Grade/Level: {item.grade}</Text>}
+        {item.grade && (
+          <Text style={[styles.gradeInfo, isUrdu && styles.urduText]}>
+            {t("claimsHistory.gradeLevel", "Grade/Level")}: {t(`education.grades.${item.grade}`, item.grade)}
+          </Text>
+        )}
 
-        {item.condition && <Text style={styles.conditionInfo}>Condition: {item.condition}</Text>}
+        {item.condition && (
+          <Text style={[styles.conditionInfo, isUrdu && styles.urduText]}>
+            {t("itemDetail.condition", "Condition")}: {t(`education.conditions.${item.condition}`, item.condition)}
+          </Text>
+        )}
 
-        <Text style={styles.donationDate}>Donated on: {formatDate(item.createdAt)}</Text>
+        <Text style={[styles.donationDate, isUrdu && styles.urduText]}>
+          {t("donationsHistory.donatedOn", "Donated on")}: {formatDate(item.createdAt)}
+        </Text>
       </View>
 
       <View style={[styles.statusBadge, getStatusStyle(item.claimStatus)]}>
-        <Text style={styles.statusText}>{item.claimStatus}</Text>
+        <Text style={styles.statusText}>{translateStatus(item.claimStatus)}</Text>
       </View>
     </View>
   )
 
   return (
-    <View style={styles.container}>
-
+    <View style={[styles.container, isUrdu && styles.rtlContainer]}>
       <View style={styles.tabContainer}>
         <TouchableOpacity
-          style={[styles.tabButton, activeTab === "clothes" && styles.activeTab]}
-          onPress={() => setActiveTab("clothes")}
-        >
-          <Text style={[styles.tabText, activeTab === "clothes" && styles.activeTabText]}>Clothes</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.tabButton, activeTab === "food" && styles.activeTab]}
-          onPress={() => setActiveTab("food")}
-        >
-          <Text style={[styles.tabText, activeTab === "food" && styles.activeTabText]}>Food</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.tabButton, activeTab === "education" && styles.activeTab]}
-          onPress={() => setActiveTab("education")}
-        >
-          <Text style={[styles.tabText, activeTab === "education" && styles.activeTabText]}>Education</Text>
-        </TouchableOpacity>
+                 style={[styles.tabButton, activeTab === "clothes" && styles.activeTab]}
+                 onPress={() => setActiveTab("clothes")}
+               >
+                 <Text style={[styles.tabText, activeTab === "clothes" && styles.activeTabText, isUrdu && styles.urduText]}>
+                   {t("titles.clothes", "Clothes")}
+                 </Text>
+               </TouchableOpacity>
+       
+               <TouchableOpacity
+                 style={[styles.tabButton, activeTab === "food" && styles.activeTab]}
+                 onPress={() => setActiveTab("food")}
+               >
+                 <Text style={[styles.tabText, activeTab === "food" && styles.activeTabText, isUrdu && styles.urduText]}>
+                   {t("titles.food", "Food")}
+                 </Text>
+               </TouchableOpacity>
+       
+               <TouchableOpacity
+                 style={[styles.tabButton, activeTab === "education" && styles.activeTab]}
+                 onPress={() => setActiveTab("education")}
+               >
+                 <Text style={[styles.tabText, activeTab === "education" && styles.activeTabText, isUrdu && styles.urduText]}>
+                   {t("titles.education", "Education")}
+                 </Text>
+               </TouchableOpacity>
       </View>
 
       {activeTab === "clothes" &&
         (clothesDonations.length === 0 ? (
-          <Text style={styles.emptyText}>You haven't made any clothes donations yet</Text>
+          <Text style={[styles.emptyText, isUrdu && styles.urduText]}>
+            {t("donationsHistory.noClothes", "You haven't made any clothes donations yet")}
+          </Text>
         ) : (
           <FlatList
             data={clothesDonations}
@@ -210,7 +297,9 @@ const DonationsHistory = () => {
 
       {activeTab === "food" &&
         (foodDonations.length === 0 ? (
-          <Text style={styles.emptyText}>You haven't made any food donations yet</Text>
+          <Text style={[styles.emptyText, isUrdu && styles.urduText]}>
+            {t("donationsHistory.noFood", "You haven't made any food donations yet")}
+          </Text>
         ) : (
           <FlatList
             data={foodDonations}
@@ -222,7 +311,9 @@ const DonationsHistory = () => {
 
       {activeTab === "education" &&
         (educationDonations.length === 0 ? (
-          <Text style={styles.emptyText}>You haven't made any education donations yet</Text>
+          <Text style={[styles.emptyText, isUrdu && styles.urduText]}>
+            {t("donationsHistory.noEducation", "You haven't made any education donations yet")}
+          </Text>
         ) : (
           <FlatList
             data={educationDonations}
@@ -240,6 +331,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
     padding: 20,
+  },
+  rtlContainer: {
   },
   centered: {
     justifyContent: "center",
@@ -377,6 +470,10 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 12,
     fontWeight: "500",
+  },
+  urduText: {
+    fontSize: 18, // Increase font size for Urdu
+    fontFamily: 'System', // You might want to use a specific Urdu font if available
   },
 })
 

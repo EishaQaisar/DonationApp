@@ -6,6 +6,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
 import { getBaseUrl } from "../helpers/deviceDetection";
 import { AuthContext } from "../context/AuthContext";
+import i18n, { t } from "../i18n";
 
 const HomeScreenRec = ({ navigation, route }) => {
   const tabBarHeight = useBottomTabBarHeight();
@@ -14,6 +15,8 @@ const HomeScreenRec = ({ navigation, route }) => {
   
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
+  const isUrdu = i18n.locale === "ur";
+  
 
   // Fetch campaigns data when component mounts
   useEffect(() => {
@@ -37,11 +40,11 @@ const HomeScreenRec = ({ navigation, route }) => {
       <ScrollView>
         <View style={Styles.banner}>
           <Image source={require('../../assets/items/hi_rec.jpg')} style={{ opacity: 0.3, width: '100%', height: '100%', position: 'relative' }} />
-          <Text style={Styles.heroText}>Hi {"\n"}Recipient!</Text>
+          <Text style={Styles.heroText}>{t("recipientScreen.greeting")}</Text>
         </View>
 
         <View style={{ color: theme.colors.ivory }}>
-          <Text style={[Styles.headings, { marginTop: 0 }]}>Available Donations</Text>
+          <Text style={[Styles.headings, { marginTop: 0 }]}>  {t("recipientScreen.availableDonations")}</Text>
           <View style={Styles.iconContainer}>
             <TouchableOpacity onPress={() => navigation.navigate('Education')}>
               <Icon name="school" size={40} color={theme.colors.sageGreen} style={Styles.icon} />
@@ -58,8 +61,11 @@ const HomeScreenRec = ({ navigation, route }) => {
         <View style={Styles.hero}>
           <View>
             <Image source={require('../../assets/items/poor.jpeg')} style={{ height: '100%', width: '100%', borderRadius: 20, position: 'relative' }} />
-            <Text style={Styles.herooText}>
-              "Your journey to a{"\n"} better {"\n"}tomorrow starts here"{"\n"}Claim now!
+            <Text style={[
+    Styles.herooText, 
+    { fontSize: i18n.locale === 'ur' ? 26: 16 } // Increase size for Urdu
+  ]}>
+            {t("recipientScreen.motivational_text")}
             </Text>
 
             <Pressable
@@ -69,7 +75,7 @@ const HomeScreenRec = ({ navigation, route }) => {
               ]}
               onPress={() => navigation.navigate('RecepientStartScreen')}
             >
-              <Text style={{ color: 'white', fontSize: 16 }}>Claim Now</Text>
+              <Text style={{ color: 'white', fontSize: 16 }}>{t("recipientScreen.claimNow")}</Text>
             </Pressable>
           </View>
         </View>
@@ -85,9 +91,9 @@ const HomeScreenRec = ({ navigation, route }) => {
 {!(role === 'recipient' && user.recipientType !== 'ngo') && (
   <>
     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 10, marginTop: 10 }}>
-      <Text style={[Styles.headings, { marginTop: 0 }]}>Campaigns</Text>
+      <Text style={[Styles.headings, { marginTop: 0 }]}>{t("recipientScreen.campaigns")}</Text>
       <TouchableOpacity onPress={() => navigation.navigate("ViewNgoPostsScreen")}>
-        <Text style={[Styles.viewAllButton, { marginTop: 0 }]}>View All</Text>
+        <Text style={[Styles.viewAllButton, { marginTop: 0 }]}>{t("recipientScreen.viewAll")}</Text>
       </TouchableOpacity>
     </View>
 
@@ -130,7 +136,7 @@ const HomeScreenRec = ({ navigation, route }) => {
       ) : (
         <View style={Styles.CampCards}>
           <Text style={Styles.campaignTitle}>
-            {loading ? "Loading campaigns..." : "No campaigns available"}
+            {loading ? t("recipientScreen.loadingCampaigns") : t("recipientScreen.noCampaigns")}
           </Text>
         </View>
       )}
@@ -143,7 +149,7 @@ const HomeScreenRec = ({ navigation, route }) => {
               onPress={() => navigation.navigate('NGOCampaignForm')}
               style={Styles.campaignButton}
             >
-              <Text style={Styles.campaignButtonText}>Post Campaign</Text>
+              <Text style={Styles.campaignButtonText}>{t("recipientScreen.postCampaign")}</Text>
             </TouchableOpacity>
           </View>
         )}

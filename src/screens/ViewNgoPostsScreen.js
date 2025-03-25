@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { 
   SafeAreaView, 
   StyleSheet, 
@@ -17,6 +17,8 @@ import BackButton from "../components/BackButton";
 import axios from 'axios';
 import { getBaseUrl } from "../helpers/deviceDetection";
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import { AuthContext } from "../context/AuthContext";
+import { t } from "../i18n";
 
 const { width } = Dimensions.get('window');
 
@@ -24,6 +26,8 @@ export default function ViewNgoPostsScreen({ navigation }) {
   const [ngoCampaigns, setNgoCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const fadeAnim = useState(new Animated.Value(0))[0];
+  const { isRTL, language } = useContext(AuthContext);
+  const isUrdu = language === "ur";
 
   useEffect(() => {
     const fetchNgoCampaigns = async () => {
@@ -47,18 +51,21 @@ export default function ViewNgoPostsScreen({ navigation }) {
 
     fetchNgoCampaigns();
   }, []);
+
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={theme.colors.sageGreen} />
-        <Text style={styles.loadingText}>Loading NGO campaigns...</Text>
+        <Text style={styles.loadingText}>
+          {t("ngoPost.loading", "Loading NGO campaigns...")}
+        </Text>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
-         <Animated.View style={{ opacity: fadeAnim, flex: 1 }}>
+      <Animated.View style={{ opacity: fadeAnim, flex: 1 }}>
         <ScrollView 
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
@@ -93,40 +100,83 @@ export default function ViewNgoPostsScreen({ navigation }) {
                       resizeMode="cover"
                     />
                     <View style={styles.overlay}>
-                      <Text style={styles.ngoName}>{campaign.ngoName}</Text>
+                      <Text style={[
+                        styles.ngoName,
+                        isUrdu && styles.urduText
+                      ]}>
+                        {campaign.ngoName}
+                      </Text>
                     </View>
                   </View>
                   
                   <View style={styles.cardContent}>
-                    <Text style={styles.title}>{campaign.campaignTitle}</Text>
-                    <Text style={styles.description} numberOfLines={2}>
+                    <Text style={[
+                      styles.title,
+                      isUrdu && styles.urduTitle,
+                    ]}>
+                      {campaign.campaignTitle}
+                    </Text>
+                    <Text style={[
+                      styles.description,
+                      isUrdu && styles.urduText,
+                    ]} numberOfLines={2}>
                       {campaign.shortDescription}
                     </Text>
                     
                     <Divider style={styles.divider} />
                     
                     <View style={styles.contactInfo}>
-                      <View style={styles.contactItem}>
+                      <View style={[
+                        styles.contactItem,
+                      ]}>
                         <Ionicons name="call" size={16} color={theme.colors.sageGreen} />
-                        <Text style={styles.contactText}>{campaign.phoneNumber}</Text>
+                        <Text style={[
+                          styles.contactText,
+                          isUrdu && styles.urduSmallText,
+                        ]}>
+                          {campaign.phoneNumber}
+                        </Text>
                       </View>
                       
-                      <View style={styles.contactItem}>
+                      <View style={[
+                        styles.contactItem,
+                      ]}>
                         <MaterialIcons name="email" size={16} color={theme.colors.sageGreen} />
-                        <Text style={styles.contactText}>{campaign.email}</Text>
+                        <Text style={[
+                          styles.contactText,
+                          isUrdu && styles.urduSmallText,
+                        ]}>
+                          {campaign.email}
+                        </Text>
                       </View>
                       
-                      <View style={styles.contactItem}>
+                      <View style={[
+                        styles.contactItem,
+                      ]}>
                         <FontAwesome name="bank" size={14} color={theme.colors.sageGreen} />
-                        <Text style={styles.contactText}>
+                        <Text style={[
+                          styles.contactText,
+                          isUrdu && styles.urduSmallText,
+                        ]}>
                           {campaign.bankAccount.substring(0, 4)}****{campaign.bankAccount.substring(campaign.bankAccount.length - 4)}
                         </Text>
                       </View>
                     </View>
                     
-                    <View style={styles.buttonContainer}>
-                      <Text style={styles.viewDetailsText}>View Details</Text>
-                      <Ionicons name="chevron-forward" size={16} color={theme.colors.sageGreen} />
+                    <View style={[
+                      styles.buttonContainer,
+                    ]}>
+                      <Text style={[
+                        styles.viewDetailsText,
+                        isUrdu && styles.urduSmallText,
+                      ]}>
+                        {t("ngoPost.viewDetails", "View Details")}
+                      </Text>
+                      <Ionicons 
+                        name={isRTL ? "chevron-back" : "chevron-forward"} 
+                        size={16} 
+                        color={theme.colors.sageGreen} 
+                      />
                     </View>
                   </View>
                 </Card>
@@ -135,15 +185,22 @@ export default function ViewNgoPostsScreen({ navigation }) {
           ) : (
             <View style={styles.noDataContainer}>
               <Ionicons name="alert-circle-outline" size={60} color={theme.colors.sageGreen} />
-              <Text style={styles.noDataText}>No campaigns available</Text>
-              <Text style={styles.noDataSubText}>Check back later for new campaigns</Text>
+              <Text style={[
+                styles.noDataText,
+                isUrdu && styles.urduTitle
+              ]}>
+                {t("ngoPost.noCampaigns", "No campaigns available")}
+              </Text>
+              <Text style={[
+                styles.noDataSubText,
+                isUrdu && styles.urduText
+              ]}>
+                {t("ngoPost.checkLater", "Check back later for new campaigns")}
+              </Text>
             </View>
           )}
         </ScrollView>
       </Animated.View>
-      
-     
-          
     </SafeAreaView>
   );
 }
@@ -285,5 +342,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 8,
     opacity: 0.7,
+  },
+  urduTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+  },
+  urduText: {
+    fontSize: 16,
+  },
+  urduSmallText: {
+    fontSize: 14,
   },
 });

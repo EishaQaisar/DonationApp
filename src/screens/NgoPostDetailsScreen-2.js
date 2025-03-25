@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { SafeAreaView, StyleSheet, Text, Image, TouchableOpacity, ScrollView, View, Animated } from 'react-native';
 import { theme } from '../core/theme';
 import BackButton from "../components/BackButton";
 import Button from "../components/Button";
+import { AuthContext } from "../context/AuthContext";
+import { t } from "../i18n";
 
 export default function NgoPostDetailsScreen({ route, navigation }) {
   const { title, description, image } = route.params;
   const [showButton, setShowButton] = useState(true);
+  const { isRTL, language } = useContext(AuthContext);
+  const isUrdu = language === "ur";
 
   const handleScroll = (event) => {
     const scrollY = event.nativeEvent.contentOffset.y;
@@ -16,7 +20,10 @@ export default function NgoPostDetailsScreen({ route, navigation }) {
   return (
     <SafeAreaView style={styles.container}>
       {showButton && (
-        <View style={styles.backButtonWrapper}>
+        <View style={[
+          styles.backButtonWrapper,
+          isRTL && { right: 2, left: 'auto' }
+        ]}>
           <BackButton goBack={navigation.goBack} />
         </View>
       )}
@@ -25,17 +32,31 @@ export default function NgoPostDetailsScreen({ route, navigation }) {
         scrollEventThrottle={16} // Improves scroll performance
       >
         <Image source={image} style={styles.detailsImage} />
-        <Text style={styles.detailsTitle}>{title}</Text>
-        <Text style={styles.detailsDescription}>{description}</Text>
-        <Text style={styles.poeticLine}>
-          "Extend your hand, where hope begins, and kindness wins."
+        <Text style={[
+          styles.detailsTitle,
+          isUrdu && styles.urduTitle
+        ]}>
+          {title}
+        </Text>
+        <Text style={[
+          styles.detailsDescription,
+          isRTL && { textAlign: isRTL ? 'right' : 'justify' },
+          isUrdu && styles.urduText
+        ]}>
+          {description}
+        </Text>
+        <Text style={[
+          styles.poeticLine,
+          isUrdu && styles.urduPoetic
+        ]}>
+          {t("ngoPost.poeticLine", "\"Extend your hand, where hope begins, and kindness wins.\"")}
         </Text>
         <View style={styles.buttonContainer}>
           <Button
             mode="contained"
             style={styles.button}
           >
-            Donate Now
+            {t("ngoPost.donateNow", "Donate Now")}
           </Button>
         </View>
       </ScrollView>
@@ -61,6 +82,10 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     color: theme.colors.ivory,
   },
+  urduTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+  },
   detailsDescription: {
     fontSize: 16,
     lineHeight: 24,
@@ -68,9 +93,13 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     color: theme.colors.ivory,
   },
+  urduText: {
+    fontSize: 18,
+    lineHeight: 28,
+  },
   backButtonWrapper: {
     position: 'absolute',
-    marginTop:-10,
+    marginTop: -10,
     left: 2,
     zIndex: 100,
   },
@@ -85,5 +114,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginVertical: 10,
     color: theme.colors.ivory,
+  },
+  urduPoetic: {
+    fontSize: 22,
+    fontStyle: 'normal',
   },
 });

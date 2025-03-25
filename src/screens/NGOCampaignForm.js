@@ -1,67 +1,72 @@
 import { useEffect, useState, useContext, useCallback } from "react"
-
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput } from 'react-native';
 import { Formik } from 'formik';
 import { theme } from "../core/theme";
 import axios from "axios"
 import { getBaseUrl } from "../helpers/deviceDetection"
 import { AuthContext } from "../context/AuthContext"
-
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 import ImagePickerComponent from '../components/ImagePickerComponent';
+import { t } from "../i18n";
 
 const NGOCampaignForm = ({ navigation }) => {
     const tabBarHeight = useBottomTabBarHeight();
     const [image, setImage] = useState(null);
-    const { user } = useContext(AuthContext)
+    const { user, isRTL, language } = useContext(AuthContext);
+    const isUrdu = language === "ur";
     
     const validate = (values) => {
         const errors = {};
-        if (!values.ngoName) errors.ngoName = 'NGO name is required';
         if (!values.email) {
-            errors.email = 'Email is required';
+          errors.email = t("ngoCampaign.errors.emailRequired", "Email is required");
         } else if (!/^[A-Z0-9._%+-]+@gmail\.com$/i.test(values.email)) {
-            errors.email = 'Invalid Gmail address';
+          errors.email = t("ngoCampaign.errors.invalidGmail", "Invalid Gmail address");
         }
         if (!values.phoneNumber) {
-            errors.phoneNumber = 'Phone number is required';
+          errors.phoneNumber = t("ngoCampaign.errors.phoneRequired", "Phone number is required");
         } else if (!/^\+92\d{10}$/.test(values.phoneNumber)) {
-            errors.phoneNumber = 'Invalid phone number format. Use "+92485255947"';
+          errors.phoneNumber = t("ngoCampaign.errors.invalidPhone", "Invalid phone number format. Use \"+92485255947\"");
         }
         if (!values.bankAccount) {
-            errors.bankAccount = 'Bank account number is required';
+          errors.bankAccount = t("ngoCampaign.errors.bankRequired", "Bank account number is required");
         } else if (!/^\d{16}$/.test(values.bankAccount)) {
-            errors.bankAccount = 'Invalid bank account number (16 digits required)';
+          errors.bankAccount = t("ngoCampaign.errors.invalidBank", "Invalid bank account number (16 digits required)");
         }
         if (!values.campaignTitle) {
-            errors.campaignTitle = 'Campaign title is required';
+          errors.campaignTitle = t("ngoCampaign.errors.titleRequired", "Campaign title is required");
         } else if (values.campaignTitle.length > 30) {
-            errors.campaignTitle = 'Campaign title must be 30 characters or less';
+          errors.campaignTitle = t("ngoCampaign.errors.titleTooLong", "Campaign title must be 30 characters or less");
+        } else if (values.campaignTitle.length < 2) {
+          errors.campaignTitle = t("ngoCampaign.errors.titleTooFewWords", "Campaign title must contain at least 2 words");
         }
         if (!values.shortDescription) {
-            errors.shortDescription = 'Short description is required';
+          errors.shortDescription = t("ngoCampaign.errors.shortDescRequired", "Short description is required");
         } else if (values.shortDescription.length > 50) {
-            errors.shortDescription = 'Short description must be 50 characters or less';
+          errors.shortDescription = t("ngoCampaign.errors.shortDescTooLong", "Short description must be 50 characters or less");
+        } else if (values.shortDescription.length < 10) {
+          errors.shortDescription = t("ngoCampaign.errors.shortDescTooShort", "Short description must be at least 10 characters");
         }
         if (!values.fullDescription) {
-            errors.fullDescription = 'Full description is required';
+          errors.fullDescription = t("ngoCampaign.errors.fullDescRequired", "Full description is required");
         } else if (values.fullDescription.length > 200) {
-            errors.fullDescription = 'Full description must be 200 characters or less';
+          errors.fullDescription = t("ngoCampaign.errors.fullDescTooLong", "Full description must be 200 characters or less");
+        } else if (values.fullDescription.length < 30) {
+          errors.fullDescription = t("ngoCampaign.errors.fullDescTooShort", "Full description must be at least 30 characters");
         }
-        if (!image) errors.image = 'Campaign image is required';
+        if (!image) errors.image = t("ngoCampaign.errors.imageRequired", "Campaign image is required");
         return errors;
-    };
+      };
 
     const onSubmit = async (values, { setSubmitting }) => {
         try {
             const formData = {
                 ...values,
-                image, // Assuming image is already a base64 string or proper format.
-                campaignCreatorUsername: user.username, // Replace with dynamic username if necessary
+                image,
+                campaignCreatorUsername: user.username,
             };
     
             console.log('Form data being sent:', formData);
-            const BASE_URL = await getBaseUrl(); // If you're using a base URL helper function
+            const BASE_URL = await getBaseUrl();
     
             const response = await axios.post(`${BASE_URL}/api/add-ngo-campaign`, formData, {
                 headers: {
@@ -69,9 +74,8 @@ const NGOCampaignForm = ({ navigation }) => {
                 },
             });
     
-            // Check for a successful response
             if (response.status === 200 || response.status === 201) {
-                console.log('Success:', response.data); // response.data contains the actual data
+                console.log('Success:', response.data);
                 navigation.navigate("DonationSuccessScreen");
             } else {
                 throw new Error('Failed to create campaign');
@@ -88,7 +92,7 @@ const NGOCampaignForm = ({ navigation }) => {
     };
     
     const formatPhoneNumber = (value) => {
-        const cleaned = value.replace(/[^\d]/g, ''); // Remove all non-numeric characters
+        const cleaned = value.replace(/[^\d]/g, '');
         const countryCode = "+92";
         if (cleaned.startsWith("92")) {
             return `+${cleaned}`;
@@ -102,12 +106,12 @@ const NGOCampaignForm = ({ navigation }) => {
     return (
         <View style={[styles.container, { marginBottom: tabBarHeight }]}>
             <ScrollView>
-                <Text style={styles.title}>Create Campaign</Text>
+                <Text style={styles.title}>{t("ngoCampaign.createCampaign", "Create Campaign")}</Text>
                 <View style={styles.line} />
 
                 <Formik
                     initialValues={{
-                        ngoName: '',
+                        ngoName: user.name,
                         email: '',
                         phoneNumber: '',
                         bankAccount: '',
@@ -120,122 +124,136 @@ const NGOCampaignForm = ({ navigation }) => {
                 >
                     {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
                         <>
-                            {/* NGO Name Input */}
-                            <View style={styles.inputContainer}>
-                                <Text style={styles.label}>NGO Name</Text>
-                                <TextInput
-                                    style={styles.input}
-                                    onChangeText={handleChange('ngoName')}
-                                    onBlur={handleBlur('ngoName')}
-                                    value={values.ngoName}
-                                    placeholder="Enter NGO name"
-                                    placeholderTextColor={theme.colors.ivory}
-                                />
-                                {errors.ngoName && touched.ngoName && <Text style={styles.errorText}>{errors.ngoName}</Text>}
-                            </View>
+                           
 
                             {/* Email Input */}
                             <View style={styles.inputContainer}>
-                                <Text style={styles.label}>Email (Gmail only)</Text>
+                                <Text style={styles.label}>{t("ngoCampaign.email", "Email (Gmail only)")}</Text>
                                 <TextInput
-                                    style={styles.input}
+                                    style={[
+                                        styles.input,
+                                        isUrdu && styles.urduInput
+                                    ]}
                                     onChangeText={handleChange('email')}
                                     onBlur={handleBlur('email')}
                                     value={values.email}
-                                    placeholder="Enter Gmail address"
+                                    placeholder={t("ngoCampaign.emailPlaceholder", "Enter Gmail address")}
                                     placeholderTextColor={theme.colors.ivory}
                                     keyboardType="email-address"
                                     autoCapitalize="none"
+                                    textAlign={isRTL ? 'right' : 'left'}
                                 />
                                 {errors.email && touched.email && <Text style={styles.errorText}>{errors.email}</Text>}
                             </View>
 
                             {/* Phone Number Input */}
                             <View style={styles.inputContainer}>
-                                <Text style={styles.label}>Phone Number</Text>
+                                <Text style={styles.label}>{t("ngoCampaign.phoneNumber", "Phone Number")}</Text>
                                 <TextInput
-                                    style={styles.input}
+                                    style={[
+                                        styles.input,
+                                        isUrdu && styles.urduInput
+                                    ]}
                                     onChangeText={(value) => {
                                         const formatted = formatPhoneNumber(value);
                                         setFieldValue('phoneNumber', formatted);
                                     }}
                                     onBlur={handleBlur('phoneNumber')}
                                     value={values.phoneNumber}
-                                    placeholder="Enter phone number (e.g., +92485255947)"
+                                    placeholder={t("ngoCampaign.phonePlaceholder", "Enter phone number (e.g., +92485255947)")}
                                     placeholderTextColor={theme.colors.ivory}
                                     keyboardType="phone-pad"
+                                    textAlign={isRTL ? 'right' : 'left'}
                                 />
                                 {errors.phoneNumber && touched.phoneNumber && <Text style={styles.errorText}>{errors.phoneNumber}</Text>}
                             </View>
 
                             {/* Bank Account Input */}
                             <View style={styles.inputContainer}>
-                                <Text style={styles.label}>Bank Account Number (16 digits)</Text>
+                                <Text style={styles.label}>{t("ngoCampaign.bankAccount", "Bank Account Number (16 digits)")}</Text>
                                 <TextInput
-                                    style={styles.input}
+                                    style={[
+                                        styles.input,
+                                        isUrdu && styles.urduInput
+                                    ]}
                                     onChangeText={(value) => {
                                         const numericValue = value.replace(/\D/g, '');
                                         setFieldValue('bankAccount', numericValue.slice(0, 16));
                                     }}
                                     onBlur={handleBlur('bankAccount')}
                                     value={values.bankAccount}
-                                    placeholder="Enter 16-digit bank account number"
+                                    placeholder={t("ngoCampaign.bankPlaceholder", "Enter 16-digit bank account number")}
                                     placeholderTextColor={theme.colors.ivory}
                                     keyboardType="numeric"
                                     maxLength={16}
+                                    textAlign={isRTL ? 'right' : 'left'}
                                 />
                                 {errors.bankAccount && touched.bankAccount && <Text style={styles.errorText}>{errors.bankAccount}</Text>}
                             </View>
 
                             {/* Campaign Title Input */}
                             <View style={styles.inputContainer}>
-                                <Text style={styles.label}>Campaign Title (max 30 characters)</Text>
+                                <Text style={styles.label}>{t("ngoCampaign.campaignTitle", "Campaign Title (max 30 characters)")}</Text>
                                 <TextInput
-                                    style={styles.input}
+                                    style={[
+                                        styles.input,
+                                        isUrdu && styles.urduInput
+                                    ]}
                                     onChangeText={handleChange('campaignTitle')}
                                     onBlur={handleBlur('campaignTitle')}
                                     value={values.campaignTitle}
-                                    placeholder="Enter campaign title"
+                                    placeholder={t("ngoCampaign.titlePlaceholder", "Enter campaign title")}
                                     placeholderTextColor={theme.colors.ivory}
                                     maxLength={30}
+                                    textAlign={isRTL ? 'right' : 'left'}
                                 />
-                                <Text style={styles.charCount}>{values.campaignTitle.length}/30</Text>
+                                <Text style={[styles.charCount, isRTL && styles.rtlText]}>{values.campaignTitle.length}/30</Text>
                                 {errors.campaignTitle && touched.campaignTitle && <Text style={styles.errorText}>{errors.campaignTitle}</Text>}
                             </View>
 
                             {/* Short Description Input */}
                             <View style={styles.inputContainer}>
-                                <Text style={styles.label}>Short Description (max 50 characters)</Text>
+                                <Text style={styles.label}>{t("ngoCampaign.shortDescription", "Short Description (max 50 characters)")}</Text>
                                 <TextInput
-                                    style={styles.textArea}
+                                    style={[
+                                        styles.textArea,
+                                        isUrdu && styles.urduTextArea
+                                    ]}
                                     onChangeText={handleChange('shortDescription')}
                                     onBlur={handleBlur('shortDescription')}
                                     value={values.shortDescription}
-                                    placeholder="Enter short description"
+                                    placeholder={t("ngoCampaign.shortDescPlaceholder", "Enter short description")}
                                     placeholderTextColor={theme.colors.ivory}
                                     multiline
                                     numberOfLines={3}
                                     maxLength={50}
+                                    textAlign={isRTL ? 'right' : 'left'}
+                                    textAlignVertical="top"
                                 />
-                                <Text style={styles.charCount}>{values.shortDescription.length}/50</Text>
+                                <Text style={[styles.charCount, isRTL && styles.rtlText]}>{values.shortDescription.length}/50</Text>
                                 {errors.shortDescription && touched.shortDescription && <Text style={styles.errorText}>{errors.shortDescription}</Text>}
                             </View>
 
                             {/* Full Description Input */}
                             <View style={styles.inputContainer}>
-                                <Text style={styles.label}>Full Description (max 200 characters)</Text>
+                                <Text style={styles.label}>{t("ngoCampaign.fullDescription", "Full Description (max 200 characters)")}</Text>
                                 <TextInput
-                                    style={styles.textArea}
+                                    style={[
+                                        styles.textArea,
+                                        isUrdu && styles.urduTextArea
+                                    ]}
                                     onChangeText={handleChange('fullDescription')}
                                     onBlur={handleBlur('fullDescription')}
                                     value={values.fullDescription}
-                                    placeholder="Enter full description"
+                                    placeholder={t("ngoCampaign.fullDescPlaceholder", "Enter full description")}
                                     placeholderTextColor={theme.colors.ivory}
                                     multiline
                                     numberOfLines={6}
                                     maxLength={200}
+                                    textAlign={isRTL ? 'right' : 'left'}
+                                    textAlignVertical="top"
                                 />
-                                <Text style={styles.charCount}>{values.fullDescription.length}/200</Text>
+                                <Text style={[styles.charCount, isRTL && styles.rtlText]}>{values.fullDescription.length}/200</Text>
                                 {errors.fullDescription && touched.fullDescription && <Text style={styles.errorText}>{errors.fullDescription}</Text>}
                             </View>
 
@@ -252,7 +270,7 @@ const NGOCampaignForm = ({ navigation }) => {
                             {/* Wrapper for Submit Button */}
                             <View style={styles.buttonWrapper}>
                                 <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
-                                    <Text style={styles.submitButtonText}>Create Campaign</Text>
+                                    <Text style={styles.submitButtonText}>{t("ngoCampaign.createCampaignButton", "Create Campaign")}</Text>
                                 </TouchableOpacity>
                             </View>
                         </>
@@ -301,6 +319,10 @@ const styles = StyleSheet.create({
         color: theme.colors.ivory,
         fontSize: 16,
     },
+    urduInput: {
+        fontSize: 18,
+        textAlign: 'right',
+    },
     textArea: {
         backgroundColor: theme.colors.TaupeBlack,
         height: 100,
@@ -312,6 +334,10 @@ const styles = StyleSheet.create({
         color: theme.colors.ivory,
         fontSize: 16,
         textAlignVertical: 'top',
+    },
+    urduTextArea: {
+        fontSize: 18,
+        textAlign: 'right',
     },
     submitButton: {
         backgroundColor: theme.colors.sageGreen,
@@ -336,6 +362,9 @@ const styles = StyleSheet.create({
         fontSize: 12,
         textAlign: 'right',
         marginTop: 5,
+    },
+    rtlText: {
+        textAlign: 'left',
     },
     buttonWrapper: {
         flex: 1,

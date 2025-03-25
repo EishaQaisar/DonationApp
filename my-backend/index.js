@@ -668,7 +668,7 @@ app.delete('/api/delete-claim/:id', (req, res) => {
   });
   //api to return notifications to recipient
   app.get('/api/claimed-status', (req, res) => {
-    const query = 'SELECT * FROM ClaimedItems WHERE claimStatus = ?';
+    const query = 'SELECT * FROM claimeditems WHERE claimStatus = ?';
     
     // Execute the database query with 'Approved' status instead of 'Claimed'
     db.query(query, ['Approved'], (err, results) => {
@@ -787,6 +787,7 @@ app.post('/api/reverse-claim-status', (req, res) => {
 
 app.get('/api/claimed-items', (req, res) => {
   const query = "SELECT * FROM ClaimedItems WHERE scheduleDelivery = 'Unscheduled'";
+  console.log("hereee")
 
   // Execute the database query
   db.query(query, (err, results) => {
@@ -980,4 +981,27 @@ app.get('/api/reset-notification-count', (req, res) => {
   // For now, we'll just return success
   // In a real implementation, you might want to mark notifications as read in the database
   return res.status(200).json({ success: true });
+});
+app.get('/api/claimed-items/unscheduled', (req, res) => {
+  console.log("here")
+  const query = 'SELECT * FROM ClaimedItems WHERE scheduledelivery = ?';
+  
+  // Execute the database query
+  db.query(query, ['Unscheduled'], (err, results) => {
+      if (err) {
+          // Log the error for debugging
+          console.error('Error fetching unscheduled claimed items:', err);
+          return res.status(500).json({
+              status: 'error',
+              message: 'Error fetching unscheduled claimed items',
+              error: err.message, // Optional: Remove in production
+          });
+      }
+
+      // Return the results in a structured format
+      return res.status(200).json({
+          status: 'success',
+          data: results,
+      });
+  });
 });

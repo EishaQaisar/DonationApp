@@ -6,6 +6,7 @@ import { theme } from "../core/theme"
 import { AuthContext } from "../context/AuthContext"
 import { getBaseUrl } from "../helpers/deviceDetection"
 import axios from "axios"
+import i18n, { t } from "../i18n" // Import the translation function
 
 const ClaimsHistory = () => {
   const [clothesClaims, setClothesClaims] = useState([])
@@ -15,6 +16,8 @@ const ClaimsHistory = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const { user } = useContext(AuthContext)
+  
+  const isUrdu = i18n.locale === "ur";
 
   useEffect(() => {
     const fetchClaims = async () => {
@@ -43,11 +46,11 @@ const ClaimsHistory = () => {
           setEducationClaims(educationItems)
         } catch (err) {
           console.error("Error fetching claimed items:", err)
-          setError("Failed to load claimed items")
+          setError(t("claimsHistory.errorLoadingItems", "Failed to load claimed items"))
         }
       } catch (err) {
         console.error("Error getting base URL:", err)
-        setError("Failed to connect to server")
+        setError(t("claimsHistory.errorConnecting", "Failed to connect to server"))
       } finally {
         setLoading(false)
       }
@@ -64,7 +67,9 @@ const ClaimsHistory = () => {
     return (
       <View style={[styles.container, styles.centered]}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text style={styles.loadingText}>Loading your claims history...</Text>
+        <Text style={[styles.loadingText, isUrdu && styles.urduText]}>
+          {t("claimsHistory.loading", "Loading your claims history...")}
+        </Text>
       </View>
     )
   }
@@ -72,98 +77,170 @@ const ClaimsHistory = () => {
   if (error) {
     return (
       <View style={[styles.container, styles.centered]}>
-        <Text style={styles.errorText}>{error}</Text>
+        <Text style={[styles.errorText, isUrdu && styles.urduText]}>{error}</Text>
       </View>
     )
   }
 
   const renderClothesItem = ({ item }) => (
     <View style={styles.claimItem}>
-      <Text style={styles.claimTitle}>{item.itemName || item.itemCategory || "Unnamed Item"}</Text>
+      <Text style={[styles.claimTitle, isUrdu && styles.urduText]}>
+        {t(`clothes.item_category_options.${item.itemName}`)||item.itemName || t("claimsHistory.unnamedItem", "Unnamed Item")}
+      </Text>
 
       <View style={styles.claimDetails}>
-        <Text style={styles.categoryInfo}>Category: {item.donationType || item.itemCategory || "Unknown"}</Text>
+        <Text style={[styles.categoryInfo, isUrdu && styles.urduText]}>
+          {t("claimsHistory.category", "Category")}: {t(`titles.${(item.donationType || item.itemCategory || "Unknown").toLowerCase()}`, item.donationType || item.itemCategory || "Unknown")}
+        </Text>
 
-        {item.gender && <Text style={styles.genderInfo}>Gender: {item.gender}</Text>}
+        {item.gender && (
+          <Text style={[styles.genderInfo, isUrdu && styles.urduText]}>
+            {t("clothes.gender", "Gender")}: {t(`clothes.gender_options.${item.gender}`, item.gender)}
+          </Text>
+        )}
 
-        {item.upperWearSize && <Text style={styles.sizeInfo}>Upper Wear Size: {item.upperWearSize}</Text>}
+        {item.upperWearSize && (
+          <Text style={[styles.sizeInfo, isUrdu && styles.urduText]}>
+            {t("claimsHistory.upperWearSize", "Upper Wear Size")}: {item.upperWearSize}
+          </Text>
+        )}
 
-        {item.bottomWearSize && <Text style={styles.sizeInfo}>Bottom Wear Size: {item.bottomWearSize}</Text>}
+        {item.bottomWearSize && (
+          <Text style={[styles.sizeInfo, isUrdu && styles.urduText]}>
+            {t("claimsHistory.bottomWearSize", "Bottom Wear Size")}: {item.bottomWearSize}
+          </Text>
+        )}
 
-        {item.clothingSize && <Text style={styles.sizeInfo}>Clothing Size: {item.clothingSize}</Text>}
+        {item.clothingSize && (
+          <Text style={[styles.sizeInfo, isUrdu && styles.urduText]}>
+            {t("claimsHistory.clothingSize", "Clothing Size")}: {item.clothingSize}
+          </Text>
+        )}
 
-        {item.shoeSize && <Text style={styles.sizeInfo}>Shoe Size: {item.shoeSize}</Text>}
+        {item.shoeSize && (
+          <Text style={[styles.sizeInfo, isUrdu && styles.urduText]}>
+            {t("claimsHistory.shoeSize", "Shoe Size")}: {item.shoeSize}
+          </Text>
+        )}
 
-        <Text style={styles.donorInfo}>Donated by: {item.donorUsername || "Anonymous"}</Text>
-        <Text style={styles.claimDate}>Claimed on: {formatDate(item.claimDate || item.updatedAt)}</Text>
+        <Text style={[styles.donorInfo, isUrdu && styles.urduText]}>
+          {t("claimsHistory.donatedBy", "Donated by")}: {item.donorUsername || t("claimsHistory.anonymous", "Anonymous")}
+        </Text>
+        <Text style={[styles.claimDate, isUrdu && styles.urduText]}>
+          {t("claimsHistory.claimedOn", "Claimed on")}: {formatDate(item.claimDate || item.updatedAt)}
+        </Text>
       </View>
     </View>
   )
 
   const renderFoodItem = ({ item }) => (
     <View style={styles.claimItem}>
-      <Text style={styles.claimTitle}>{item.foodName || item.itemName || "Unnamed Item"}</Text>
+      <Text style={[styles.claimTitle, isUrdu && styles.urduText]}>
+        {item.foodName || item.itemName || t("claimsHistory.unnamedItem", "Unnamed Item")}
+      </Text>
 
       <View style={styles.claimDetails}>
-        <Text style={styles.categoryInfo}>Type: {item.donationType || item.itemCategory || "Unknown"}</Text>
+        <Text style={[styles.categoryInfo, isUrdu && styles.urduText]}>
+          {t("claimsHistory.type", "Type")}: {t(`titles.${(item.donationType || item.itemCategory || "Unknown").toLowerCase()}`, item.donationType || item.itemCategory || "Unknown")}
+        </Text>
 
-        {item.quantity && <Text style={styles.quantityInfo}>Quantity: {item.quantity}</Text>}
+        {item.quantity && (
+          <Text style={[styles.quantityInfo, isUrdu && styles.urduText]}>
+            {t("itemDetail.quantity", "Quantity")}: {item.quantity}
+          </Text>
+        )}
 
-        {item.expiryDate && <Text style={styles.expiryInfo}>Expires on: {formatDate(item.expiryDate)}</Text>}
+        {item.expiryDate && (
+          <Text style={[styles.expiryInfo, isUrdu && styles.urduText]}>
+            {t("claimsHistory.expiresOn", "Expires on")}: {formatDate(item.expiryDate)}
+          </Text>
+        )}
 
-        <Text style={styles.donorInfo}>Donated by: {item.donorUsername || "Anonymous"}</Text>
-        <Text style={styles.claimDate}>Claimed on: {formatDate(item.claimDate || item.updatedAt)}</Text>
+        <Text style={[styles.donorInfo, isUrdu && styles.urduText]}>
+          {t("claimsHistory.donatedBy", "Donated by")}: {item.donorUsername || t("claimsHistory.anonymous", "Anonymous")}
+        </Text>
+        <Text style={[styles.claimDate, isUrdu && styles.urduText]}>
+          {t("claimsHistory.claimedOn", "Claimed on")}: {formatDate(item.claimDate || item.updatedAt)}
+        </Text>
       </View>
     </View>
   )
 
   const renderEducationItem = ({ item }) => (
     <View style={styles.claimItem}>
-      <Text style={styles.claimTitle}>{item.itemName || "Unnamed Item"}</Text>
+      <Text style={[styles.claimTitle, isUrdu && styles.urduText]}>
+        {item.itemName ||  t("claimsHistory.unnamedItem", "Unnamed Item")}
+      </Text>
 
       <View style={styles.claimDetails}>
-        <Text style={styles.categoryInfo}>Type: {item.donationType || item.itemCategory || "Unknown"}</Text>
+        <Text style={[styles.categoryInfo, isUrdu && styles.urduText]}>
+          {t("claimsHistory.type", "Type")}: {t(`titles.${(item.donationType || item.itemCategory || "Unknown").toLowerCase()}`, item.donationType || item.itemCategory || "Unknown")}
+        </Text>
 
-        {item.subject && <Text style={styles.subjectInfo}>Subject: {item.subject}</Text>}
+        {item.subject && (
+          <Text style={[styles.subjectInfo, isUrdu && styles.urduText]}>
+            {t("itemDetail.subject", "Subject")}: {t(`education.subjects.${item.subject}`, item.subject)}
+          </Text>
+        )}
 
-        {item.grade && <Text style={styles.gradeInfo}>Grade/Level: {item.grade}</Text>}
+        {item.grade && (
+          <Text style={[styles.gradeInfo, isUrdu && styles.urduText]}>
+            {t("claimsHistory.gradeLevel", "Grade/Level")}: {t(`education.grades.${item.grade}`, item.grade)}
+          </Text>
+        )}
 
-        {item.condition && <Text style={styles.conditionInfo}>Condition: {item.condition}</Text>}
+        {item.condition && (
+          <Text style={[styles.conditionInfo, isUrdu && styles.urduText]}>
+            {t("itemDetail.condition", "Condition")}: {t(`education.conditions.${item.condition}`, item.condition)}
+          </Text>
+        )}
 
-        <Text style={styles.donorInfo}>Donated by: {item.donorUsername || "Anonymous"}</Text>
-        <Text style={styles.claimDate}>Claimed on: {formatDate(item.claimDate || item.updatedAt)}</Text>
+        <Text style={[styles.donorInfo, isUrdu && styles.urduText]}>
+          {t("claimsHistory.donatedBy", "Donated by")}: {item.donorUsername || t("claimsHistory.anonymous", "Anonymous")}
+        </Text>
+        <Text style={[styles.claimDate, isUrdu && styles.urduText]}>
+          {t("claimsHistory.claimedOn", "Claimed on")}: {formatDate(item.claimDate || item.updatedAt)}
+        </Text>
       </View>
     </View>
   )
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isUrdu && styles.rtlContainer]}>
       <View style={styles.tabContainer}>
         <TouchableOpacity
           style={[styles.tabButton, activeTab === "clothes" && styles.activeTab]}
           onPress={() => setActiveTab("clothes")}
         >
-          <Text style={[styles.tabText, activeTab === "clothes" && styles.activeTabText]}>Clothes</Text>
+          <Text style={[styles.tabText, activeTab === "clothes" && styles.activeTabText, isUrdu && styles.urduText]}>
+            {t("titles.clothes", "Clothes")}
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.tabButton, activeTab === "food" && styles.activeTab]}
           onPress={() => setActiveTab("food")}
         >
-          <Text style={[styles.tabText, activeTab === "food" && styles.activeTabText]}>Food</Text>
+          <Text style={[styles.tabText, activeTab === "food" && styles.activeTabText, isUrdu && styles.urduText]}>
+            {t("titles.food", "Food")}
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.tabButton, activeTab === "education" && styles.activeTab]}
           onPress={() => setActiveTab("education")}
         >
-          <Text style={[styles.tabText, activeTab === "education" && styles.activeTabText]}>Education</Text>
+          <Text style={[styles.tabText, activeTab === "education" && styles.activeTabText, isUrdu && styles.urduText]}>
+            {t("titles.education", "Education")}
+          </Text>
         </TouchableOpacity>
       </View>
 
       {activeTab === "clothes" &&
         (clothesClaims.length === 0 ? (
-          <Text style={styles.emptyText}>You haven't claimed any clothes items yet</Text>
+          <Text style={[styles.emptyText, isUrdu && styles.urduText]}>
+            {t("claimsHistory.noClothesItems", "You haven't claimed any clothes items yet")}
+          </Text>
         ) : (
           <FlatList
             data={clothesClaims}
@@ -175,7 +252,9 @@ const ClaimsHistory = () => {
 
       {activeTab === "food" &&
         (foodClaims.length === 0 ? (
-          <Text style={styles.emptyText}>You haven't claimed any food items yet</Text>
+          <Text style={[styles.emptyText, isUrdu && styles.urduText]}>
+            {t("claimsHistory.noFoodItems", "You haven't claimed any food items yet")}
+          </Text>
         ) : (
           <FlatList
             data={foodClaims}
@@ -187,7 +266,9 @@ const ClaimsHistory = () => {
 
       {activeTab === "education" &&
         (educationClaims.length === 0 ? (
-          <Text style={styles.emptyText}>You haven't claimed any education items yet</Text>
+          <Text style={[styles.emptyText, isUrdu && styles.urduText]}>
+            {t("claimsHistory.noEducationItems", "You haven't claimed any education items yet")}
+          </Text>
         ) : (
           <FlatList
             data={educationClaims}
@@ -205,6 +286,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.background,
     padding: 20,
+  },
+  rtlContainer: {
   },
   centered: {
     justifyContent: "center",
@@ -327,6 +410,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "center",
     marginTop: 20,
+  },
+  urduText: {
+    fontSize: 20, // Increase font size for Urdu
+    fontFamily: 'System', // You might want to use a specific Urdu font if available
   },
 })
 
