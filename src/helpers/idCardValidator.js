@@ -1,13 +1,20 @@
+import { t } from "../i18n";
+
 export function idCardValidator(idCard) {
-    // Regular expression to match the ID card format "34101-7678623-8"
-    const re = /^\d{5}-\d{7}-\d{1}$/;
-  
-    if (!idCard) return "Please fill in this field.";
-    if (idCard.trim() === "") {
-      return "Id Card cannot contain only spaces.";
-    }
-    if (!re.test(idCard)) return 'Please enter a valid ID card number in the format 34101-7678623-8';
-    
-    return '';
+  // Regular expression to match the ID card format "34101-7678623-8"
+  const re = /^\d{5}-\d{7}-\d{1}$/;
+
+  if (!idCard) {
+    return t("validation.required");
   }
   
+  if (idCard.trim() === "") {
+    return t("validation.onlySpaces", { field: t("fields.idCard") });
+  }
+  
+  if (!re.test(idCard)) {
+    return t("validation.validIdCard");
+  }
+  
+  return '';
+}

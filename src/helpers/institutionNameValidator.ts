@@ -1,17 +1,17 @@
-export function institutionNameValidator(institutionName: string): string {
-  if (!institutionName) {
-    return "Please fill in this field.";
+import { t } from "../i18n";
 
+export function institutionNameValidator(institutionName) {
+  if (!institutionName) {
+    return t("validation.required");
   }
 
   if (institutionName.trim() === "") {
-    return "Institution cannot contain only spaces.";
+    return t("validation.onlySpaces", { field: t("fields.institution") });
   }
 
   if (institutionName.length > 30) {
-    return "Institution name should not be longer than 30 characters.";
+    return t("validation.maxLength", { field: t("fields.institution"), length: 30 });
   }
 
   return ""; // Valid institution name
 }
-

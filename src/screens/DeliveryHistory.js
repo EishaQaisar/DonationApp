@@ -66,7 +66,6 @@ const DeliveryHistory = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>My Delivery History</Text>
       {deliveries.length === 0 ? (
         <Text style={styles.emptyText}>You haven't made any deliveries yet</Text>
       ) : (

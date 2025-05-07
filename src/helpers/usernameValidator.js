@@ -1,10 +1,21 @@
+import { t } from "../i18n";
+
 export function usernameValidator(username) {
-    if (!username) return "Please fill in this field."
-    if (username.trim() === "") {
-      return "username cannot contain only spaces.";
-    }
-    if (username.length < 6) return 'Username should contain at least 6 characters.'
-    if (username.length > 30) return 'Username should be less than 30 characters.'
-    return ''
+  if (!username) {
+    return t("validation.required");
   }
   
+  if (username.trim() === "") {
+    return t("validation.onlySpaces", { field: t("fields.username") });
+  }
+  
+  if (username.length < 6) {
+    return t("validation.minLength", { field: t("fields.username"), length: 6 });
+  }
+  
+  if (username.length > 30) {
+    return t("validation.maxLength", { field: t("fields.username"), length: 30 });
+  }
+  
+  return '';
+}

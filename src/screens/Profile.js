@@ -30,12 +30,12 @@ const Profile = ({ route }) => {
     username: {
       fontSize: isUrdu ? 26 : 24,
       fontWeight: "700",
-      color: theme.colors.ivory,
+      color: theme.colors.pearlWhite,
       marginBottom: 8,
     },
     khairPoints: {
       fontSize: isUrdu ? 20 : 18,
-      color: theme.colors.sageGreen,
+      color: theme.colors.copper,
       marginLeft: 5,
     },
     info: {
@@ -127,7 +127,7 @@ const Profile = ({ route }) => {
 
         {role === "recipient" && (
           <View style={styles.khairPointsContainer}>
-            <MaterialCommunityIcons name="star" size={24} color={theme.colors.sageGreen} />
+            <MaterialCommunityIcons name="star" size={24} color={theme.colors.copper} />
             <Text style={dynamicStyles.khairPoints}>{userProfile?.khairPoints || 0} {t("profile.khairPoints")}</Text>
           </View>
         )}
@@ -183,7 +183,7 @@ const InfoItem = ({ icon, text, isUrdu }) => {
   const dynamicStyles = {
     info: {
       fontSize: isUrdu ? 18 : 16,
-      color: theme.colors.ivory,
+      color: theme.colors.pearlWhite,
     }
   }
   
@@ -201,7 +201,7 @@ const AnimatedButton = ({ icon, text, onPress, style, textStyle, isUrdu }) => {
   const dynamicStyles = {
     buttonText: {
       fontSize: isUrdu ? 20 : 18,
-      color: theme.colors.ivory,
+      color: theme.colors.pearlWhite,
       fontWeight: "600",
       ...(textStyle || {})
     }
@@ -288,6 +288,7 @@ const styles = StyleSheet.create({
     width: "100%",
     marginTop: 10,
     backgroundColor: "transparent", // Ensure this is transparent
+    color:theme.colors.pearlWhite
   },
   infoItem: {
     flexDirection: "row",
@@ -325,7 +326,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   logoutButton: {
-    backgroundColor: theme.colors.outerSpace,
+    backgroundColor: theme.colors.sageGreen,
   },
   // buttonText moved to dynamicStyles
   // logoutText moved to dynamicStyles

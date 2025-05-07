@@ -1,12 +1,17 @@
-export function numberValidator(phoneNumber) {
-    if (!phoneNumber) return "Please fill in this field."
+import { t } from "../i18n";
 
-    if (phoneNumber.trim() === "") {
-      return "Phone number cannot contain only spaces.";
-    }
-    
-    else if (!/^\+92\d{10}$/.test(phoneNumber)) {
-      return 'Invalid phone number format. Use "+923485255947"';
+export function numberValidator(phoneNumber) {
+  if (!phoneNumber) {
+    return t("validation.required");
   }
-  return ''
+
+  if (phoneNumber.trim() === "") {
+    return t("validation.onlySpaces", { field: t("fields.phoneNumber") });
+  }
+  
+  else if (!/^\+92\d{10}$/.test(phoneNumber)) {
+    return t("validation.validPhoneNumber");
+  }
+  
+  return '';
 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { theme } from "../core/theme";
 import {t} from '../i18n'
@@ -54,6 +54,7 @@ const ImagePickerComponent = ({ maxImages = 3, selectedImages = [], onImagesChan
 
   return (
     <View style={{ marginTop: 20 }}>
+      
       <Text style={styles.headings}>{t("imagePicker.select_images")}</Text>
       <TouchableOpacity style={styles.imageContainer}  onPress={images.length < maxImages ? pickImage : null} >
         {images.length > 0 ? (

@@ -1,107 +1,105 @@
 import React from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  ImageBackground,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
+
 import Background from "../components/Background";
-import Header from "../components/Header";
-import ImageButton from "../components/ImageButton";
-import Button from "../components/Button";
 import BackButton from "../components/BackButton";
-import { StyleSheet, View, Text } from "react-native";
-
 import { theme } from "../core/theme";
-import i18n,{ t } from "../i18n" // Import only the translation function
-console.log(i18n.locale)
-
+import i18n, { t } from "../i18n";
 
 export default function ChooseRole({ navigation }) {
   return (
     <Background>
       <BackButton goBack={navigation.goBack} />
+      <ScrollView contentContainerStyle={styles.scroll}>
+        <View style={styles.container}>
+          <Text style={styles.header}>{t("chooseRole.chooseRole")}</Text>
 
-      <View style={styles.container}>
-        {/* Header text */}
-        <Text style={styles.header}>{t("chooseRole.chooseRole")}</Text>
-
-        {/* Button container placed under the header in a vertical layout */}
-        <View style={styles.buttonContainer}>
-        <ImageButton
-            onPress={() => navigation.navigate("LoginScreen",{ role: "recipient" })}
-            source={require("../../assets/items/desktop-wallpaper-child-african-bl-african-kids.jpg")}
-            imageStyle={styles.image}
-            text={t("chooseRole.recipient")}
-            textStyle={{ fontSize: i18n.locale === "ur" ? 20 : 16 }} // Adjust size based on language
-
-            
+          {/* Role cards */}
+          <RoleCard
+            title={t("chooseRole.recipient")}
+            image={require("../../assets/items/desktop-wallpaper-child-african-bl-african-kids.jpg")}
+            onPress={() => navigation.navigate("LoginScreen", { role: "recipient" })}
           />
 
-        <ImageButton
-          onPress={() => navigation.navigate("LoginScreen", { role: "donor" })}
-          source={require("../../assets/items/illustration-about-helping-poor-needy-with-concept-giving-charity_882884-955.jpg")}
-          imageStyle={styles.image}
-          textStyle={{ fontSize: i18n.locale === "ur" ? 20 : 16 }} // Adjust size based on language
-          text={t("chooseRole.donor")}
-        />
-
- 
-        <ImageButton
-            onPress={() => navigation.navigate("LoginScreen",{role:"rider"})}
-            source={require("../../assets/items/testinglogo.jpg")} 
-            imageStyle={styles.image}
-            text={t("chooseRole.rider")}
-            textStyle={{ fontSize: i18n.locale === "ur" ? 20 : 16 }} // Adjust size based on language
-
+          <RoleCard
+            title={t("chooseRole.donor")}
+            image={require("../../assets/items/illustration-about-helping-poor-needy-with-concept-giving-charity_882884-955.jpg")}
+            onPress={() => navigation.navigate("LoginScreen", { role: "donor" })}
           />
 
-
-         
+          <RoleCard
+            title={t("chooseRole.rider")}
+            image={require("../../assets/items/testinglogo.jpg")}
+            onPress={() => navigation.navigate("LoginScreen", { role: "rider" })}
+          />
         </View>
-      </View>
+      </ScrollView>
     </Background>
   );
 }
 
+function RoleCard({ title, image, onPress }) {
+  return (
+    <TouchableOpacity onPress={onPress} style={styles.cardWrapper}>
+      <ImageBackground source={image} style={styles.cardImage} imageStyle={styles.cardImageStyle}>
+        <View style={styles.overlay} />
+        <Text style={[styles.cardText, { fontSize: i18n.locale === "ur" ? 22 : 18 }]}>
+          {title}
+        </Text>
+      </ImageBackground>
+    </TouchableOpacity>
+  );
+}
+
 const styles = StyleSheet.create({
+  scroll: {
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+  },
   container: {
-    flex: 1,  
-    justifyContent: 'center',  
-    alignItems: 'center',  
-    paddingBottom: 10,
-  },
-  image: {
-    width: 130, // Size of the image
-    height: 120, // Size of the image
-    borderRadius: 30, // Make the image circular
-    marginBottom: 10, // Space between image and text
-    borderWidth: 2, // Border around the image
-    borderColor: theme.colors.sageGreen, // Border color (white for contrast)
-    shadowColor: theme.colors.ivory, // Shadow color
-    shadowOffset: { width: 0, height: 2 }, // Shadow offset
-    shadowOpacity: 0.3, // Shadow opacity
-    shadowRadius: 5, // Shadow blur radius
-    elevation: 5, // Elevation for Android devices (shadow effect)
-  },
-  text: {
-    color: 'white', // Use white text color
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    alignItems: "center",
   },
   header: {
-    fontSize: 30,
-    fontWeight: 'bold',
+    fontSize: 32,
+    fontWeight: "bold",
     color: theme.colors.ivory,
-    textAlign: 'center',
-    marginBottom: 30, // Adds space between the header and button container
+    textAlign: "center",
+    marginBottom: 30,
   },
-  buttonContainer: {
-    flexDirection: "column",  // Stack buttons vertically
-    alignItems: "center",
-    width: '80%',  // Adjust width as needed
+  cardWrapper: {
+    width: "100%",
+    height: 180,
+    marginVertical: 12,
+    borderRadius: 18,
+    overflow: "hidden",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 3 },
   },
-  circularButton: {
-    width: 140,
-    height: 110,
-    borderRadius: 45,  // Circular shape
-    justifyContent: "center",
-    alignItems: "center",
-    marginVertical: 10,  // Spacing between buttons
+  cardImage: {
+    flex: 1,
+    justifyContent: "flex-end",
+    padding: 20,
+  },
+  cardImageStyle: {
+    resizeMode: "cover",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.35)",
+  },
+  cardText: {
+    color: "#fff",
+    fontWeight: "bold",
+    textAlign: "left",
   },
 });

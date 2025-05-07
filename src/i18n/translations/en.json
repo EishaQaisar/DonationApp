@@ -13,7 +13,8 @@
     "ngo_campaigns": "NGO Campaigns",
     "claims_history": "Claims History",
   "donations_history": "Donation History",
-  "your_cart":"Your Cart"
+  "your_cart":"Your Cart",
+  "delivery_history":"Delivery History"
   },
   
   "chooseRole":{
@@ -26,6 +27,11 @@
     "donorHome": {
       "greeting": "Welcome,",
       "donations": "Donations",
+      "causes": "Causes",
+      "impact": "Impact",
+      "education": "Education",
+      "clothes": "Clothes",
+      "food": "Food",
       "hero": {
         "title": "Make a difference today",
         "button": "Donate Now"
@@ -37,10 +43,14 @@
         "viewAnalytics": "View Analytics"
       },
       "campaigns": {
-        "title": "Campaigns",
-        "viewAll": "View All",
+        "title": "Active Campaigns",
+        "viewAll": "View all",
         "loading": "Loading campaigns...",
-        "noCampaigns": "No campaigns available"
+        "noCampaigns": "No active campaigns found at the moment. Check back later!",
+        "refresh": "Refresh",
+        "urgent": "URGENT",
+        "fundedPercent": "{{percent}} funded",
+        "daysLeft": "{{days}} days left"
       }
     },
     "recipientScreen": {
@@ -563,6 +573,61 @@
   "imagePicker":{
       "select_images": "Select Images",
       "max_images_alert": "Please select a maximum of {{max}} images."
+  },
+  "auth": {
+    "hello": "Hello.",
+    "name": "Name",
+    "username": "Username",
+    "phoneNumber": "Phone Number",
+    "password": "Password",
+    "idCard": "ID Card",
+    "next": "Next",
+    "enterCode": "Enter the code sent to your phone",
+    "confirmCode": "Confirm Code",
+    "alreadyHaveAccount": "I already have an account!",
+    "login": "Log in",
+    "uploadCertificate": "Upload Certificate",
+    "selectedCertificate": "Selected Certificate:",
+    "certificateName": "Name:",
+    "certificateUri": "URI:",
+    "errors": {
+      "usernameExists": "This username is already taken.",
+      "phoneExists": "Phone number is already registered.",
+      "cnicExists": "This CNIC is already registered."
+    }
+  },
+  "validation": {
+    "required": "Please fill in this field.",
+    "onlySpaces": "{{field}} cannot contain only spaces.",
+    "maxLength": "{{field}} should not be longer than {{length}} characters.",
+    "minLength": "{{field}} should contain at least {{length}} characters.",
+    "noNumbers": "The {{field}} should not contain any numbers.",
+    "fullName": "Please enter your full name.",
+    "namePartLength": "Each part of the name must have at least 2 characters.",
+    "ageNumber": "Age must be a number",
+    "ageInteger": "Age must be a whole number",
+    "ageMin": "Age must be at least 1",
+    "ageMax": "Age must be 120 or less",
+    "classDigits": "Class number should not be longer than 2 digits.",
+    "classNameLength": "Class name should not be longer than 20 characters.",
+    "validEmail": "Please enter a valid email address!",
+    "validIdCard": "Please enter a valid ID card number in the format 34101-7678623-8",
+    "validPhoneNumber": "Invalid phone number format. Use \"+923485255947\"",
+    "passwordSpecialChar": "Password should contain at least one special character."
+  },
+  "fields": {
+    "address": "Address",
+    "age": "Age",
+    "class": "Class",
+    "email": "Email",
+    "idCard": "ID Card",
+    "input": "Input",
+    "institution": "Institution",
+    "name": "Name",
+    "occupation": "Occupation",
+    "password": "Password",
+    "phoneNumber": "Phone number",
+    "username": "Username"
   }
       
       

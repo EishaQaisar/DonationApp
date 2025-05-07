@@ -4,7 +4,7 @@ import {
   ChooseCategory, DonorHomeScreen, ScheduleRDeliveryScreen, UploadClothes, UploadEdu, UploadFood, HomeScreenRec, 
   Education, Clothes, Food, ClaimsHistory, ItemDetail, RecepientStartScreen, DonationSuccessScreen, 
   NgoPostDetailsScreen, ViewNgoPostsScreen, NGOCampaignForm, RiderFinalHomeScreen, DonorOrderTrackingScreen, 
-  DonationsHistory, NGOProfileDetailsScreen 
+  DonationsHistory, NGOProfileDetailsScreen , DeliveryHistory
 } from '../screens';
 import i18n, {t} from '../i18n'
 const Stack = createStackNavigator();
@@ -143,6 +143,16 @@ const HomeStackNav = ({ navigation, route }) => {
       <Stack.Screen 
         name="DonationsHistory" 
         component={DonationsHistory} 
+        options={{
+          title: t("titles.donation_history"),
+          headerTitleAlign: 'center',
+          headerStyle: { backgroundColor: theme.colors.charcoalBlack, height: 70 },
+          headerTintColor: theme.colors.ivory
+        }} 
+      />
+      <Stack.Screen 
+        name="DeliveryHistory" 
+        component={DeliveryHistory} 
         options={{
           title: t("titles.donation_history"),
           headerTitleAlign: 'center',

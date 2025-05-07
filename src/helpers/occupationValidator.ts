@@ -1,15 +1,17 @@
-export function occupationValidator(occupation: string): string {
+import { t } from "../i18n";
+
+export function occupationValidator(occupation) {
   if (!occupation) {
-    return "Please fill in this field.";
+    return t("validation.required");
   }
 
   if (occupation.trim() === "") {
-    return "Occupation cannot contain only spaces.";
+    return t("validation.onlySpaces", { field: t("fields.occupation") });
   }
+  
   if (occupation.length > 50) {
-    return "Occupation should not be longer than 50 characters.";
+    return t("validation.maxLength", { field: t("fields.occupation"), length: 50 });
   }
 
   return ""; // Valid occupation
 }
-
