@@ -52,7 +52,7 @@ const RiderFinalHomeScreen = ({ navigation, route }) => {
       if (service) {
         service.stopTracking()
       }
-    }
+    } 
   }, [user.username])
 
   // Load declined orders from Firestore on component mount
