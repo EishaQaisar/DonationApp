@@ -14,7 +14,8 @@ import RiderLocationService from "../components/rider-location-service"
 
 
 
-const GOOGLE_API_KEY = "AIzaSyB9irjntPHdEJf024h7H_XKpS11OeW1Nh8"
+const GOOGLE_API_KEY = "AIzaSyAAt8OqnkBz7phiQqy75spQMs5tthoCTZw"
+// const originrider = { latitude: 31.362987553740638, longitude: 72.98790695201525}
 const originrider = { latitude: 37.3318456, longitude: -122.0296002 }
 const destination = { latitude: 37.771707, longitude: -122.4053769 }
 
@@ -42,6 +43,7 @@ const RiderFinalHomeScreen = ({ navigation, route }) => {
   // Initialize location service when component mounts
   useEffect(() => {
     const service = new RiderLocationService(user.username)
+    console.log("this is what is in the service",service)
     setLocationService(service)
     console.log("setting location service", locationService)
 
@@ -127,12 +129,16 @@ const RiderFinalHomeScreen = ({ navigation, route }) => {
       console.log("origin in checkValidity",origin,origin.latitude,origin.longitude)
       console.log("destination in checkValidity",destination,destination.latitude,destination.longitude)
   
-      // This is a simplified example - you'll need to implement the actual API call
+      
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&key=${GOOGLE_API_KEY}`,
       )
 
+      console.log("the result of the fetch call", data)
+
       const data = await response.json()
+      console.log("the result of the fetch call", data)
+
 
       // Check if a route was found
       if (data.status === "OK" && data.routes && data.routes.length > 0) {
@@ -173,9 +179,47 @@ const RiderFinalHomeScreen = ({ navigation, route }) => {
           const availableOrders = snapshot.docs
             .map((doc) => {
               const data = doc.data()
-              return { ...data, id: doc.id }
+              const now = new Date()
+            
+              // Parse pickup date and time
+              let pickupDate = data.pickupDate ? new Date(data.pickupDate) : null
+              let pickupTime = data.pickupTime ? new Date(data.pickupTime) : null
+
+              console.log("this is date from doc" , data.pickupDate)
+              console.log("this is date after parsing" , pickupDate)
+              console.log("this is time from doc" , data.pickupTime)
+              console.log("this is time after parsing" , pickupTime)
+            
+              // Default to current date/time if missing
+              if (!pickupDate) pickupDate = now
+              if (!pickupTime) pickupTime = now
+            
+              const isToday = pickupDate.toDateString() === now.toDateString()
+              const isTodayOrPast = pickupDate.setHours(0, 0, 0, 0) <= now.setHours(0, 0, 0, 0)
+
+              const isValidTime = pickupTime.getHours() > now.getHours() || 
+                                  (pickupTime.getHours() === now.getHours() && pickupTime.getMinutes() >= now.getMinutes())
+
+              console.log("is today wala variabel", isToday)
+            
+              const isPickupValid = isTodayOrPast && isValidTime
+
+              console.log("variable isPickupValid values= ",isPickupValid )
+            
+              return {
+                ...data,
+                id: doc.id,
+                pickupDate,
+                pickupTime,
+                isPickupValid,
+              }
             })
-            .filter((order) => !declinedOrders.includes(order.id))
+            
+            .filter((order) => 
+            (!declinedOrders.includes(order.id)) && 
+            (order.isPickupValid || (!order.pickupDate && !order.pickupTime))
+          )
+          
 
           console.log(
             `Found ${snapshot.docs.length} pending orders, ${availableOrders.length} available after filtering declined orders`,
@@ -186,6 +230,11 @@ const RiderFinalHomeScreen = ({ navigation, route }) => {
             const ordersWithRouteInfo = await Promise.all(
               availableOrders.map(async (order) => {
                 // Check if there's a valid route between rider and order origin
+                console.log("this is my position",myPosition)
+                if(myPosition==null){
+                  setMyPosition(originrider)
+                  console.log("this is my position after setting it after null ",myPosition)
+                }
                 const hasValidRoute = await checkValidRoute(myPosition, order.destination)
                 return { ...order, hasValidRoute }
               }),
@@ -621,7 +670,9 @@ const RiderFinalHomeScreen = ({ navigation, route }) => {
         <Ionicons name={"options"} size={30} color={"black"} />
         {renderBottomTitle()}
         <Ionicons name={"options"} size={30} color={"black"} />
+
       </View>
+  
 
       {newOrder && (
         <NewOrderPopup newOrder={newOrder} duration={8} distance={5} onDecline={onDecline} onAccept={onAccept} />

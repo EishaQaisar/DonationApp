@@ -17,7 +17,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 
 import axios from 'axios';
 
-const GOOGLE_API_KEY = "AIzaSyB9irjntPHdEJf024h7H_XKpS11OeW1Nh8";
+const GOOGLE_API_KEY = "AIzaSyAAt8OqnkBz7phiQqy75spQMs5tthoCTZw";
 
 export default function ScheduleRDeliveryScreen({ navigation }) {
  const route = useRoute();
