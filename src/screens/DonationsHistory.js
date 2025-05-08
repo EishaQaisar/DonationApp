@@ -124,7 +124,7 @@ const DonationsHistory = () => {
   const renderClothesItem = ({ item }) => (
     <View style={styles.donationItem}>
       <Text style={[styles.donationTitle, isUrdu && styles.urduText]}>
-        {item.itemName || item.itemCategory || t("donationsHistory.unnamedItem", "Unnamed Item")}
+        {item.itemName ||t(`clothes.item_category_options.${item.itemCategory}`) || t("donationsHistory.unnamedItem", "Unnamed Item")}
       </Text>
 
       <View style={styles.donationDetails}>
@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: 16,
-    color: theme.colors.pearlWhite,
+    color: theme.colors.ivory,
   },
   activeTabText: {
     color: theme.colors.primary,

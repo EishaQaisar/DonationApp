@@ -1,25 +1,27 @@
-
-
 import { DefaultTheme } from "react-native-paper";
 
 export const theme = {
   ...DefaultTheme,
   colors: {
-    charcoalBlack:'#0A0A0A',
-    sageGreen: '#B2AC88',
-    copper: '#B87333',
-    pearlWhite: '#EAE0C8',
-    ivory:  '#FFFFF0',
-    outerSpace: '#2E2E2E',     // Add any other missing colors
-    TaupeBlack:'#2E2E2E',
-    text: "#EAE0C8",           // Licorice for text color
-    primary: "#B2AC88",        // Atomic tangerine for primary color (for warmth and brightness)
-    secondary: "#A47355",      // Chamoisee as a secondary color (complementary earthy tone)
-    background: "#0A0A0A",
-    surface: "#FAEBD7",        // Antique white for surface (from your original selection)
-    error: "#8B0000",          // Dark red for error messages (unchanged)
-    placeholder: "#8A7D72",
+    // Daily Havit inspired color scheme (keeping same property names)
+    charcoalBlack: '#FFFFFF',  // Pure white background - clean and minimal
+    sageGreen: '#2A5D4B',      // Forest green - primary brand color
+    copper: '#9DDBC8',         // Mint green - secondary accent color
+    pearlWhite: "#FFFFFF",     // Pure white - for cards and surfaces
+    ivory: 'black',          // Off-white - subtle background variation 
+    outerSpace: '#E8F3EF',     // Very light mint - for highlights and sections
+    TaupeBlack: '#333333',     // Dark gray - for primary text
+    
+    // Standard theme colors mapped to Daily Havit scheme
+    text: "#333333",           // Dark gray for readable text
+    primary: "#2A5D4B",        // Forest green for primary actions and branding
+    secondary: "#9DDBC8",      // Mint green for accents and highlights
+    background: "#FFFFFF",     // White for clean backgrounds
+    surface: "#FFFFFF",        // White for cards and surfaces
+    error: "#D64045",          // Muted red that works with the palette
+    placeholder: '#8A8F8D',    // Medium gray for placeholders and hints
   },
-
-
+  
+  // Additional customization to match Daily Havit
+  roundness: 16,               // Rounded corners for buttons and cards
 };

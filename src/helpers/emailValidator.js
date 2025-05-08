@@ -1,9 +1,19 @@
+import { t } from "../i18n";
+
 export function emailValidator(email) {
-    const re = /\S+@\S+\.\S+/
-    if (!email) return "Please fill in this field."
-    if (email.trim() === "") {
-      return "Email cannot contain only spaces.";
-    }
-    if (!re.test(email)) return 'Please enter a valid email address!'
-    return ''
+  const re = /\S+@\S+\.\S+/;
+  
+  if (!email) {
+    return t("validation.required");
   }
+  
+  if (email.trim() === "") {
+    return t("validation.onlySpaces", { field: t("fields.email") });
+  }
+  
+  if (!re.test(email)) {
+    return t("validation.validEmail");
+  }
+  
+  return '';
+}

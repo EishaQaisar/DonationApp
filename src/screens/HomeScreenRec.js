@@ -183,7 +183,7 @@ const Styles = StyleSheet.create({
     position: 'absolute',
     top: 60,
     left: 20,
-    color: theme.colors.sageGreen,
+    color: theme.colors.pearlWhite,
     fontSize: 30,
     fontWeight: 'bold',
     fontFamily: 'Roboto',

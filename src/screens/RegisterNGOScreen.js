@@ -1,7 +1,7 @@
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
-import React, { useState ,useContext} from "react";
-import { TouchableOpacity, StyleSheet, View, ImageBackground, Dimensions } from "react-native";
+import React, { useState, useContext } from "react";
+import { TouchableOpacity, StyleSheet, View, ImageBackground, Dimensions, ScrollView } from "react-native";
 import { Text } from "react-native-paper";
 import * as DocumentPicker from 'expo-document-picker'; 
 import Background from "../components/Background";
@@ -13,8 +13,8 @@ import BackButton from "../components/BackButton";
 import { theme } from "../core/theme";
 import CryptoJS from "crypto-js";
 import { AuthContext } from "../context/AuthContext";
-
-
+import i18n, { t } from "../i18n"; // Import the translation function
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 import { emailValidator } from "../helpers/emailValidator";
 import { ngoNameValidator } from "../helpers/ngoNameValidator";
@@ -34,10 +34,7 @@ export default function RegisterNGOScreen({ navigation }) {
   const [approved]=useState({value:"false"});
   const [confirm, setConfirm] = useState("");
   const [code, setCode] = useState("");
-    const { setUser } = useContext(AuthContext); // Access setUser from AuthContext
-  
-  
-
+  const { setUser } = useContext(AuthContext);
 
   // Handle the document pick and store the result in state
   const handleDocumentPick = async () => {
@@ -64,16 +61,13 @@ export default function RegisterNGOScreen({ navigation }) {
     const isUsernameUnique = await IsUsernameUnique(username);
     const isPhoneUnique = await IsUniqueNumber(phoneNumber);
     
-  
     return {
       isUsernameUnique,
       isPhoneUnique,
-      
     };
   }
 
-  const onSignUpPressed =async () => {
-
+  const onSignUpPressed = async () => {
     const usernameError=usernameValidator(username.value);
     const nameError = ngoNameValidator(name.value);
     const numberError=numberValidator(phoneNumber.value);
@@ -92,15 +86,14 @@ export default function RegisterNGOScreen({ navigation }) {
     );
 
     if (!isUsernameUnique) {
-      setUsername({ ...username, error: "This username is already taken." });
+      setUsername({ ...username, error: t('auth.errors.usernameExists') });
       return;
     }
     if (!isPhoneUnique) {
-      setPhoneNumber({...phoneNumber, error: "Phone number is already registered."});
+      setPhoneNumber({...phoneNumber, error: t('auth.errors.phoneExists') });
       return;
     }
     
-
     try {
       const confirmation = await auth().signInWithPhoneNumber(phoneNumber.value);
       setConfirm(confirmation);
@@ -124,7 +117,6 @@ export default function RegisterNGOScreen({ navigation }) {
       console.log(userDocument)
 
       if (userDocument.exists) {
-        
         navigation.navigate("TabNavigator");
       } 
       else {
@@ -161,111 +153,107 @@ export default function RegisterNGOScreen({ navigation }) {
 
   return (
     <ImageBackground 
-      source={require('../../assets/items/0d59de270836b6eafe057c8afb642e77.jpg')} // Replace with your image path
+      source={require('../../assets/items/0d59de270836b6eafe057c8afb642e77.jpg')}
       style={styles.imageBackground}
-      blurRadius={8} // Adjust the blur intensity
+      blurRadius={8}
     >
       <BackButton goBack={navigation.goBack} />
+      
+      <ScrollView contentContainerStyle={styles.scrollView}>
+
       <View style={styles.container}>
-      <Text style={styles.header}>Hello.</Text>
-      {!confirm ? (
+        
+        <Text style={styles.header}>{t('auth.hello')}</Text>
+        {!confirm ? (
           <>
-
-      <View style={styles.inputContainer}>
-      <TextInput
-        label="Name"
-        returnKeyType="next"
-        value={name.value}
-        style={styles.input}
-        onChangeText={(text) => setName({ value: text, error: "" })}
-        error={!!name.error}
-        errorText={name.error ? <Text style={styles.errorText}>{name.error}</Text> : null}
-
-      />
-      </View>
-      <View style={styles.inputContainer}>
-            <TextInput
-              label="Username"
-              returnKeyType="next"
-              value={username.value}
-              style={styles.input}
-              onChangeText={(text) => setUsername({ value: text, error: "" })}
-              error={!!username.error}
-              errorText={username.error ? <Text style={styles.errorText}>{username.error}</Text> : null}
-
-            />
+            <View style={styles.inputContainer}>
+              <TextInput
+                label={t('auth.name')}
+                returnKeyType="next"
+                value={name.value}
+                style={styles.input}
+                onChangeText={(text) => setName({ value: text, error: "" })}
+                error={!!name.error}
+                errorText={name.error ? <Text style={styles.errorText}>{name.error}</Text> : null}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                label={t('auth.username')}
+                returnKeyType="next"
+                value={username.value}
+                style={styles.input}
+                onChangeText={(text) => setUsername({ value: text, error: "" })}
+                error={!!username.error}
+                errorText={username.error ? <Text style={styles.errorText}>{username.error}</Text> : null}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                label={t('auth.phoneNumber')}
+                returnKeyType="next"
+                value={phoneNumber.value}
+                style={styles.input}
+                onChangeText={(text) => setPhoneNumber({ value: text, error: "" })}
+                error={!!phoneNumber.error}
+                errorText={phoneNumber.error ? <Text style={styles.errorText}>{phoneNumber.error}</Text> : null}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                label={t('auth.password')}
+                returnKeyType="done"
+                style={styles.input}
+                value={password.value}
+                onChangeText={(text) => setPassword({ value: text, error: "" })}
+                error={!!password.error}
+                errorText={password.error}
+                secureTextEntry
+              />
             </View>
 
-   
-      
-      <View style={styles.inputContainer}>
-            <TextInput
-              label="Phone Number"
-              returnKeyType="next"
-              value={phoneNumber.value}
-              style={styles.input}
-              onChangeText={(text) => setPhoneNumber({ value: text, error: "" })}
-              error={!!phoneNumber.error}
-              errorText={phoneNumber.error ? <Text style={styles.errorText}>{phoneNumber.error}</Text> : null}
-            />
-            </View>
+            {/* Button to pick certificate */}
+            <Button mode="contained" onPress={handleDocumentPick} style={{ marginTop: 24 }}>
+              {t('auth.uploadCertificate')}
+            </Button>
 
-            
-        <View style={styles.inputContainer}>
-      <TextInput
-        label="Password"
-        returnKeyType="done"
-        style={styles.input}
-        value={password.value}
-        onChangeText={(text) => setPassword({ value: text, error: "" })}
-        error={!!password.error}
-        errorText={password.error}
-        secureTextEntry
-      />
-      </View>
-      
+            {/* Display selected certificate details */}
+            {certificate && (
+              <View style={styles.certificateContainer}>
+                <Text style={styles.certificateText}>{t('auth.selectedCertificate')}</Text>
+                <Text style={styles.certificateText}>{t('auth.certificateName')} {certificate.name}</Text>
+                <Text style={styles.certificateText}>{t('auth.certificateUri')} {certificate.uri}</Text>
+              </View>
+            )}
 
-
-      {/* Button to pick certificate */}
-      <Button mode="contained" onPress={handleDocumentPick} style={{ marginTop: 24 }}>
-        Upload Certificate
-      </Button>
-
-      {/* Display selected certificate details */}
-      {certificate && (
-        <View style={styles.certificateContainer}>
-          <Text style={styles.certificateText}>Selected Certificate:</Text>
-          <Text style={styles.certificateText}>Name: {certificate.name}</Text>
-          <Text style={styles.certificateText}>URI: {certificate.uri}</Text>
-        </View>
-      )}
-
-      <Button
-        mode="contained"
-        onPress={onSignUpPressed}
-        style={{ marginTop: 24 }}
-      >
-        Next
-      </Button>
-      </>
+            <Button
+              mode="contained"
+              onPress={onSignUpPressed}
+              style={{ marginTop: 24 }}
+            >
+              {t('auth.next')}
+            </Button>
+          </>
         ) : (
           <>
-          <Text>Enter the code sent to your phone</Text>
-            <TextInput label="Code" value={code} onChangeText={setCode} style={styles.input} />
+            <Text>{t('auth.enterCode')}</Text>
+            <TextInput label={t('auth.confirmCode')} value={code} onChangeText={setCode} style={styles.input} />
             <TouchableOpacity onPress={confirmCode}>
-              <Text style={styles.link}>Confirm Code</Text>
+              <Text style={styles.link}>{t('auth.confirmCode')}</Text>
             </TouchableOpacity>
           </>
         )}
-      <View style={styles.row}>
-        <Text style={styles.already}>I already have an account !</Text>
+        <View style={styles.row}>
+          <Text style={styles.already}>{t('auth.alreadyHaveAccount')}</Text>
+        </View>
+        <View style={styles.row}>
+          <TouchableOpacity onPress={() => navigation.replace("LoginScreen",{ role: "recipient" })}>
+            <Text style={styles.link}>{t('auth.login')}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-      <View style={styles.row}>
-        <TouchableOpacity onPress={() => navigation.replace("LoginScreen",{ role: "recipient" })}>
-          <Text style={styles.link}>Log in</Text>
-        </TouchableOpacity>
-      </View>
-      </View>
+      </ScrollView>
+
     </ImageBackground>
   );
 }
@@ -276,9 +264,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 20,
   },
+  scrollView:{
+    justifyContent:'center',
+    flexGrow:1
+  },
   container: {
     alignItems: 'center',
-    backgroundColor: theme.colors.background, // Slightly transparent background for better readability
+    backgroundColor: theme.colors.background,
     borderRadius: 40,
     paddingVertical: 30,
     paddingHorizontal: 20,
@@ -288,9 +280,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     color: theme.colors.sageGreen,
-    textShadowColor: theme.colors.background, // Outline color
-    textShadowOffset: { width: 2, height: 2 }, // Offset for the shadow
-    textShadowRadius: 1, // Spread for the shadow
+    textShadowColor: theme.colors.background,
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 1,
   },
   row: {
     flexDirection: "row",
@@ -298,9 +290,9 @@ const styles = StyleSheet.create({
   },
   input: {
     alignSelf:'center',
-    width: '100%', // Responsive input width
+    width: '100%',
     marginBottom: 3,
-    backgroundColor: 'white', // Ensures clear visibility of input fields
+    backgroundColor: 'white',
   },
   already: {
     fontWeight: "bold",
@@ -324,7 +316,5 @@ const styles = StyleSheet.create({
   inputContainer: {
     width:'100%',
     marginBottom:10
-   
-  },
+  }
 });
-

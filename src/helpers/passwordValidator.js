@@ -1,22 +1,26 @@
+import { t } from "../i18n";
+
 export function passwordValidator(password) {
   if (!password) {
-    return "Please fill in this field.";
+    return t("validation.required");
   }
 
   if (password.length < 8) {
-    return "Password should contain at least 8 characters.";
+    return t("validation.minLength", { field: t("fields.password"), length: 8 });
   }
+  
   if (password.length > 30) {
-    return "Password should be less than 30.";
+    return t("validation.maxLength", { field: t("fields.password"), length: 30 });
   }
+  
   if (password.trim() === "") {
-    return "Password cannot contain only spaces.";
+    return t("validation.onlySpaces", { field: t("fields.password") });
   }
 
   // Check for at least one special character
   const specialCharacterRegex = /[!@#$%^&*(),.?":{}|<>]/;
   if (!specialCharacterRegex.test(password)) {
-    return "Password should contain at least one special character.";
+    return t("validation.passwordSpecialChar");
   }
 
   return ""; // Password is valid

@@ -1,6 +1,6 @@
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
-import React, { useState ,useContext} from "react";
+import React, { useState, useContext } from "react";
 import { TouchableOpacity, StyleSheet, View, ImageBackground } from "react-native";
 import { Text } from "react-native-paper";
 import TextInput from "../components/TextInput";
@@ -8,6 +8,8 @@ import Button from "../components/Button";
 import BackButton from "../components/BackButton";
 import { theme } from "../core/theme";
 import { ScrollView } from "react-native-gesture-handler";
+import i18n, { t } from "../i18n"; // Import the translation function
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 import { nameValidator} from "../helpers/nameValidator";
 import { idCardValidator } from "../helpers/idCardValidator";
@@ -20,9 +22,6 @@ import { IsUniqueNumber } from "../helpers/isUniqueNumber";
 import CryptoJS from "crypto-js";
 import { AuthContext } from "../context/AuthContext";
 
-
-
-
 export default function RegisterIndividualScreen({ navigation }) {
   const [name, setName] = useState({ value: "", error: "" });
   const [username, setUsername] = useState({ value: "", error: "" });
@@ -32,10 +31,7 @@ export default function RegisterIndividualScreen({ navigation }) {
   const [code, setCode] = useState("");
   const [confirm, setConfirm] = useState("");
   const [approved]=useState({value:"false"});
-  const { setUser } = useContext(AuthContext); // Access setUser from AuthContext
-
-
-  
+  const { setUser } = useContext(AuthContext);
   
   const validateFields = async (username, phoneNumber, cnic) => {
     console.log("dfverferer");
@@ -43,7 +39,6 @@ export default function RegisterIndividualScreen({ navigation }) {
     const isPhoneUnique = await IsUniqueNumber(phoneNumber);
     const isCnicUnique = await IsCnicUnique(cnic);
     
-  
     return {
       isUsernameUnique,
       isPhoneUnique,
@@ -53,10 +48,6 @@ export default function RegisterIndividualScreen({ navigation }) {
 
   const onSignUpPressed = async () => {
     console.log("here");
-
-    //navigation.navigate("RecipientProfileForm");
-    
-
 
     const usernameError=usernameValidator(username.value);
     const nameError = nameValidator(name.value);
@@ -84,15 +75,15 @@ export default function RegisterIndividualScreen({ navigation }) {
     );
 
     if (!isUsernameUnique) {
-      setUsername({ ...username, error: "This username is already taken." });
+      setUsername({ ...username, error: t('auth.errors.usernameExists') });
       return;
     }
     if (!isPhoneUnique) {
-      setPhoneNumber({...phoneNumber, error: "Phone number is already registered."});
+      setPhoneNumber({...phoneNumber, error: t('auth.errors.phoneExists') });
       return;
     }
     if (!isCnicUnique) {
-      setidCard({ ...idCard, error: "This CNIC is already registered." });
+      setidCard({ ...idCard, error: t('auth.errors.cnicExists') });
       return;
     }
 
@@ -159,109 +150,99 @@ export default function RegisterIndividualScreen({ navigation }) {
       
   };
 
-
   return (
-
     <ImageBackground
       source={require("../../assets/items/0d59de270836b6eafe057c8afb642e77.jpg")}
       style={styles.imageBackground}
       blurRadius={8}
     >
       <ScrollView contentContainerStyle={styles.scrollView}>
-
-      <BackButton goBack={navigation.goBack} />
-      <View style={styles.container}>
-        <Text style={styles.header}>Hello.</Text>
-        {!confirm ? (
-          <>
-            <View style={styles.inputContainer}>
-            <TextInput
-              label="Name"
-              returnKeyType="next"
-              value={name.value}
-              style={styles.input}
-              onChangeText={(text) => setName({ value: text, error: "" })}
-              error={!!name.error}
-              errorText={name.error ? <Text style={styles.errorText}>{name.error}</Text> : null}
-
-            />
-            </View>
-            <View style={styles.inputContainer}>
-            <TextInput
-              label="Username"
-              returnKeyType="next"
-              value={username.value}
-              style={styles.input}
-              onChangeText={(text) => setUsername({ value: text, error: "" })}
-              error={!!username.error}
-              errorText={username.error ? <Text style={styles.errorText}>{username.error}</Text> : null}
-
-            />
-            </View>
-            <View style={styles.inputContainer}>
-            <TextInput
-              label="Phone Number"
-              returnKeyType="next"
-              value={phoneNumber.value}
-              style={styles.input}
-              onChangeText={(text) => setPhoneNumber({ value: text, error: "" })}
-              error={!!phoneNumber.error}
-              errorText={phoneNumber.error ? <Text style={styles.errorText}>{phoneNumber.error}</Text> : null}
-            />
-            </View>
-
-            <View style={styles.inputContainer}>
-            <TextInput
-              label="Password"
-              returnKeyType="done"
-              value={password.value}
-              style={styles.input}
-              onChangeText={(text) => setPassword({ value: text, error: "" })}
-              error={!!password.error}
-              errorText={password.error ? <Text style={styles.errorText}>{password.error}</Text> : null}
-
-
-              secureTextEntry
-            />
-            </View>
-            <View style={styles.inputContainer}>
-            <TextInput
-              label="ID Card"
-              returnKeyType="done"
-              value={idCard.value}
-              style={styles.input}
-              onChangeText={(text) => setidCard({ value: text, error: "" })}
-              error={!!idCard.error}
-              errorText={idCard.error ? <Text style={styles.errorText}>{idCard.error}</Text> : null}
-              
-
-
-            />
-            </View>
-            <Button mode="contained" onPress={onSignUpPressed} style={{ marginTop: 24 }}>
-              Next
-            </Button>
-          </>
-        ) : (
-          <>
-            <Text>Enter the code sent to your phone</Text>
-            <TextInput label="Code" value={code} onChangeText={setCode} style={styles.input} />
-            <TouchableOpacity onPress={confirmCode}>
-              <Text style={styles.link}>Confirm Code</Text>
+        <BackButton goBack={navigation.goBack} />
+        
+        
+        
+        <View style={styles.container}>
+          <Text style={styles.header}>{t('auth.hello')}</Text>
+          {!confirm ? (
+            <>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  label={t('auth.name')}
+                  returnKeyType="next"
+                  value={name.value}
+                  style={styles.input}
+                  onChangeText={(text) => setName({ value: text, error: "" })}
+                  error={!!name.error}
+                  errorText={name.error ? <Text style={styles.errorText}>{name.error}</Text> : null}
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  label={t('auth.username')}
+                  returnKeyType="next"
+                  value={username.value}
+                  style={styles.input}
+                  onChangeText={(text) => setUsername({ value: text, error: "" })}
+                  error={!!username.error}
+                  errorText={username.error ? <Text style={styles.errorText}>{username.error}</Text> : null}
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  label={t('auth.phoneNumber')}
+                  returnKeyType="next"
+                  value={phoneNumber.value}
+                  style={styles.input}
+                  onChangeText={(text) => setPhoneNumber({ value: text, error: "" })}
+                  error={!!phoneNumber.error}
+                  errorText={phoneNumber.error ? <Text style={styles.errorText}>{phoneNumber.error}</Text> : null}
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  label={t('auth.password')}
+                  returnKeyType="done"
+                  value={password.value}
+                  style={styles.input}
+                  onChangeText={(text) => setPassword({ value: text, error: "" })}
+                  error={!!password.error}
+                  errorText={password.error ? <Text style={styles.errorText}>{password.error}</Text> : null}
+                  secureTextEntry
+                />
+              </View>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  label={t('auth.idCard')}
+                  returnKeyType="done"
+                  value={idCard.value}
+                  style={styles.input}
+                  onChangeText={(text) => setidCard({ value: text, error: "" })}
+                  error={!!idCard.error}
+                  errorText={idCard.error ? <Text style={styles.errorText}>{idCard.error}</Text> : null}
+                />
+              </View>
+              <Button mode="contained" onPress={onSignUpPressed} style={{ marginTop: 24 }}>
+                {t('auth.next')}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Text>{t('auth.enterCode')}</Text>
+              <TextInput label={t('auth.confirmCode')} value={code} onChangeText={setCode} style={styles.input} />
+              <TouchableOpacity onPress={confirmCode}>
+                <Text style={styles.link}>{t('auth.confirmCode')}</Text>
+              </TouchableOpacity>
+            </>
+          )}
+          <View style={styles.row}>
+            <Text style={styles.footerText}>{t('auth.alreadyHaveAccount')}</Text>
+            <TouchableOpacity onPress={() => navigation.replace("LoginScreen", { role: "donor" })}>
+              <Text style={styles.link}>{t('auth.login')}</Text>
             </TouchableOpacity>
-          </>
-        )}
-        <View style={styles.row}>
-          <Text style={styles.footerText}>I already have an account!</Text>
-          <TouchableOpacity onPress={() => navigation.replace("LoginScreen", { role: "donor" })}>
-            <Text style={styles.link}>Log in</Text>
-          </TouchableOpacity>
+          </View>
         </View>
-      </View>
       </ScrollView>
-
     </ImageBackground>
-
   );
 }
 
@@ -269,7 +250,6 @@ const styles = StyleSheet.create({
   scrollView:{
     justifyContent:'center',
     flexGrow:1
-
   },
   imageBackground: {
     flex: 1,
@@ -314,7 +294,5 @@ const styles = StyleSheet.create({
   inputContainer: {
     width:'100%',
     marginBottom:10
-   
-  },
-  
+  }
 });

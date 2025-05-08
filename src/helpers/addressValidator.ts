@@ -1,17 +1,17 @@
-export function addressValidator(address: string): string {
-    if (!address) {
-      return "Please fill in this field.";
-    }
+import { t } from "../i18n";
 
-    if (address.trim() === "") {
-      return "Address cannot contain only spaces.";
-    }
-  
-    if (address.length > 120) {
-      return "Address should not be longer than 120 characters.";
-    }
-  
-    return "";
+export function addressValidator(address) {
+  if (!address) {
+    return t("validation.required");
   }
-  
-  
+
+  if (address.trim() === "") {
+    return t("validation.onlySpaces", { field: t("fields.address") });
+  }
+
+  if (address.length > 120) {
+    return t("validation.maxLength", { field: t("fields.address"), length: 120 });
+  }
+
+  return "";
+}

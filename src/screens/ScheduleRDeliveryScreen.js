@@ -539,7 +539,7 @@ const styles = StyleSheet.create({
  marginTop: 20,
  },
  calendarContainer: {
- backgroundColor: theme.colors.ivory,
+ backgroundColor: theme.colors.sageGreen,
  width: '100%',
  height: '30%',
  alignItems: 'center',
@@ -598,10 +598,11 @@ const styles = StyleSheet.create({
  borderWidth: 1,
  borderColor: theme.colors.sageGreen,
  borderRadius: 7,
- backgroundColor: theme.colors.ivory,
+ backgroundColor: theme.colors.pearlWhite,
  },
  locationInputContainer: {
  width: '100%',
+ backgroundColor:theme.colors.pearlWhite
  },
  mapOverlay: {
  position: "absolute",
@@ -709,7 +710,7 @@ const styles = StyleSheet.create({
  // Modal styles
  modalContainer: {
  flex: 1,
- backgroundColor: theme.colors.ivory,
+ backgroundColor: theme.colors.pearlWhite,
  },
  modalHeader: {
  flexDirection: 'row',
@@ -741,7 +742,7 @@ const styles = StyleSheet.create({
  autocompleteInput: {
  height: 50,
  fontSize: 16,
- backgroundColor: theme.colors.ivory,
+ backgroundColor: theme.colors.pearlWhite,
  borderWidth: 1,
  borderColor: theme.colors.sageGreen,
  borderRadius: 5,
@@ -749,7 +750,7 @@ const styles = StyleSheet.create({
  paddingHorizontal: 10,
  },
  autocompleteList: {
- backgroundColor: theme.colors.ivory,
+ backgroundColor: theme.colors.pearlWhite,
  borderWidth: 1,
  borderColor: theme.colors.sageGreen,
  borderRadius: 5,

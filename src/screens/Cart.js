@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   itemRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: theme.colors.outerSpace,
+    backgroundColor: theme.colors.sageGreen,
     padding: 10,
     borderRadius: 10,
     marginBottom: 10,

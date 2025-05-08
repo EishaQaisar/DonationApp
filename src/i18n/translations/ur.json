@@ -25,6 +25,11 @@
   "donorHome": {
       "greeting": "خوش آمدید،",
       "donations": "عطیات",
+      "causes": "وجوہات",
+      "impact": "اثر",
+      "education": "تعلیم",
+      "clothes": "کپڑے",
+      "food": "کھانا",
       "hero": {
         "title": "آج ہی فرق پیدا کریں",
         "button": "ابھی عطیہ کریں"
@@ -36,10 +41,14 @@
         "viewAnalytics": "تجزیات دیکھیں"
       },
       "campaigns": {
-        "title": "مہمات",
-        "viewAll": "سب دیکھیں",
+        "title": "فعال مہمات",
+        "viewAll": "تمام دیکھیں",
         "loading": "مہمات لوڈ ہو رہی ہیں...",
-        "noCampaigns": "کوئی مہم دستیاب نہیں ہے"
+        "noCampaigns": "اس وقت کوئی فعال مہم نہیں ملی۔ بعد میں دوبارہ چیک کریں!",
+        "refresh": "ریفریش کریں",
+        "urgent": "فوری",
+        "fundedPercent": "{{percent}} فنڈ ہو چکا ہے",
+        "daysLeft": "{{days}} دن باقی ہیں"
       }
     },
     "recipientScreen": {
@@ -582,7 +591,62 @@
        "select_images": "تصاویر منتخب کریں",
       "max_images_alert": "براہ کرم زیادہ سے زیادہ {{max}} تصاویر منتخب کریں۔"
   }
-  
+  ,
+  "auth": {
+    "hello": "ہیلو۔",
+    "name": "نام",
+    "username": "صارف نام",
+    "phoneNumber": "فون نمبر",
+    "password": "پاس ورڈ",
+    "idCard": "شناختی کارڈ",
+    "next": "اگلا",
+    "enterCode": "آپ کے فون پر بھیجا گیا کوڈ درج کریں",
+    "confirmCode": "کوڈ کی تصدیق کریں",
+    "alreadyHaveAccount": "میرا پہلے سے ہی اکاؤنٹ ہے!",
+    "login": "لاگ ان کریں",
+    "uploadCertificate": "سرٹیفکیٹ اپ لوڈ کریں",
+    "selectedCertificate": "منتخب سرٹیفکیٹ:",
+    "certificateName": "نام:",
+    "certificateUri": "URI:",
+    "errors": {
+      "usernameExists": "یہ صارف نام پہلے سے لیا جا چکا ہے۔",
+      "phoneExists": "فون نمبر پہلے سے رجسٹرڈ ہے۔",
+      "cnicExists": "یہ CNIC پہلے سے رجسٹرڈ ہے۔"
+    }
+  },
+  "validation": {
+    "required": "براہ کرم اس فیلڈ کو پُر کریں۔",
+    "onlySpaces": "{{field}} میں صرف خالی جگہیں نہیں ہو سکتیں۔",
+    "maxLength": "{{field}} {{length}} حروف سے زیادہ نہیں ہونا چاہیے۔",
+    "minLength": "{{field}} میں کم از کم {{length}} حروف ہونے چاہئیں۔",
+    "noNumbers": "{{field}} میں کوئی نمبر نہیں ہونا چاہیے۔",
+    "fullName": "براہ کرم اپنا پورا نام درج کریں۔",
+    "namePartLength": "نام کے ہر حصے میں کم از کم 2 حروف ہونے چاہئیں۔",
+    "ageNumber": "عمر ایک نمبر ہونا چاہیے",
+    "ageInteger": "عمر ایک مکمل نمبر ہونا چاہیے",
+    "ageMin": "عمر کم از کم 1 ہونی چاہیے",
+    "ageMax": "عمر 120 یا اس سے کم ہونی چاہیے",
+    "classDigits": "کلاس نمبر 2 ہندسوں سے زیادہ نہیں ہونا چاہیے۔",
+    "classNameLength": "کلاس کا نام 20 حروف سے زیادہ نہیں ہونا چاہیے۔",
+    "validEmail": "براہ کرم ایک درست ای میل ایڈریس درج کریں!",
+    "validIdCard": "براہ کرم 34101-7678623-8 فارمیٹ میں درست شناختی کارڈ نمبر درج کریں",
+    "validPhoneNumber": "غلط فون نمبر فارمیٹ۔ \"+923485255947\" استعمال کریں",
+    "passwordSpecialChar": "پاس ورڈ میں کم از کم ایک خصوصی حرف ہونا چاہیے۔"
+  },
+  "fields": {
+    "address": "پتہ",
+    "age": "عمر",
+    "class": "کلاس",
+    "email": "ای میل",
+    "idCard": "شناختی کارڈ",
+    "input": "ان پٹ",
+    "institution": "ادارہ",
+    "name": "نام",
+    "occupation": "پیشہ",
+    "password": "پاس ورڈ",
+    "phoneNumber": "فون نمبر",
+    "username": "صارف نام"
+  }
   }
   
   

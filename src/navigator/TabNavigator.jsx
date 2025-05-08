@@ -62,7 +62,7 @@ function TabNavigator({ navigation, route }) {
           tabBarShowLabel: false,
           tabBarHideOnKeyboard: true,
           tabBarStyle: styles.tabBarStyle,
-          tabBarActiveTintColor: theme.colors.pearlWhite,
+          tabBarActiveTintColor: theme.colors.sageGreen,
         }}
       >
         <Tab.Screen
