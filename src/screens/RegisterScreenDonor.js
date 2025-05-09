@@ -1,7 +1,7 @@
 import auth from "@react-native-firebase/auth";
 import firestore from "@react-native-firebase/firestore";
-import React, { useState } from "react";
-import { TouchableOpacity, StyleSheet, View, ImageBackground } from "react-native";
+import React, { useState, useRef } from "react";
+import { TouchableOpacity, StyleSheet, View, ImageBackground, Modal, Alert } from "react-native";
 import { Text } from "react-native-paper";
 import TextInput from "../components/TextInput";
 import Button from "../components/Button";
@@ -19,6 +19,11 @@ import { IsUniqueNumber } from "../helpers/isUniqueNumber";
 import CryptoJS from "crypto-js";
 import i18n, { t } from "../i18n"; // Import the translation function
 import LanguageSwitcher from "../components/LanguageSwitcher";
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
+import axios from 'axios';
+
+// Google API Key
+const GOOGLE_API_KEY = "";
 
 export default function RegisterScreenDonor({ navigation }) {
   const [name, setName] = useState({ value: "", error: "" });
@@ -26,9 +31,52 @@ export default function RegisterScreenDonor({ navigation }) {
   const [phoneNumber, setPhoneNumber] = useState({value:"", error:""});
   const [password, setPassword] = useState({ value: "", error: "" });
   const [idCard, setidCard] = useState({ value: "", error: "" });
+  const [address, setAddress] = useState(""); // Simple string for address
+  const [addressError, setAddressError] = useState(""); // Separate error state
   const [code, setCode] = useState("");
   const [confirm, setConfirm] = useState("");
   const [approved]=useState({value:"false"});
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [addressCoordinates, setAddressCoordinates] = useState(null);
+  
+  // Ref for GooglePlacesAutocomplete
+  const googlePlacesRef = useRef(null);
+
+  // Validate address and get coordinates using Google Maps API
+  const validateAndGetCoordinates = async (address) => {
+    console.log("Validating address:", address);
+    if (!address) return null;
+
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_API_KEY}`
+      );
+
+      if (response.data.status === 'OK' && response.data.results.length > 0) {
+        const location = response.data.results[0].geometry.location;
+        const coordinates = {
+          latitude: location.lat,
+          longitude: location.lng
+        };
+
+        // Format the address
+        const formattedAddress = response.data.results[0].formatted_address;
+        console.log("Formatted address:", formattedAddress);
+        console.log("Coordinates:", coordinates);
+
+        setAddressCoordinates(coordinates);
+        return coordinates;
+      } else {
+        console.error("Address validation failed:", response.data.status);
+        Alert.alert('Invalid Address', 'Please enter a valid address');
+        return null;
+      }
+    } catch (error) {
+      console.error("Error validating address:", error);
+      Alert.alert('Error', 'Failed to validate address');
+      return null;
+    }
+  };
 
   const validateFields = async (username, phoneNumber, cnic) => {
     const isUsernameUnique = await IsUsernameUnique(username);
@@ -43,19 +91,28 @@ export default function RegisterScreenDonor({ navigation }) {
   }
 
   const onSignUpPressed = async () => {
-    console.log("here");
+    console.log("Signup pressed");
 
     const usernameError=usernameValidator(username.value);
     const nameError = nameValidator(name.value);
     const numberError=numberValidator(phoneNumber.value);
     const passwordError=passwordValidator(password.value);
     const idCardError = idCardValidator(idCard.value);
-    if (nameError || idCardError || passwordError || usernameError || numberError ) {
+    const addrError = !address ? t('auth.errors.addressRequired') || "Address is required" : "";
+    
+    if (nameError || idCardError || passwordError || usernameError || numberError || addrError) {
       setName({ ...name, error: nameError });
       setidCard({ ...idCard, error: idCardError });
       setPassword({...password, error:passwordError});
       setUsername({ ...username, error: usernameError });
       setPhoneNumber({ ...phoneNumber,error: numberError });
+      setAddressError(addrError);
+      return;
+    }
+
+    // Validate address coordinates
+    if (!addressCoordinates) {
+      setAddressError("Please select a valid address from the suggestions");
       return;
     }
 
@@ -104,7 +161,6 @@ export default function RegisterScreenDonor({ navigation }) {
       console.log(userDocument)
 
       if (userDocument.exists) {
-        
         navigation.navigate("TabNavigator");
       } 
       else {
@@ -119,15 +175,17 @@ export default function RegisterScreenDonor({ navigation }) {
               username: username.value,
               phone: phoneNumber.value,
               idCard: idCard.value,
-              password: hashedPassword, // Hash password before saving
-              approved:approved.value
+              address: address,
+              addressCoordinates: addressCoordinates,
+              password: hashedPassword,
+              approved: approved.value
             });
             
           console.log("in navigation say oper if");
+          console.log("Saved address:", address);
+          console.log("Saved coordinates:", addressCoordinates);
 
           navigation.navigate("DonorProfileForm");
-
-          // navigation.navigate("WaitForApprovalScreen", { uid: user.uid });
         } catch (error) {
           console.log("Error saving details", error);
         }
@@ -136,6 +194,72 @@ export default function RegisterScreenDonor({ navigation }) {
       console.log("Invalid verification code:", error);
     }
   };
+
+  // Location search modal component
+  const LocationSearchModal = () => (
+    <Modal
+      visible={showLocationModal}
+      animationType="slide"
+      transparent={false}
+      onRequestClose={() => setShowLocationModal(false)}
+    >
+      <View style={styles.modalContainer}>
+        <View style={styles.modalHeader}>
+          <Text style={styles.modalTitle}>{t('auth.searchAddress') || "Search Address"}</Text>
+          <TouchableOpacity onPress={() => setShowLocationModal(false)} style={styles.closeButton}>
+            <Text style={styles.closeButtonText}>{t('common.close') || "Close"}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <GooglePlacesAutocomplete
+          ref={googlePlacesRef}
+          placeholder={t('auth.enterAddress') || "Enter your address"}
+          minLength={2}
+          fetchDetails={true}
+          onPress={(data, details = null) => {
+            console.log("Place selected:", data.description);
+            
+            if (details) {
+              const location = details.geometry.location;
+              const formattedAddress = details.formatted_address;
+              
+              console.log("Setting address to:", formattedAddress);
+              console.log("Setting coordinates to:", location);
+              
+              // Set address as a string
+              setAddress(formattedAddress);
+              setAddressError(""); // Clear any error
+              
+              setAddressCoordinates({
+                latitude: location.lat,
+                longitude: location.lng
+              });
+              
+              // Log after setting state to verify
+              console.log("Address state after setting:", formattedAddress);
+              
+              setShowLocationModal(false);
+            }
+          }}
+          query={{
+            key: GOOGLE_API_KEY,
+            language: 'en',
+          }}
+          styles={{
+            container: styles.autocompleteContainer,
+            textInput: styles.autocompleteInput,
+            listView: styles.autocompleteList,
+            row: styles.autocompleteRow,
+            description: styles.autocompleteDescription,
+          }}
+          enablePoweredByContainer={false}
+          keyboardShouldPersistTaps="handled"
+          listViewDisplayed={true}
+          debounce={300}
+        />
+      </View>
+    </Modal>
+  );
 
   return (
     <ImageBackground
@@ -146,7 +270,8 @@ export default function RegisterScreenDonor({ navigation }) {
       <ScrollView contentContainerStyle={styles.scrollView}>
         <BackButton goBack={navigation.goBack} />
         
-
+        {/* Location Search Modal */}
+        <LocationSearchModal />
         
         <View style={styles.container}>
           <Text style={styles.header}>{t('auth.hello')}</Text>
@@ -208,6 +333,39 @@ export default function RegisterScreenDonor({ navigation }) {
                   errorText={idCard.error ? <Text style={styles.errorText}>{idCard.error}</Text> : null}
                 />
               </View>
+              
+              {/* Improved Address Input with Sleek Search Button */}
+              <View style={styles.inputContainer}>
+                <View style={styles.addressInputWrapper}>
+                  <TextInput
+                    label={t('auth.address') || "Address"}
+                    returnKeyType="done"
+                    value={address}
+                    style={[
+                      styles.input,
+                      addressError ? { borderColor: "red" } : null
+                    ]}
+                    editable={false}
+                    error={!!addressError}
+                    errorText={addressError ? <Text style={styles.errorText}>{addressError}</Text> : null}
+                  />
+                  <TouchableOpacity
+                    style={styles.searchIconButton}
+                    onPress={() => {
+                      console.log("Opening location modal");
+                      setShowLocationModal(true);
+                    }}
+                  >
+                    <Text style={styles.searchIconText}>🔍</Text>
+                  </TouchableOpacity>
+                </View>
+                {addressCoordinates && (
+                  <Text style={styles.coordinatesText}>
+                    Address validated ✓
+                  </Text>
+                )}
+              </View>
+              
               <Button mode="contained" onPress={onSignUpPressed} style={{ marginTop: 24 }}>
                 {t('auth.next')}
               </Button>
@@ -245,10 +403,11 @@ const styles = StyleSheet.create({
   },
   container: {
     alignItems: "center",
+    marginTop: 40,
     backgroundColor: theme.colors.background,
-    borderRadius: 40,
+    borderRadius: 60,
     paddingVertical: 20,
-    paddingHorizontal: 30,
+    paddingHorizontal: 40,
   },
   input: {
     alignSelf: "center",
@@ -277,15 +436,110 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 13,
     marginTop: -5,
+    color: "red",
   },
   inputContainer: {
     width:'100%',
-    marginBottom:10
+    marginBottom:10,
+    position: 'relative',
   },
   forgotPassword: {
     fontSize: 13,
     color: theme.colors.ivory,
     marginTop: -10,
     marginBottom: 20,
-  }
+  },
+  // Improved styles for address input with sleek search button
+  addressInputWrapper: {
+    position: 'relative',
+    width: '100%',
+  },
+  searchIconButton: {
+    position: 'absolute',
+    right: 10,
+    bottom: 23,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: theme.colors.sageGreen,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  searchIconText: {
+    color: 'white',
+    fontSize: 16,
+  },
+  coordinatesText: {
+    color: theme.colors.sageGreen,
+    fontSize: 12,
+    marginTop: 2,
+    marginLeft: 5,
+  },
+  // Modal styles
+  modalContainer: {
+    flex: 1,
+    backgroundColor: theme.colors.background || "#fff",
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.sageGreen,
+    backgroundColor: theme.colors.sageGreen,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "white",
+  },
+  closeButton: {
+    padding: 8,
+  },
+  closeButtonText: {
+    color: "white",
+    fontSize: 16,
+  },
+  // Autocomplete styles
+  autocompleteContainer: {
+    flex: 1,
+    width: '100%',
+    paddingHorizontal: 15,
+  },
+  autocompleteInput: {
+    height: 50,
+    fontSize: 16,
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderColor: theme.colors.sageGreen,
+    borderRadius: 5,
+    marginTop: 10,
+    paddingHorizontal: 10,
+  },
+  autocompleteList: {
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderColor: theme.colors.sageGreen,
+    borderRadius: 5,
+    marginTop: 5,
+  },
+  autocompleteRow: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  autocompleteDescription: {
+    fontSize: 16,
+    color: '#333',
+  },
 });
