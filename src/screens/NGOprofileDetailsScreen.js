@@ -10,7 +10,7 @@ import firestore from "@react-native-firebase/firestore"
 import axios from 'axios'
 
 // You would replace this with your actual API key
-const GOOGLE_API_KEY = "AIzaSyB9irjntPHdEJf024h7H_XKpS11OeW1Nh8";
+const GOOGLE_API_KEY = "";
 
 const NGOProfileDetailsScreen = ({ navigation }) => {
  const { user } = useContext(AuthContext)
@@ -21,6 +21,14 @@ const NGOProfileDetailsScreen = ({ navigation }) => {
  const googlePlacesRef = useRef(null)
  const [khairPoints] = useState({value:100})
  const [addressCoordinates, setAddressCoordinates] = useState(null)
+ 
+ // Add city selection state
+ const [selectedCity, setSelectedCity] = useState("")
+ const [cityError, setCityError] = useState("")
+ const [showCityModal, setShowCityModal] = useState(false)
+ 
+ // Define the cities
+ const cities = ["Karachi", "Lahore", "Islamabad"]
 
  // Validate address and get coordinates using Google Maps API
  const validateAndGetCoordinates = async (address) => {
@@ -56,13 +64,42 @@ const NGOProfileDetailsScreen = ({ navigation }) => {
  return null;
  }
  };
+ 
+ // Validate if the selected city is in the address
+ const validateCityInAddress = (address) => {
+   if (!selectedCity) {
+     setCityError("Please select a city");
+     return false;
+   }
+
+   if (!address) {
+     return false;
+   }
+
+   // Check if the selected city is in the address string
+   if (!address.includes(selectedCity)) {
+     return false;
+   }
+
+   return true;
+ };
 
  const validate = (values) => {
  const errors = {}
 
+ // City validation
+ if (!selectedCity) {
+   errors.city = "City is required";
+ }
+
  // Address validation
  if (!values.address) {
- errors.address = "Address is required"
+   errors.address = "Address is required";
+ }
+ 
+ // Check if address contains the selected city
+ if (selectedCity && values.address && !values.address.includes(selectedCity)) {
+   errors.address = `Your address must include ${selectedCity}`;
  }
 
  // Number of recipients validation
@@ -88,8 +125,14 @@ const NGOProfileDetailsScreen = ({ navigation }) => {
  setSubmitting(false)
 
  if (!addressCoordinates) {
- Alert.alert('Address Error', 'Please select a valid address from the suggestions');
- return;
+   Alert.alert('Address Error', 'Please select a valid address from the suggestions');
+   return;
+ }
+ 
+ // Check if address contains the selected city
+ if (!validateCityInAddress(values.address)) {
+   Alert.alert('Address Error', `Your address must include ${selectedCity}`);
+   return;
  }
 
  // Here you would typically save the NGO profile to your database
@@ -101,6 +144,7 @@ const NGOProfileDetailsScreen = ({ navigation }) => {
  .doc(user.uid)
  .set({
  address: values.address,
+ city: selectedCity, // Add the selected city
  addressCoordinates: addressCoordinates,
  membersCount: parseInt(values.membersCount),
  contactPerson: values.contactPerson,
@@ -143,11 +187,19 @@ const NGOProfileDetailsScreen = ({ navigation }) => {
  onPress={(data, details = null) => {
  if (details && currentField) {
  const location = details.geometry.location;
- currentField.setFieldValue("address", details.formatted_address);
+ const formattedAddress = details.formatted_address;
+ 
+ currentField.setFieldValue("address", formattedAddress);
  setAddressCoordinates({
- latitude: location.lat,
- longitude: location.lng
+   latitude: location.lat,
+   longitude: location.lng
  });
+ 
+ // Check if the selected city is in the address
+ if (selectedCity && !formattedAddress.includes(selectedCity)) {
+   Alert.alert('Address Error', `Your address must include ${selectedCity}`);
+ }
+ 
  setShowLocationModal(false);
  }
  }}
@@ -221,6 +273,42 @@ const NGOProfileDetailsScreen = ({ navigation }) => {
  </View>
  </Modal>
  )
+ 
+ // City selection modal component
+ const CitySelectionModal = () => (
+   <Modal
+     visible={showCityModal}
+     animationType="slide"
+     transparent={true}
+     onRequestClose={() => setShowCityModal(false)}
+   >
+     <View style={styles.cityModalContainer}>
+       <View style={styles.cityModalContent}>
+         <Text style={styles.cityModalTitle}>Select Your City</Text>
+
+         {cities.map((city) => (
+           <TouchableOpacity
+             key={city}
+             style={[styles.cityOption, selectedCity === city && styles.selectedCityOption]}
+             onPress={() => {
+               setSelectedCity(city)
+               setCityError("")
+               setShowCityModal(false)
+             }}
+           >
+             <Text style={[styles.cityOptionText, selectedCity === city && styles.selectedCityOptionText]}>
+               {city}
+             </Text>
+           </TouchableOpacity>
+         ))}
+
+         <TouchableOpacity style={styles.closeCityModalButton} onPress={() => setShowCityModal(false)}>
+           <Text style={styles.closeCityModalButtonText}>Close</Text>
+         </TouchableOpacity>
+       </View>
+     </View>
+   </Modal>
+ )
 
  return (
  <View style={styles.container}>
@@ -243,6 +331,32 @@ const NGOProfileDetailsScreen = ({ navigation }) => {
  >
  {({ handleChange, handleBlur, handleSubmit, values, errors, touched, setFieldValue }) => (
  <>
+   {/* City Selection Field */}
+   <View style={styles.inputContainer}>
+     <Text style={styles.label}>City</Text>
+     <View style={styles.addressContainer}>
+       <TextInput
+         style={[
+           styles.addressInput,
+           cityError ? { borderColor: "red" } : null
+         ]}
+         value={selectedCity}
+         placeholder="Select your city"
+         placeholderTextColor={theme.colors.ivory}
+         editable={false}
+       />
+       <TouchableOpacity
+         style={styles.searchButton}
+         onPress={() => {
+           setShowCityModal(true)
+         }}
+       >
+         <Text style={styles.searchButtonText}>Select</Text>
+       </TouchableOpacity>
+     </View>
+     {cityError && <Text style={styles.errorText}>{cityError}</Text>}
+   </View>
+   
  {/* Address Input with Location Search */}
  <View style={styles.inputContainer}>
  <Text style={styles.label}>NGO Address</Text>
@@ -333,6 +447,9 @@ const NGOProfileDetailsScreen = ({ navigation }) => {
 
  {/* Location Search Modal */}
  <LocationSearchModal />
+ 
+ {/* City Selection Modal */}
+ <CitySelectionModal />
  </View>
  )
 }
@@ -464,6 +581,65 @@ const styles = StyleSheet.create({
  closeButtonText: {
  color: theme.colors.sageGreen,
  fontWeight: "bold",
+ },
+ // City modal styles
+ cityModalContainer: {
+   flex: 1,
+   justifyContent: "center",
+   alignItems: "center",
+   backgroundColor: "rgba(0,0,0,0.5)",
+ },
+ cityModalContent: {
+   width: "80%",
+   backgroundColor: "white",
+   borderRadius: 10,
+   padding: 20,
+   alignItems: "center",
+   shadowColor: "#000",
+   shadowOffset: {
+     width: 0,
+     height: 2,
+   },
+   shadowOpacity: 0.25,
+   shadowRadius: 3.84,
+   elevation: 5,
+ },
+ cityModalTitle: {
+   fontSize: 18,
+   fontWeight: "bold",
+   marginBottom: 20,
+   color: theme.colors.sageGreen,
+ },
+ cityOption: {
+   width: "100%",
+   padding: 15,
+   borderWidth: 1,
+   borderColor: "#ddd",
+   borderRadius: 5,
+   marginBottom: 10,
+   alignItems: "center",
+ },
+ selectedCityOption: {
+   backgroundColor: theme.colors.sageGreen,
+   borderColor: theme.colors.sageGreen,
+ },
+ cityOptionText: {
+   fontSize: 16,
+   color: "#333",
+ },
+ selectedCityOptionText: {
+   color: "white",
+   fontWeight: "bold",
+ },
+ closeCityModalButton: {
+   marginTop: 10,
+   padding: 10,
+   backgroundColor: "#f0f0f0",
+   borderRadius: 5,
+ },
+ closeCityModalButtonText: {
+   color: "#333",
+   fontSize: 16,
  },
 })
 

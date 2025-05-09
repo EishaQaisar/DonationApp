@@ -14,7 +14,7 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 import axios from 'axios'
 
 // You would replace this with your actual API key
-const GOOGLE_API_KEY = "AIzaSyB9irjntPHdEJf024h7H_XKpS11OeW1Nh8";
+const GOOGLE_API_KEY = "";
 
 const RecipientProfileForm = ({ navigation }) => {
   const [khairPoints] = useState({value:100});
@@ -25,6 +25,14 @@ const RecipientProfileForm = ({ navigation }) => {
   const [currentField, setCurrentField] = useState(null)
   const googlePlacesRef = useRef(null)
   const [addressCoordinates, setAddressCoordinates] = useState(null)
+  
+  // Add city selection state
+  const [selectedCity, setSelectedCity] = useState("")
+  const [cityError, setCityError] = useState("")
+  const [showCityModal, setShowCityModal] = useState(false)
+  
+  // Define the cities
+  const cities = ["Karachi", "Lahore", "Islamabad"]
 
   const genderOptions = ["Male", "Female", "Other"]
   const maritalStatusOptions = ["Single", "Married", "Divorced", "Widowed"]
@@ -72,6 +80,25 @@ const RecipientProfileForm = ({ navigation }) => {
       return null;
     }
   };
+  
+  // Validate if the selected city is in the address
+  const validateCityInAddress = (address) => {
+    if (!selectedCity) {
+      setCityError("Please select a city");
+      return false;
+    }
+
+    if (!address) {
+      return false;
+    }
+
+    // Check if the selected city is in the address string
+    if (!address.includes(selectedCity)) {
+      return false;
+    }
+
+    return true;
+  };
 
   const validate = (values) => {
     console.log("HFEE")
@@ -109,11 +136,21 @@ const RecipientProfileForm = ({ navigation }) => {
         errors.income = "Income can not be negative"
       }
     }
+    
+    // City validation
+    if (!selectedCity) {
+      errors.city = "City is required";
+    }
   
     // Address validation
     if (!values.address) errors.address = "Address is required"
     if (!addressCoordinates && values.address) {
       errors.address = "Please select a valid address from the suggestions"
+    }
+    
+    // Check if address contains the selected city
+    if (selectedCity && values.address && !values.address.includes(selectedCity)) {
+      errors.address = `Your address must include ${selectedCity}`;
     }
   
     // Only validate education-related fields if occupation is "Student"
@@ -144,6 +181,12 @@ const RecipientProfileForm = ({ navigation }) => {
     console.log("Form submitted with values:", values)
     console.log(values)
     
+    // Check if address contains the selected city
+    if (!validateCityInAddress(values.address)) {
+      Alert.alert('Address Error', `Your address must include ${selectedCity}`);
+      return;
+    }
+    
     if (Number.parseInt(values.children) > 0) {
       navigation.navigate("ChildrenProfiles", { ParentValues: values })
     } else {
@@ -167,6 +210,7 @@ const RecipientProfileForm = ({ navigation }) => {
             shirtSize: values.shirtSize,
             trouserSize: values.trouserSize,
             address: values.address,
+            city: selectedCity, // Add the selected city
             addressCoordinates: addressCoordinates, // Add coordinates
             profileImage: values.profileImage || "", // Ensure string (or default empty)
             createdAt: firestore.FieldValue.serverTimestamp(), // Timestamp for when the profile is created
@@ -206,11 +250,19 @@ const RecipientProfileForm = ({ navigation }) => {
           onPress={(data, details = null) => {
             if (details && currentField) {
               const location = details.geometry.location;
-              currentField.setFieldValue("address", details.formatted_address);
+              const formattedAddress = details.formatted_address;
+              
+              currentField.setFieldValue("address", formattedAddress);
               setAddressCoordinates({
                 latitude: location.lat,
                 longitude: location.lng
               });
+              
+              // Check if the selected city is in the address
+              if (selectedCity && !formattedAddress.includes(selectedCity)) {
+                Alert.alert('Address Error', `Your address must include ${selectedCity}`);
+              }
+              
               setShowLocationModal(false);
             }
           }}
@@ -284,6 +336,42 @@ const RecipientProfileForm = ({ navigation }) => {
       </View>
     </Modal>
   )
+  
+  // City selection modal component
+  const CitySelectionModal = () => (
+    <Modal
+      visible={showCityModal}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={() => setShowCityModal(false)}
+    >
+      <View style={styles.cityModalContainer}>
+        <View style={styles.cityModalContent}>
+          <Text style={styles.cityModalTitle}>Select Your City</Text>
+
+          {cities.map((city) => (
+            <TouchableOpacity
+              key={city}
+              style={[styles.cityOption, selectedCity === city && styles.selectedCityOption]}
+              onPress={() => {
+                setSelectedCity(city)
+                setCityError("")
+                setShowCityModal(false)
+              }}
+            >
+              <Text style={[styles.cityOptionText, selectedCity === city && styles.selectedCityOptionText]}>
+                {city}
+              </Text>
+            </TouchableOpacity>
+          ))}
+
+          <TouchableOpacity style={styles.closeCityModalButton} onPress={() => setShowCityModal(false)}>
+            <Text style={styles.closeCityModalButtonText}>Close</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  )
 
   const [selectedOption, setSelectedOption] = useState("option1")
   const [inputValue, setInputValue] = useState("")
@@ -348,6 +436,32 @@ const RecipientProfileForm = ({ navigation }) => {
                   ))}
                 </View>
                 {errors.gender && touched.gender && <Text style={styles.errorText}>{errors.gender}</Text>}
+              </View>
+              
+              {/* City Selection Field */}
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>City</Text>
+                <View style={styles.addressContainer}>
+                  <TextInput
+                    style={[
+                      styles.addressInput,
+                      cityError ? { borderColor: "red" } : null
+                    ]}
+                    value={selectedCity}
+                    placeholder="Select your city"
+                    placeholderTextColor={theme.colors.ivory}
+                    editable={false}
+                  />
+                  <TouchableOpacity
+                    style={styles.searchButton}
+                    onPress={() => {
+                      setShowCityModal(true)
+                    }}
+                  >
+                    <Text style={styles.searchButtonText}>Select</Text>
+                  </TouchableOpacity>
+                </View>
+                {cityError && <Text style={styles.errorText}>{cityError}</Text>}
               </View>
 
               {/* Address Input with Location Search */}
@@ -669,6 +783,9 @@ const RecipientProfileForm = ({ navigation }) => {
 
       {/* Location Search Modal */}
       <LocationSearchModal />
+      
+      {/* City Selection Modal */}
+      <CitySelectionModal />
     </View>
   )
 }
@@ -840,6 +957,65 @@ const styles = StyleSheet.create({
   closeButtonText: {
     color: theme.colors.sageGreen,
     fontWeight: "bold",
+  },
+  // City modal styles
+  cityModalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  cityModalContent: {
+    width: "80%",
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 20,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  cityModalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: theme.colors.sageGreen,
+  },
+  cityOption: {
+    width: "100%",
+    padding: 15,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 5,
+    marginBottom: 10,
+    alignItems: "center",
+  },
+  selectedCityOption: {
+    backgroundColor: theme.colors.sageGreen,
+    borderColor: theme.colors.sageGreen,
+  },
+  cityOptionText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  selectedCityOptionText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  closeCityModalButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: "#f0f0f0",
+    borderRadius: 5,
+  },
+  closeCityModalButtonText: {
+    color: "#333",
+    fontSize: 16,
   },
 })
 
