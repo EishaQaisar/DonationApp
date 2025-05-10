@@ -18,7 +18,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import axios from 'axios';
 import i18n,{t} from "../i18n";
 
-const GOOGLE_API_KEY = "AIzaSyB9irjntPHdEJf024h7H_XKpS11OeW1Nh8";
+const GOOGLE_API_KEY = "AI";
 const isUrdu = i18n.locale === "ur";
 
 
