@@ -4,7 +4,7 @@ import { getBaseUrl } from './deviceDetection';
 
 export async function addClothesDonation(clothesData) {
   const { season, gender, ageCategory, itemCategory, clothesCategory, shoeSize, upperWearSize, bottomWearSize,
-     clothingSize, c_condition, quantity, fabric, description, images, donorUsername } = clothesData;
+     clothingSize, c_condition, quantity, fabric, description, images, donorUsername ,donorCity} = clothesData;
 
   try {
     // Send POST request to backend API
@@ -27,6 +27,7 @@ export async function addClothesDonation(clothesData) {
       description,
       images,
       donorUsername,
+      donorCity
     });
     console.log('Clothes donation added successfully:', response.data);
   } catch (error) {

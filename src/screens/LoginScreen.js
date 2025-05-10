@@ -68,8 +68,15 @@ export default function LoginScreen({ navigation, route }) {
 
         // Verify password
         if (userData.password === hashedEnteredPassword) {
+           if (userData.approved == "false") {
+    navigation.navigate("WaitForApprovalScreen");
+    return { success: false, message: "User not yet approved" };
+  }
+         else{
           setUser({ ...userData, uid: userId, role:role});
+         
           return { success: true, message: "Login successful!" };
+         }
         } else {
           setPassword({ ...password, error: t("errors.incorrect_password") });
           return { success: false, message: "Invalid password" };

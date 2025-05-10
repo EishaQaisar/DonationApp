@@ -153,6 +153,7 @@ const UploadFood = ({navigation}) => {
       quantity: quantity.value,
       images: images,
       donorUsername: user.username,
+      donorCity:user.username
     };
 
     try {

@@ -311,6 +311,7 @@ const UploadClothes = ({ navigation }) => {
       description: description.value,
       images: images,
       donorUsername: user.username,
+      donorCity:user.city
     };
 
     try {

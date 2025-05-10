@@ -54,7 +54,13 @@
       }
     },
     "recipientScreen": {
-      "greeting": "Hi \nRecipient!",
+      "greeting": "Welcome,",
+      "donations": "Donations",
+      "causes": "Causes",
+      "impact": "Impact",
+      "education": "Education",
+      "clothes": "Clothes",
+      "food": "Food",
       "availableDonations": "Available Donations",
       "motivational_text": "Your journey to a\nbetter\ntomorrow starts here\nClaim now!",
       "claimNow": "Claim Now",
@@ -372,7 +378,9 @@
       "no": "No",
       "insufficientPoints": "Insufficient Khair Points",
       "insufficientPointsMessage": "You do not have enough Khair Points to claim this item.",
-      "ok": "OK"
+      "ok": "OK",
+      "differentCity": "Different City",
+  "differentCityMessage": "You cannot claim items from another city. Please look for items available in your city."
     },
     "profile": {
     "myProfile": "My Profile",
@@ -478,7 +486,43 @@
   "errors": {
     "required": "This field is required.",
     "incorrect_password": "Incorrect password",
-    "user_not_found": "User not found"
+    "user_not_found": "User not found",
+    "age_required": "Age is required",
+    "age_number": "Age must be a number",
+    "age_min": "Age must be greater than 18",
+    "age_child_max": "Child older than 18 can not be registered",
+    "age_child_min": "Child younger than 1 year can not be registered",
+    "gender_required": "Gender is required",
+    "marital_status_required": "Marital status is required",
+    "children_required": "Number of children is required",
+    "children_number": "Number of children must be a number",
+    "children_negative": "Number of children can not be negative",
+    "children_whole": "Number of children must be a whole number",
+    "children_exceed": "Number of children can not exceed number of family members",
+    "occupation_required": "Occupation is required",
+    "income_required": "Income is required",
+    "income_spaces": "Income cannot contain only spaces",
+    "income_number": "Income must be a number",
+    "income_negative": "Income can not be negative",
+    "city_required": "City is required",
+    "address_required": "Address is required",
+    "address_invalid": "Please select a valid address from the suggestions",
+    "address_city": "Your address must include",
+    "education_required": "Education level is required",
+    "institution_required": "Institution is required",
+    "class_required": "Class/Year is required",
+    "shoe_size_required": "Shoe size is required",
+    "clothing_size_required": "Clothing size is required",
+    "shirt_size_required": "Shirt size is required",
+    "trouser_size_required": "Trouser size is required",
+    "members_required": "Number of family members is required",
+    "members_number": "Number of family members must be a number",
+    "members_negative": "Number of family members cannot be negative",
+    "members_whole": "Number of family members must be a whole number",
+    "members_max": "Number of family members should be less than 10",
+    "id_card_required": "ID Card is required",
+    "id_card_duplicate": "This ID Card is already used for another child",
+    "id_card_registered": "This ID Card is already registered"
   },
   "messages": {
     "login_success": "Login successful!",
@@ -628,6 +672,160 @@
     "password": "Password",
     "phoneNumber": "Phone number",
     "username": "Username"
+  },
+
+   "rChoose": {
+    "title": "Are you an NGO or an Individual?",
+    "ngo": "NGO",
+    "individual": "Individual"
+  },
+   "options": {
+    "gender": {
+      "male": "Male",
+      "female": "Female",
+      "other": "Other"
+    },
+    "marital_status": {
+      "single": "Single",
+      "married": "Married",
+      "divorced": "Divorced",
+      "widowed": "Widowed"
+    },
+    "occupation": {
+      "student": "Student",
+      "employed": "Employed",
+      "unemployed": "Unemployed"
+    },
+    "education": {
+      "school": "School",
+      "college": "College",
+      "university": "University",
+      "special": "Special Education"
+    },
+    "enrollment": {
+      "enrolled": "Enrolled",
+      "not_enrolled": "Not Enrolled"
+    },
+    "cities": {
+      "karachi": "Karachi",
+      "lahore": "Lahore",
+      "islamabad": "Islamabad"
+    },
+    "clothing_sizes": {
+      "S": "S",
+      "M": "M",
+      "L": "L",
+      "XL": "XL",
+      "XXL": "XXL"
+    },
+    "grades": {
+      "nursery": "Nursery",
+      "kg": "KG",
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6",
+      "7": "7",
+      "8": "8",
+      "9": "9",
+      "10": "10",
+      "11": "11"
+    },
+    "college_years": {
+      "1st_year": "1st Year",
+      "2nd_year": "2nd Year"
+    },
+    "university_years": {
+      "1st": "1st",
+      "2nd": "2nd",
+      "3rd": "3rd",
+      "4th": "4th"
+    }
+  },
+    "recipient_profile": {
+    "title": "Recipient Profile",
+    "age": "Age",
+    "gender": "Gender",
+    "city": "City",
+    "address": "Address",
+    "family_members": "Number of Family Members",
+    "marital_status": "Marital Status",
+    "children": "Number of Children *under 18*",
+    "occupation": "Occupation",
+    "income": "Monthly Income",
+    "education_level": "Educational Level",
+    "institution": "Institution Name",
+    "year_of_study": "Year Of Study",
+    "shoe_size": "Shoe Size",
+    "clothing_size": "Clothing Size",
+    "shirt_size": "Shirt Size",
+    "trouser_size": "Trouser Size",
+    "profile_picture": "Profile Picture",
+    "save_profile": "Save Profile",
+    "select_city": "Select your city",
+    "search_address": "Search your address",
+    "address_validated": "Address validated ✓",
+    "search": "Search",
+    "select": "Select"
+  },
+  "children_profiles": {
+    "title": "Children Profiles",
+    "number_of_children": "Number of children",
+    "child": "Child",
+    "age": "Age",
+    "gender": "Gender",
+    "id_card": "ID Card",
+    "id_card_format": "Format: 34101-7678623-8",
+    "enrollment_status": "Enrollment Status",
+    "educational_level": "Educational Level",
+    "institution": "Institution Name",
+    "class_year": "Class/Year",
+    "shoe_size": "Shoe Size",
+    "clothing_size": "Clothing Size",
+    "shirt_size": "Shirt Size",
+    "trouser_size": "Trouser Size",
+    "save_profiles": "Save Profiles"
+  },
+  "city_modal": {
+    "title": "Select Your City",
+    "close": "Close"
+  },
+  "location_modal": {
+    "title": "Search Location",
+    "close": "Close"
+  },
+    "waitForApproval": {
+    "message": "We got your information, please wait while our representatives verify it.",
+    "homeButton": "Home"
+  },
+    "ngo_profile": {
+    "title": "NGO Profile",
+    "ngo_address": "NGO Address",
+    "search_ngo_address": "Search NGO address",
+    "recipients_count": "Number of Recipients",
+    "recipients_placeholder": "Enter number of recipients (max 500)",
+    "description": "NGO Description",
+    "description_placeholder": "Enter a brief description of your NGO",
+    "save_profile": "Save NGO Profile",
+    "search_location": "Search NGO Location",
+    "enter_location": "Enter NGO Location",
+    "invalid_address_title": "Invalid Address",
+    "invalid_address_message": "Please enter a valid address",
+    "error_title": "Error",
+    "address_validation_error": "Failed to validate address",
+    "address_error_title": "Address Error",
+    "select_valid_address": "Please select a valid address from the suggestions",
+    "save_error": "Failed to save NGO profile details",
+    "errors": {
+      "recipients_required": "Number of recipients is required",
+      "recipients_number": "Number of recipients must be a number",
+      "recipients_negative": "Number of recipients cannot be negative",
+      "recipients_max": "Number of recipients should be less than 500",
+      "recipients_whole": "Number of recipients must be a whole number",
+      "recipients_digits": "Number of recipients must contain only digits"
+    }
   }
       
       

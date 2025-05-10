@@ -52,7 +52,13 @@
       }
     },
     "recipientScreen": {
-      "greeting": "ہیلو \nوصول کنندہ!",
+            "greeting": "خوش آمدید،",
+      "donations": "عطیات",
+      "causes": "وجوہات",
+      "impact": "اثر",
+      "education": "تعلیم",
+      "clothes": "کپڑے",
+      "food": "کھانا",
       "availableDonations": "دستیاب عطیات",
       "motivational_text": "آپ کا بہتر مستقبل\nیہیں سے شروع ہوتا ہے",
 
@@ -332,11 +338,11 @@
         "25 year onwards": "25 سال سے آگے"
       },
       "clothing_sizes": {
-        "S": "چھوٹا",
-        "M": "درمیانہ",
-        "L": "بڑا",
-        "XL": "بہت بڑا",
-        "XXL": "انتہائی بڑا"
+        "S": "S",
+        "M": "M",
+        "L": "L",
+        "XL": "XL",
+        "XXL": "XXL"
       },
       "shirt_sizes": ["36", "38", "40", "42", "44", "46", "48"],
       "shoe_sizes": ["34", "36", "38", "40", "42", "44", "46"],
@@ -386,7 +392,9 @@
     "no": "نہیں",
     "insufficientPoints": "ناکافی خیر پوائنٹس",
     "insufficientPointsMessage": "آپ کے پاس اس آئٹم کو حاصل کرنے کے لیے کافی خیر پوائنٹس نہیں ہیں۔",
-    "ok": "ٹھیک ہے"
+    "ok": "ٹھیک ہے",
+    "differentCity": "مختلف شہر",
+  "differentCityMessage": "آپ دوسرے شہر سے اشیاء کا دعویٰ نہیں کر سکتے۔ براہ کرم اپنے شہر میں دستیاب اشیاء تلاش کریں۔"
   },
   
   "profile": {
@@ -496,7 +504,43 @@
   "errors": {
     "required": "یہ فیلڈ درکار ہے۔",
     "incorrect_password": "غلط پاس ورڈ",
-    "user_not_found": "صارف نہیں ملا"
+    "user_not_found": "صارف نہیں ملا",
+    "age_required": "عمر ضروری ہے",
+    "age_number": "عمر ایک نمبر ہونا چاہیے",
+    "age_min": "عمر 18 سال سے زیادہ ہونی چاہیے",
+    "age_child_max": "18 سال سے زیادہ عمر کے بچے کو رجسٹر نہیں کیا جا سکتا",
+    "age_child_min": "1 سال سے کم عمر کے بچے کو رجسٹر نہیں کیا جا سکتا",
+    "gender_required": "جنس ضروری ہے",
+    "marital_status_required": "ازدواجی حیثیت ضروری ہے",
+    "children_required": "بچوں کی تعداد ضروری ہے",
+    "children_number": "بچوں کی تعداد ایک نمبر ہونا چاہیے",
+    "children_negative": "بچوں کی تعداد منفی نہیں ہو سکتی",
+    "children_whole": "بچوں کی تعداد ایک مکمل نمبر ہونا چاہیے",
+    "children_exceed": "بچوں کی تعداد خاندان کے افراد کی تعداد سے زیادہ نہیں ہو سکتی",
+    "occupation_required": "پیشہ ضروری ہے",
+    "income_required": "آمدنی ضروری ہے",
+    "income_spaces": "آمدنی میں صرف خالی جگہیں نہیں ہو سکتیں",
+    "income_number": "آمدنی ایک نمبر ہونا چاہیے",
+    "income_negative": "آمدنی منفی نہیں ہو سکتی",
+    "city_required": "شہر ضروری ہے",
+    "address_required": "پتہ ضروری ہے",
+    "address_invalid": "براہ کرم تجاویز سے ایک درست پتہ منتخب کریں",
+    "address_city": "آپ کے پتے میں شامل ہونا چاہیے",
+    "education_required": "تعلیمی سطح ضروری ہے",
+    "institution_required": "ادارہ ضروری ہے",
+    "class_required": "کلاس/سال ضروری ہے",
+    "shoe_size_required": "جوتے کا سائز ضروری ہے",
+    "clothing_size_required": "کپڑوں کا سائز ضروری ہے",
+    "shirt_size_required": "قمیص کا سائز ضروری ہے",
+    "trouser_size_required": "پتلون کا سائز ضروری ہے",
+    "members_required": "خاندان کے افراد کی تعداد ضروری ہے",
+    "members_number": "خاندان کے افراد کی تعداد ایک نمبر ہونا چاہیے",
+    "members_negative": "خاندان کے افراد کی تعداد منفی نہیں ہو سکتی",
+    "members_whole": "خاندان کے افراد کی تعداد ایک مکمل نمبر ہونا چاہیے",
+    "members_max": "خاندان کے افراد کی تعداد 10 سے کم ہونی چاہیے",
+    "id_card_required": "شناختی کارڈ ضروری ہے",
+    "id_card_duplicate": "یہ شناختی کارڈ پہلے سے ہی کسی دوسرے بچے کے لیے استعمال ہو رہا ہے",
+    "id_card_registered": "یہ شناختی کارڈ پہلے سے ہی رجسٹرڈ ہے"
   },
   "messages": {
     "login_success": "لاگ ان کامیاب!",
@@ -646,7 +690,160 @@
     "password": "پاس ورڈ",
     "phoneNumber": "فون نمبر",
     "username": "صارف نام"
-  }
+  },
+     "rChoose": {
+    "title": "کیا آپ ایک این جی او ہیں یا ایک فرد؟",
+    "ngo": "این جی او",
+    "individual": "فرد"
+  },
+   "recipient_profile": {
+    "title": "وصول کنندہ پروفائل",
+    "age": "عمر",
+    "gender": "جنس",
+    "city": "شہر",
+    "address": "پتہ",
+    "family_members": "خاندان کے افراد کی تعداد",
+    "marital_status": "ازدواجی حیثیت",
+    "children": "بچوں کی تعداد *18 سال سے کم*",
+    "occupation": "پیشہ",
+    "income": "ماہانہ آمدنی",
+    "education_level": "تعلیمی سطح",
+    "institution": "ادارے کا نام",
+    "year_of_study": "تعلیمی سال",
+    "shoe_size": "جوتے کا سائز",
+    "clothing_size": "کپڑوں کا سائز",
+    "shirt_size": "قمیص کا سائز",
+    "trouser_size": "پتلون کا سائز",
+    "profile_picture": "پروفائل تصویر",
+    "save_profile": "پروفائل محفوظ کریں",
+    "select_city": "اپنا شہر منتخب کریں",
+    "search_address": "اپنا پتہ تلاش کریں",
+    "address_validated": "پتہ تصدیق شدہ ✓",
+    "search": "تلاش کریں",
+    "select": "منتخب کریں"
+  },
+  "children_profiles": {
+    "title": "بچوں کے پروفائل",
+    "number_of_children": "بچوں کی تعداد",
+    "child": "بچہ",
+    "age": "عمر",
+    "gender": "جنس",
+    "id_card": "شناختی کارڈ",
+    "id_card_format": "فارمیٹ: 34101-7678623-8",
+    "enrollment_status": "داخلہ کی حیثیت",
+    "educational_level": "تعلیمی سطح",
+    "institution": "ادارے کا نام",
+    "class_year": "کلاس/سال",
+    "shoe_size": "جوتے کا سائز",
+    "clothing_size": "کپڑوں کا سائز",
+    "shirt_size": "قمیص کا سائز",
+    "trouser_size": "پتلون کا سائز",
+    "save_profiles": "پروفائل محفوظ کریں"
+  },
+  "city_modal": {
+    "title": "اپنا شہر منتخب کریں",
+    "close": "بند کریں"
+  },
+  "location_modal": {
+    "title": "مقام تلاش کریں",
+    "close": "بند کریں"
+  },
+   "options": {
+    "gender": {
+      "male": "مرد",
+      "female": "عورت",
+      "other": "دیگر"
+    },
+    "marital_status": {
+      "single": "غیر شادی شدہ",
+      "married": "شادی شدہ",
+      "divorced": "طلاق یافتہ",
+      "widowed": "بیوہ"
+    },
+    "occupation": {
+      "student": "طالب علم",
+      "employed": "ملازم",
+      "unemployed": "بے روزگار"
+    },
+    "education": {
+      "school": "اسکول",
+      "college": "کالج",
+      "university": "یونیورسٹی",
+      "special": "خصوصی تعلیم"
+    },
+    "enrollment": {
+      "enrolled": "داخل شدہ",
+      "not_enrolled": "داخل نہیں"
+    },
+    "cities": {
+      "karachi": "کراچی",
+      "lahore": "لاہور",
+      "islamabad": "اسلام آباد"
+    },
+    "clothing_sizes": {
+      "S": "S",
+      "M": "M",
+      "L": "L",
+      "XL": "XL",
+      "XXL": "XXL"
+    },
+    "grades": {
+      "nursery": "نرسری",
+      "kg": "کے جی",
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6",
+      "7": "7",
+      "8": "8",
+      "9": "9",
+      "10": "10",
+      "11": "11"
+    },
+    "college_years": {
+      "1st_year": "پہلا سال",
+      "2nd_year": "دوسرا سال"
+    },
+    "university_years": {
+      "1st": "پہلا سال",
+      "2nd": "دوسرا سال",
+      "3rd": "تیسرا سال",
+      "4th": "چوتھا سال"
+    }
+  },
+   "waitForApproval": {
+    "message": "ہمیں آپ کی معلومات مل گئی ہیں، براہ کرم انتظار کریں جب تک ہمارے نمائندے اس کی تصدیق کرتے ہیں۔",
+    "homeButton": "ہوم"
+  },
+    "ngo_profile": {
+    "title": "این جی او پروفائل",
+    "ngo_address": "این جی او کا پتہ",
+    "search_ngo_address": "این جی او کا پتہ تلاش کریں",
+    "recipients_count": "وصول کنندگان کی تعداد",
+    "recipients_placeholder": "وصول کنندگان کی تعداد درج کریں (زیادہ سے زیادہ 500)",
+    "description": "این جی او کی تفصیل",
+    "description_placeholder": "اپنے این جی او کی مختصر تفصیل درج کریں",
+    "save_profile": "این جی او پروفائل محفوظ کریں",
+    "search_location": "این جی او کا مقام تلاش کریں",
+    "enter_location": "این جی او کا مقام درج کریں",
+    "invalid_address_title": "غلط پتہ",
+    "invalid_address_message": "براہ کرم ایک درست پتہ درج کریں",
+    "error_title": "خرابی",
+    "address_validation_error": "پتے کی تصدیق میں ناکامی",
+    "address_error_title": "پتے کی خرابی",
+    "select_valid_address": "براہ کرم تجاویز سے ایک درست پتہ منتخب کریں",
+    "save_error": "این جی او پروفائل کی تفصیلات محفوظ کرنے میں ناکامی",
+    "errors": {
+      "recipients_required": "وصول کنندگان کی تعداد ضروری ہے",
+      "recipients_number": "وصول کنندگان کی تعداد ایک نمبر ہونا چاہیے",
+      "recipients_negative": "وصول کنندگان کی تعداد منفی نہیں ہو سکتی",
+      "recipients_max": "وصول کنندگان کی تعداد 500 سے کم ہونی چاہیے",
+      "recipients_whole": "وصول کنندگان کی تعداد ایک مکمل نمبر ہونا چاہیے",
+      "recipients_digits": "وصول کنندگان کی تعداد میں صرف ہندسے ہونے چاہئیں"
+    }
+    }
   }
   
   

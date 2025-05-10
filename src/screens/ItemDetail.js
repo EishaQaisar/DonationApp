@@ -20,9 +20,8 @@ import { UserProfileContext } from "../context/UserProfileContext"
 import firestore from "@react-native-firebase/firestore"
 import { AuthContext } from "../context/AuthContext"
 import { getBaseUrl } from "../helpers/deviceDetection"
-import axios from 'axios';
+import axios from "axios"
 import { t } from "../i18n" // Import the translation function
-
 
 const ItemDetail = ({ route }) => {
   const { item, category, role } = route.params
@@ -33,7 +32,7 @@ const ItemDetail = ({ route }) => {
   const { userProfile, setUserProfile } = useContext(UserProfileContext)
   const [requiredKhairPoints, setRequiredKhairPoints] = useState(0)
   const { user } = useContext(AuthContext)
-  const [not, setNot] = useState([]);
+  const [not, setNot] = useState([])
 
   // Detect language by comparing a known translation
   const isUrdu = t("food.donations_title") !== "Food Donations"
@@ -55,7 +54,7 @@ const ItemDetail = ({ route }) => {
       color: theme.colors.ivory,
       textAlign: "center",
       marginBottom: 25,
-    }
+    },
   }
 
   const isClaimed = isInCart(item)
@@ -67,6 +66,13 @@ const ItemDetail = ({ route }) => {
 
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
+  // Add a new state for city error modal
+  const [isCityErrorModalVisible, setIsCityErrorModalVisible] = useState(false)
+
+  // Add a function to hide the city error modal
+  const hideCityErrorModal = () => {
+    setIsCityErrorModalVisible(false)
+  }
 
   // Function to update khair points directly in this component
   const updateKhairPoints = async (newPoints) => {
@@ -75,18 +81,15 @@ const ItemDetail = ({ route }) => {
     setIsUpdating(true)
     try {
       // Update in Firestore
-      if (user.recipientType==='individual'){
+      if (user.recipientType === "individual") {
         await firestore().collection("individual_profiles").doc(user.uid).update({
           khairPoints: newPoints,
         })
-
-      }
-      else if(user.recipientType==='ngo'){
+      } else if (user.recipientType === "ngo") {
         await firestore().collection("ngo_profiles").doc(user.uid).update({
           khairPoints: newPoints,
         })
       }
-     
 
       // Update local state in context using functional update pattern
       setUserProfile((prevProfile) => ({
@@ -122,8 +125,16 @@ const ItemDetail = ({ route }) => {
           <View>
             <Text style={styles.title}>{item.foodName}</Text>
             <View style={styles.detailsCard}>
-              <DetailItem icon="food" label={t("itemDetail.meal")} value={t(`food.meal_options.${item.mealType}`, { defaultValue: item.mealType })} />
-              <DetailItem icon="silverware-fork-knife" label={t("itemDetail.foodType")} value={t(`food.food_type_options.${item.foodType}`, { defaultValue: item.foodType })} />
+              <DetailItem
+                icon="food"
+                label={t("itemDetail.meal")}
+                value={t(`food.meal_options.${item.mealType}`, { defaultValue: item.mealType })}
+              />
+              <DetailItem
+                icon="silverware-fork-knife"
+                label={t("itemDetail.foodType")}
+                value={t(`food.food_type_options.${item.foodType}`, { defaultValue: item.foodType })}
+              />
               <DetailItem icon="numeric" label={t("itemDetail.quantity")} value={item.quantity.toString()} />
               <DetailItem icon="text-short" label={t("itemDetail.description")} value={item.description} />
             </View>
@@ -133,8 +144,16 @@ const ItemDetail = ({ route }) => {
         return (
           <View>
             {/* Display clothes category only when item category is Clothes */}
-            {item.itemCategory === "Shoes" && <Text style={styles.title}>{t(`clothes.item_category_options.${item.itemCategory}`, { defaultValue: item.itemCategory })}</Text>}
-            {item.itemCategory === "Clothes" && <Text style={styles.title}>{t(`clothes.clothes_category_options.${item.clothesCategory}`, { defaultValue: item.clothesCategory })}</Text>}
+            {item.itemCategory === "Shoes" && (
+              <Text style={styles.title}>
+                {t(`clothes.item_category_options.${item.itemCategory}`, { defaultValue: item.itemCategory })}
+              </Text>
+            )}
+            {item.itemCategory === "Clothes" && (
+              <Text style={styles.title}>
+                {t(`clothes.clothes_category_options.${item.clothesCategory}`, { defaultValue: item.clothesCategory })}
+              </Text>
+            )}
 
             <View style={styles.detailsCard}>
               {/* Conditionally display size with appropriate value based on category */}
@@ -162,10 +181,26 @@ const ItemDetail = ({ route }) => {
                 (item.itemCategory === "Clothes" && item.clothesCategory === "Accessories")
               ) && <DetailItem icon="texture-box" label={t("itemDetail.fabric")} value={item.fabric} />}
 
-              <DetailItem icon="weather-sunny" label={t("itemDetail.season")} value={t(`clothes.season_options.${item.season}`, { defaultValue: item.season })} />
-              <DetailItem icon="human-male-child" label={t("itemDetail.age")} value={t(`clothes.age_categories.${item.age_category}`, { defaultValue: item.age_category })} />
-              <DetailItem icon="gender-male-female" label={t("clothes.gender")} value={t(`clothes.gender_options.${item.gender}`, { defaultValue: item.gender })} />
-              <DetailItem icon="star-outline" label={t("itemDetail.condition")} value={t(`clothes.condition_options.${item.c_condition}`, { defaultValue: item.c_condition })} />
+              <DetailItem
+                icon="weather-sunny"
+                label={t("itemDetail.season")}
+                value={t(`clothes.season_options.${item.season}`, { defaultValue: item.season })}
+              />
+              <DetailItem
+                icon="human-male-child"
+                label={t("itemDetail.age")}
+                value={t(`clothes.age_categories.${item.age_category}`, { defaultValue: item.age_category })}
+              />
+              <DetailItem
+                icon="gender-male-female"
+                label={t("clothes.gender")}
+                value={t(`clothes.gender_options.${item.gender}`, { defaultValue: item.gender })}
+              />
+              <DetailItem
+                icon="star-outline"
+                label={t("itemDetail.condition")}
+                value={t(`clothes.condition_options.${item.c_condition}`, { defaultValue: item.c_condition })}
+              />
               <DetailItem icon="numeric" label={t("itemDetail.quantity")} value={item.quantity.toString()} />
             </View>
           </View>
@@ -176,13 +211,37 @@ const ItemDetail = ({ route }) => {
             <Text style={styles.title}>{item.itemName}</Text>
             <View style={styles.detailsCard}>
               {item.type !== "Stationary" && (
-                <DetailItem icon="book-open-variant" label={t("itemDetail.subject")} value={t(`education.subjects.${item.subject}`, { defaultValue: item.subject })} />
+                <DetailItem
+                  icon="book-open-variant"
+                  label={t("itemDetail.subject")}
+                  value={t(`education.subjects.${item.subject}`, { defaultValue: item.subject })}
+                />
               )}
-              {item.type === "Books" && <DetailItem icon="school" label={t("itemDetail.grade")} value={t(`education.grades.${item.grade}`, { defaultValue: item.grade })} />}
-              {item.type === "Books" && <DetailItem icon="school" label={t("itemDetail.institute")} value={item.institution} />}
-              <DetailItem icon="school" label={t("education.level")} value={t(`education.levels.${item.level}`, { defaultValue: item.level })} />
-              <DetailItem icon="shape-outline" label={t("itemDetail.type")} value={t(`education.types.${item.type}`, { defaultValue: item.type })} />
-              <DetailItem icon="star-outline" label={t("itemDetail.condition")} value={t(`education.conditions.${item.c_condition}`, { defaultValue: item.c_condition })} />
+              {item.type === "Books" && (
+                <DetailItem
+                  icon="school"
+                  label={t("itemDetail.grade")}
+                  value={t(`education.grades.${item.grade}`, { defaultValue: item.grade })}
+                />
+              )}
+              {item.type === "Books" && (
+                <DetailItem icon="school" label={t("itemDetail.institute")} value={item.institution} />
+              )}
+              <DetailItem
+                icon="school"
+                label={t("education.level")}
+                value={t(`education.levels.${item.level}`, { defaultValue: item.level })}
+              />
+              <DetailItem
+                icon="shape-outline"
+                label={t("itemDetail.type")}
+                value={t(`education.types.${item.type}`, { defaultValue: item.type })}
+              />
+              <DetailItem
+                icon="star-outline"
+                label={t("itemDetail.condition")}
+                value={t(`education.conditions.${item.c_condition}`, { defaultValue: item.c_condition })}
+              />
               <DetailItem icon="numeric" label={t("itemDetail.quantity")} value={item.quantity.toString()} />
               <DetailItem icon="text-short" label={t("itemDetail.description")} value={item.description} />
               <DetailItem icon="account" label={t("itemDetail.donorUsername")} value={item.donorUsername} />
@@ -199,69 +258,60 @@ const ItemDetail = ({ route }) => {
   }
   /*notification work*/
   const claimItemInDB = async () => {
-    let requiredItemName;
+    let requiredItemName
 
-    if (category==='Food'){
-      requiredItemName=item.foodName;
-
-    }
-    else if (category==='Clothes'){
-      requiredItemName=item.itemCategory
-
-    }
-    else {
-      requiredItemName=item.itemName
-     
+    if (category === "Food") {
+      requiredItemName = item.foodName
+    } else if (category === "Clothes") {
+      requiredItemName = item.itemCategory
+    } else {
+      requiredItemName = item.itemName
     }
     const claimedItemDetails = {
-        donorUsername: item.donorUsername,
-        claimerUsername: user.username, // Replace this with the actual claimer's username (you can get this from user context or route)
-        donationType: category,
-        itemId: item.id,
-        claimStatus:'Claimed',
-        scheduledelivery:'Unscheduled',
-         // Assuming each item has a unique ID
-         itemName:requiredItemName,
-         khairPoints: parseInt(requiredKhairPoints)
-    };
+      donorUsername: item.donorUsername,
+      claimerUsername: user.username, // Replace this with the actual claimer's username (you can get this from user context or route)
+      donationType: category,
+      itemId: item.id,
+      claimStatus: "Claimed",
+      scheduledelivery: "Unscheduled",
+      // Assuming each item has a unique ID
+      itemName: requiredItemName,
+      khairPoints: Number.parseInt(requiredKhairPoints),
+    }
 
     try {
-      const BASE_URL = await getBaseUrl();
-      const response = await axios.post(`${BASE_URL}/api/add-claimed-item`, claimedItemDetails);
-      
-      console.log('Item claimed successfully in the database');
-      return response.data;
+      const BASE_URL = await getBaseUrl()
+      const response = await axios.post(`${BASE_URL}/api/add-claimed-item`, claimedItemDetails)
+
+      console.log("Item claimed successfully in the database")
+      return response.data
     } catch (error) {
       // Better error logging
       if (error.response) {
         // The server responded with a status code outside the 2xx range
-        console.error('Server error:', error.response.status, error.response.data);
+        console.error("Server error:", error.response.status, error.response.data)
       } else if (error.request) {
         // The request was made but no response was received
-        console.error('No response received:', error.request);
+        console.error("No response received:", error.request)
       } else {
         // Something happened in setting up the request
-        console.error('Request setup error:', error.message);
+        console.error("Request setup error:", error.message)
       }
-      console.error('Error config:', error.config);
-      throw error;
+      console.error("Error config:", error.config)
+      throw error
     }
-};
-
-const changingStatus = async (category,id) => {
-  try {
-      const BASE_URL = await getBaseUrl();  // If you're using a base URL helper function
-
-      await axios.post(`${BASE_URL}/api/approve-claims`, { id,category }); // Pass the id in the request body
-      // setNot(not.filter(item => item.id !== id));
-
-      
-  } catch (error) {
-      console.error(`Error changing claim status of table ${category}:`, error);
-      
   }
-};
 
+  const changingStatus = async (category, id) => {
+    try {
+      const BASE_URL = await getBaseUrl() // If you're using a base URL helper function
+
+      await axios.post(`${BASE_URL}/api/approve-claims`, { id, category }) // Pass the id in the request body
+      // setNot(not.filter(item => item.id !== id));
+    } catch (error) {
+      console.error(`Error changing claim status of table ${category}:`, error)
+    }
+  }
 
   const showConfirmationModal = () => {
     setIsModalVisible(true)
@@ -277,17 +327,15 @@ const changingStatus = async (category,id) => {
     console.log("fsefwefi", item.quantity * itemKhairPoints)
 
     // Calculate new khair points balance
-    const newKhairPoints = Math.max(0, userProfile.khairPoints - requiredKhairPoints);
-
+    const newKhairPoints = Math.max(0, userProfile.khairPoints - requiredKhairPoints)
 
     // Update khair points using the local function
     const success = await updateKhairPoints(newKhairPoints)
-    
 
     if (success) {
-      changingStatus(category,item.id);
-      addToCart(item,category) // Add to cart if points were successfully updated
-      claimItemInDB();
+      changingStatus(category, item.id)
+      addToCart(item, category) // Add to cart if points were successfully updated
+      claimItemInDB()
       setIsModalVisible(false)
     } else {
       // Handle error - could show an error message
@@ -295,14 +343,21 @@ const changingStatus = async (category,id) => {
       // Optionally show an error toast or alert
     }
   }
+  // Modify the handleClaim function to check city match first
   const handleClaim = () => {
+    // First check if cities match
+    if (item.donorCity !== userProfile.city) {
+      setIsCityErrorModalVisible(true)
+      return
+    }
+
+    // If cities match, proceed with the existing khair points check
     const itemKhairPoints = khairPointsPerCategory[category] || 0
     setRequiredKhairPoints(item.quantity * itemKhairPoints)
     console.log("fsefwefi", item.quantity * itemKhairPoints)
     console.log(userProfile.khairPoints)
 
-    if (userProfile.khairPoints >= (item.quantity * itemKhairPoints)) {
-
+    if (userProfile.khairPoints >= item.quantity * itemKhairPoints) {
       showConfirmationModal()
     } else {
       setIsErrorModalVisible(true) // Show error modal if insufficient points
@@ -382,6 +437,30 @@ const changingStatus = async (category,id) => {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
+      {/* City Error Modal when recipient tries to claim from another city */}
+      <Modal
+        transparent={true}
+        visible={isCityErrorModalVisible}
+        animationType="fade"
+        onRequestClose={hideCityErrorModal}
+      >
+        <TouchableWithoutFeedback onPress={hideCityErrorModal}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>{t("itemDetail.differentCity")}</Text>
+                <Text style={dynamicStyles.modalMessage}>{t("itemDetail.differentCityMessage")}</Text>
+
+                <View style={styles.modalButtons}>
+                  <TouchableOpacity style={[styles.modalButton, styles.confirmButton]} onPress={hideCityErrorModal}>
+                    <Text style={styles.modalButtonText}>{t("itemDetail.ok")}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </ScrollView>
   )
 }
@@ -389,7 +468,7 @@ const changingStatus = async (category,id) => {
 const DetailItem = ({ icon, label, value }) => {
   // Detect language by comparing a known translation
   const isUrdu = t("food.donations_title") !== "Food Donations"
-  
+
   // Dynamic styles based on language
   const dynamicStyles = {
     detailLabel: {
@@ -401,9 +480,9 @@ const DetailItem = ({ icon, label, value }) => {
       fontSize: isUrdu ? 20 : 18, // Increase font size for Urdu
       color: theme.colors.pearlWhite,
       fontWeight: "500",
-    }
+    },
   }
-  
+
   return (
     <View style={styles.detailItem}>
       <MaterialIcon name={icon} size={24} color={theme.colors.sageGreen} style={styles.detailIcon} />

@@ -5,7 +5,7 @@ import { getBaseUrl } from './deviceDetection';
 
 
 export async function addFoodDonation(foodData){
-  const { foodName, description, mealType, foodType, quantity, images, donorUsername } = foodData;
+  const { foodName, description, mealType, foodType, quantity, images, donorUsername,donorCity } = foodData;
   try {
     const BASE_URL = await getBaseUrl();
     console.log("this is the base url is",BASE_URL)
@@ -17,6 +17,7 @@ export async function addFoodDonation(foodData){
             quantity,
             images,
             donorUsername,
+            donorCity
           });
 
     console.log('Food donation added successfully:', response.data);

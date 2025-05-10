@@ -14,7 +14,7 @@ import RiderLocationService from "../components/rider-location-service"
 
 
 
-const GOOGLE_API_KEY = "AIzaSyAAt8OqnkBGVGHVGHVHGVHGhbhjbhjbbhbbhjbbbjhhoCTZw"
+//const GOOGLE_API_KEY = "AIzaSyAAt8OqnkBGVGHVGHVHGVHGhbhjbhjbbhbbhjbbbjhhoCTZw"
 // const originrider = { latitude: 31.362987553740638, longitude: 72.98790695201525}
 const originrider = { latitude: 37.3318456, longitude: -122.0296002 }
 const destination = { latitude: 37.771707, longitude: -122.4053769 }

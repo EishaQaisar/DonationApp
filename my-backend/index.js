@@ -66,7 +66,9 @@ const createTables = () => {
         images TEXT,
         claimStatus VARCHAR(255) DEFAULT 'Unclaimed',
         createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        donorUsername VARCHAR(255) NOT NULL
+        donorUsername VARCHAR(255) NOT NULL,
+        donorCity VARCHAR(255) NOT NULL
+
       );
     `;
    
@@ -91,7 +93,8 @@ const createTables = () => {
     images TEXT,
     claimStatus VARCHAR(255) DEFAULT 'Unclaimed',
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    donorUsername VARCHAR(255) NOT NULL
+    donorUsername VARCHAR(255) NOT NULL,
+    donorCity VARCHAR(255) NOT NULL
 );
 
     `;
@@ -112,7 +115,9 @@ const createTables = () => {
 
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     claimStatus VARCHAR(255) DEFAULT 'Unclaimed',
-    donorUsername VARCHAR(255) NOT NULL
+    donorUsername VARCHAR(255) NOT NULL,
+    donorCity VARCHAR(255) NOT NULL
+
   );
 `;
 
@@ -191,19 +196,19 @@ db.query(ngoCampaignsTable, (err, result) => {
 
   app.post('/api/add-food-donation', (req, res) => {
     console.log(req.body);
-    const { foodName, description, mealType, foodType, quantity, images, donorUsername } = req.body;
+    const { foodName, description, mealType, foodType, quantity, images, donorUsername,donorCity } = req.body;
   
-    console.log("Received data:", { foodName, description, mealType, foodType, quantity, images, donorUsername });
+    console.log("Received data:", { foodName, description, mealType, foodType, quantity, images, donorUsername,donorCity });
   
     const query = `
-      INSERT INTO FoodDonations (foodName, description, mealType, foodType, quantity, images, donorUsername)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO FoodDonations (foodName, description, mealType, foodType, quantity, images, donorUsername,donorCity)
+      VALUES (?, ?, ?, ?, ?, ?, ?,?)
     `;
   
     // Log the data being passed to the query
-    console.log('Executing query with:', [foodName, description, mealType, foodType, quantity, JSON.stringify(images), donorUsername]);
+    console.log('Executing query with:', [foodName, description, mealType, foodType, quantity, JSON.stringify(images), donorUsername,donorCity]);
   
-    db.query(query, [foodName, description, mealType, foodType, quantity, JSON.stringify(images), donorUsername], (err, results) => {
+    db.query(query, [foodName, description, mealType, foodType, quantity, JSON.stringify(images), donorUsername,donorCity], (err, results) => {
       if (err) {
         console.error('Error inserting food donation:', err);
         return res.status(500).send('Error inserting food donation');
@@ -228,29 +233,29 @@ db.query(ngoCampaignsTable, (err, result) => {
       shoeSize,
       upperWearSize,
       bottomWearSize,
-      clothingSize, c_condition, quantity, fabric, description, images, donorUsername } = req.body;
+      clothingSize, c_condition, quantity, fabric, description, images, donorUsername,donorCity } = req.body;
   
     console.log("Received data:", { season, gender, ageCategory,itemCategory, clothesCategory,
       shoeSize,
       upperWearSize,
       bottomWearSize,
-      clothingSize,  c_condition, quantity, fabric, description, images, donorUsername });
+      clothingSize,  c_condition, quantity, fabric, description, images, donorUsername,donorCity });
   
     const query = `
       INSERT INTO clothesdonations (season, gender,  age_category, itemCategory, clothesCategory,
        shoeSize,
       upperWearSize,
       bottomWearSize,
-      clothingSize,  c_condition, quantity, fabric, description, images, donorUsername)
-      VALUES (?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?)
+      clothingSize,  c_condition, quantity, fabric, description, images, donorUsername,donorCity)
+      VALUES (?, ?, ?,?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?)
     `;
   
     // Log the data being passed to the query
     console.log('Executing query with:', [season, gender, ageCategory, itemCategory, clothesCategory, shoeSize, upperWearSize, bottomWearSize,
-      clothingSize, c_condition, quantity, fabric, description, JSON.stringify(images), donorUsername]);
+      clothingSize, c_condition, quantity, fabric, description, JSON.stringify(images), donorUsername,donorCity]);
   
     db.query(query, [season, gender, ageCategory, itemCategory, clothesCategory, shoeSize, upperWearSize, bottomWearSize,
-      clothingSize, c_condition, quantity, fabric, description, JSON.stringify(images), donorUsername], (err, results) => {
+      clothingSize, c_condition, quantity, fabric, description, JSON.stringify(images), donorUsername,donorCity], (err, results) => {
       if (err) {
         console.error('Error inserting clothes donation:', err);
         return res.status(500).send('Error inserting clothes donation');
@@ -332,14 +337,14 @@ app.get('/api/all-food-donations', (req, res) => {
   */
 
   app.post('/api/add-education-donation', (req, res) => {
-    const { type, level, c_condition, quantity, itemName, description, images, subject, institution, grade, donorUsername } = req.body;
+    const { type, level, c_condition, quantity, itemName, description, images, subject, institution, grade, donorUsername,donorCity } = req.body;
   
     const query = `
-      INSERT INTO EducationDonations (type, level, c_condition, quantity, itemName, description, images, subject,institution, grade, donorUsername)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)
+      INSERT INTO EducationDonations (type, level, c_condition, quantity, itemName, description, images, subject,institution, grade, donorUsername,donorCity)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?)
     `;
   
-    db.query(query, [type, level, c_condition, quantity, itemName, description, JSON.stringify(images), subject, institution, grade ,donorUsername], (err, results) => {
+    db.query(query, [type, level, c_condition, quantity, itemName, description, JSON.stringify(images), subject, institution, grade ,donorUsername,donorCity], (err, results) => {
       if (err) {
         console.error('Error inserting education donation:', err);
         return res.status(500).send('Error inserting education donation');

@@ -280,6 +280,7 @@ const UploadEdu = ({ navigation }) => {
       institution: institution.value, // Keep original text
       grade: language === "ur" ? getEnglishValue(grade.value) : grade.value,
       donorUsername: user.username,
+      donorCity:user.city
     }
 
     try {

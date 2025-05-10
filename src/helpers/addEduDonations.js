@@ -13,7 +13,8 @@ export async function addEduDonation(eduData) {
     subject,
     institution,
     grade,
-    donorUsername
+    donorUsername,
+    donorCity
   } = eduData;
 
   try {
@@ -32,6 +33,7 @@ export async function addEduDonation(eduData) {
       institution,
       grade,
       donorUsername,
+      donorCity
     });
 
     console.log('Education donation added successfully:', response.data);

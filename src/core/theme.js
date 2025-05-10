@@ -8,7 +8,7 @@ export const theme = {
     sageGreen: '#2A5D4B',      // Forest green - primary brand color
     copper: '#9DDBC8',         // Mint green - secondary accent color
     pearlWhite: "#FFFFFF",     // Pure white - for cards and surfaces
-    ivory: 'black',          // Off-white - subtle background variation 
+    ivory: 'black',          // BLACK FOR TEXT
     outerSpace: '#E8F3EF',     // Very light mint - for highlights and sections
     TaupeBlack: '#333333',     // Dark gray - for primary text
     

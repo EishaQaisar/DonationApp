@@ -1,272 +1,323 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, Pressable } from 'react-native';
-import { theme } from "../core/theme";
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import axios from 'axios';
-import { getBaseUrl } from "../helpers/deviceDetection";
-import { AuthContext } from "../context/AuthContext";
-import i18n, { t } from "../i18n";
+"use client"
+
+import { useContext, useState } from "react"
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+  ImageBackground,
+  StatusBar,
+  Dimensions,
+} from "react-native"
+import { theme } from "../core/theme"
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
+import Icon from "react-native-vector-icons/MaterialIcons"
+import { AuthContext } from "../context/AuthContext"
+import i18n, { t } from "../i18n"
+
+const { width } = Dimensions.get("window")
 
 const HomeScreenRec = ({ navigation, route }) => {
-  const tabBarHeight = useBottomTabBarHeight();
-  const { role, type } = route.params;  // Assuming `role` and `type` are passed in params
-  const { user } = useContext(AuthContext);
-  
-  const [campaigns, setCampaigns] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const isUrdu = i18n.locale === "ur";
-  
+  const tabBarHeight = useBottomTabBarHeight()
+  const { role, type } = route.params
+  const { user } = useContext(AuthContext)
+  const isUrdu = i18n.locale === "ur"
+  const [activeCategory, setActiveCategory] = useState("education")
 
-  // Fetch campaigns data when component mounts
-  useEffect(() => {
-    const fetchCampaigns = async () => {
-      try {
-        const BASE_URL = await getBaseUrl();
-        const response = await axios.get(`${BASE_URL}/api/get-ngo-campaigns`);
-        setCampaigns(response.data);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching campaigns:', error);
-        setLoading(false);
-      }
-    };
+  // Helper function to safely get translation strings
+  const getTranslation = (key) => {
+    try {
+      const translation = t(key)
+      return typeof translation === "string" ? translation : key.split(".").pop()
+    } catch (error) {
+      console.error(`Translation error for key: ${key}`, error)
+      return key.split(".").pop()
+    }
+  }
 
-    fetchCampaigns();
-  }, []);
+  const handleCategoryPress = (category) => {
+    setActiveCategory(category)
+    navigation.navigate(category.charAt(0).toUpperCase() + category.slice(1))
+  }
 
   return (
-    <View style={[Styles.container, { marginBottom: tabBarHeight }]}>
-      <ScrollView>
-        <View style={Styles.banner}>
-          <Image source={require('../../assets/items/hi_rec.jpg')} style={{ opacity: 0.3, width: '100%', height: '100%', position: 'relative' }} />
-          <Text style={Styles.heroText}>{t("recipientScreen.greeting")}</Text>
-        </View>
-
-        <View style={{ color: theme.colors.ivory }}>
-          <Text style={[Styles.headings, { marginTop: 0 }]}>  {t("recipientScreen.availableDonations")}</Text>
-          <View style={Styles.iconContainer}>
-            <TouchableOpacity onPress={() => navigation.navigate('Education')}>
-              <Icon name="school" size={40} color={theme.colors.sageGreen} style={Styles.icon} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('Clothes')}>
-              <Icon name="checkroom" size={40} color={theme.colors.sageGreen} style={Styles.icon} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('Food')}>
-              <Icon name="local-dining" size={40} color={theme.colors.sageGreen} style={Styles.icon} />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={Styles.hero}>
-          <View>
-            <Image source={require('../../assets/items/poor.jpeg')} style={{ height: '100%', width: '100%', borderRadius: 20, position: 'relative' }} />
-            <Text style={[
-    Styles.herooText, 
-    { fontSize: i18n.locale === 'ur' ? 26: 16 } // Increase size for Urdu
-  ]}>
-            {t("recipientScreen.motivational_text")}
-            </Text>
-
-            <Pressable
-              style={({ pressed }) => [
-                Styles.heroBttn,
-                { backgroundColor: pressed ? theme.colors.sageGreen : 'rgba(0, 0, 0, 0.5)' }
-              ]}
-              onPress={() => navigation.navigate('RecepientStartScreen')}
-            >
-              <Text style={{ color: 'white', fontSize: 16 }}>{t("recipientScreen.claimNow")}</Text>
-            </Pressable>
-          </View>
-        </View>
-
-        {/* <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 10, marginTop: 10 }}> */}
-          {/* <Text style={[Styles.headings, { marginTop: 0 }]}>Campaigns</Text> */}
-          {/* <TouchableOpacity onPress={() => navigation.navigate("ViewNgoPostsScreen")}> */}
-            {/* <Text style={[Styles.viewAllButton, { marginTop: 0 }]}>View All</Text> */}
-          {/* </TouchableOpacity> */}
-        {/* </View> */}
-
-        {/* Only show campaigns section if role is not recipient or if type is ngo */}
-{!(role === 'recipient' && user.recipientType !== 'ngo') && (
-  <>
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginHorizontal: 10, marginTop: 10 }}>
-      <Text style={[Styles.headings, { marginTop: 0 }]}>{t("recipientScreen.campaigns")}</Text>
-      <TouchableOpacity onPress={() => navigation.navigate("ViewNgoPostsScreen")}>
-        <Text style={[Styles.viewAllButton, { marginTop: 0 }]}>{t("recipientScreen.viewAll")}</Text>
-      </TouchableOpacity>
-    </View>
-
-    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-      {!loading && campaigns.length > 0 ? (
-        campaigns.slice(0, 3).map((campaign) => (
-          <TouchableOpacity
-            key={campaign.id}
-            onPress={() => navigation.navigate('NgoPostDetailsScreen', {
-              id: campaign.id, // Make sure to pass the ID
-              title: campaign.campaignTitle,
-              description: campaign.fullDescription,
-              image: campaign.image,
-              phoneNumber: campaign.phoneNumber,
-              email: campaign.email,
-              bankAccount: campaign.bankAccount,
-              ngoName: campaign.ngoName,
-              createdAt: campaign.createdAt,
-            })}
-            style={Styles.CampCards}
-          >
-            {/* Display campaign image */}
-            <Image
-              source={{ uri: campaign.image }}
-              style={{
-                width: '100%',
-                opacity: 0.8,
-                height: '80%',
-                borderColor: 'black',
-                borderTopLeftRadius: 20,
-                borderTopRightRadius: 20,
-              }}
-            />
-            <View style={Styles.campaignContent}>
-              {/* Display campaign title */}
-              <Text style={Styles.campaignTitle} numberOfLines={1}>{campaign.campaignTitle}</Text>
+    <View style={[styles.container, { marginBottom: tabBarHeight }]}>
+      <StatusBar barStyle="light-content" backgroundColor={theme.colors.charcoalBlack} />
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Banner Section */}
+        <ImageBackground source={require("../../assets/items/hi_rec.jpg")} style={styles.bannerBackground}>
+          <View style={styles.bannerOverlay}>
+            <View style={styles.bannerContent}>
+              <View>
+                <Text style={styles.welcomeText}>{getTranslation("recipientScreen.greeting")}</Text>
+                <Text style={styles.usernameText}>{user?.username || "User"}</Text>
+              </View>
             </View>
-          </TouchableOpacity>
-        ))
-      ) : (
-        <View style={Styles.CampCards}>
-          <Text style={Styles.campaignTitle}>
-            {loading ? t("recipientScreen.loadingCampaigns") : t("recipientScreen.noCampaigns")}
-          </Text>
-        </View>
-      )}
-    </ScrollView>
-  </>
-)}
-        {role === 'recipient' && user.recipientType === 'ngo' && (
-          <View style={Styles.campaignButtonContainer}>
+          </View>
+        </ImageBackground>
+            {/* Donation Categories - Styled like donor home screen */}
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionTitle}>{getTranslation("recipientScreen.availableDonations")}</Text>
+
+          <View style={styles.categoriesContainer}>
             <TouchableOpacity
-              onPress={() => navigation.navigate('NGOCampaignForm')}
-              style={Styles.campaignButton}
+              style={[styles.categoryButton, activeCategory === "education" && styles.activeCategoryButton]}
+              onPress={() => handleCategoryPress("education")}
             >
-              <Text style={Styles.campaignButtonText}>{t("recipientScreen.postCampaign")}</Text>
+              <View
+                style={[
+                  styles.categoryIconContainer,
+                  activeCategory === "education" && styles.activeCategoryIconContainer,
+                ]}
+              >
+                <Icon
+                  name="school"
+                  size={28}
+                  color={activeCategory === "education" ? "#fff" : theme.colors.sageGreen}
+                />
+              </View>
+              <Text style={[styles.categoryText, activeCategory === "education" && styles.activeCategoryText]}>
+                {getTranslation("recipientScreen.education")}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.categoryButton, activeCategory === "clothes" && styles.activeCategoryButton]}
+              onPress={() => handleCategoryPress("clothes")}
+            >
+              <View
+                style={[
+                  styles.categoryIconContainer,
+                  activeCategory === "clothes" && styles.activeCategoryIconContainer,
+                ]}
+              >
+                <Icon
+                  name="checkroom"
+                  size={28}
+                  color={activeCategory === "clothes" ? "#fff" : theme.colors.sageGreen}
+                />
+              </View>
+              <Text style={[styles.categoryText, activeCategory === "clothes" && styles.activeCategoryText]}>
+                {getTranslation("recipientScreen.clothes")}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.categoryButton, activeCategory === "food" && styles.activeCategoryButton]}
+              onPress={() => handleCategoryPress("food")}
+            >
+              <View
+                style={[styles.categoryIconContainer, activeCategory === "food" && styles.activeCategoryIconContainer]}
+              >
+                <Icon
+                  name="local-dining"
+                  size={28}
+                  color={activeCategory === "food" ? "#fff" : theme.colors.sageGreen}
+                />
+              </View>
+              <Text style={[styles.categoryText, activeCategory === "food" && styles.activeCategoryText]}>
+                {getTranslation("recipientScreen.food")}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+
+        {/* Hero Card */}
+        <View style={styles.heroContainer}>
+          <ImageBackground
+            source={require("../../assets/items/poor.jpeg")}
+            style={styles.heroImage}
+            imageStyle={styles.heroImageStyle}
+          >
+            <View style={styles.heroOverlay}>
+              <View style={styles.heroContent}>
+                <Text style={[styles.heroTitle, { fontSize: isUrdu ? 26 : 18 }]}>
+                  {getTranslation("recipientScreen.motivational_text")}
+                </Text>
+                <TouchableOpacity style={styles.heroButton} onPress={() => navigation.navigate("RecepientStartScreen")}>
+                  <Text style={styles.heroButtonText}>{getTranslation("recipientScreen.claimNow")}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </ImageBackground>
+        </View>
+
+    
+        {/* Post Campaign Button for NGOs */}
+        {role === "recipient" && user.recipientType === "ngo" && (
+          <View style={styles.postCampaignContainer}>
+            <TouchableOpacity onPress={() => navigation.navigate("NGOCampaignForm")} style={styles.postCampaignButton}>
+              <Icon name="add-circle" size={24} color={theme.colors.ivory} style={styles.buttonIcon} />
+              <Text style={styles.postCampaignText}>{getTranslation("recipientScreen.postCampaign")}</Text>
             </TouchableOpacity>
           </View>
         )}
+
+        {/* Extra padding at bottom */}
+        <View style={{ height: 20 }} />
       </ScrollView>
     </View>
-  );
-};
+  )
+}
 
-
-
-
-const Styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.charcoalBlack,
     flex: 1,
-  },
-  banner: {
-    backgroundColor: theme.colors.TaupeBlack,
-    height: 170,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-  },
-  hero: {
-    borderRadius: 20,
-    backgroundColor: theme.colors.surface,
-    marginTop: 30,
-    height: 210,
-    borderRadius: 20,
-  },
-  heroText: {
-    position: 'absolute',
-    top: 60,
-    left: 20,
-    color: theme.colors.pearlWhite,
-    fontSize: 30,
-    fontWeight: 'bold',
-    fontFamily: 'Roboto',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  herooText: {
-    position: 'absolute',
-    top: 60,
-    left: 20,
-    color: theme.colors.pearlWhite,
-    fontSize: 16,
-    fontWeight: 'bold',
-    fontFamily: 'Roboto',
-    fontStyle: 'italic',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  heroBttn: {
-    position: 'absolute',
-    bottom: 10,
-    left: '65%',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-  },
-  iconContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
     backgroundColor: theme.colors.charcoalBlack,
   },
-  icon: {
-    backgroundColor: theme.colors.outerSpace,
-    padding: 10,
-    borderRadius: 25,
-    marginHorizontal: 5,
+  // Banner Section
+  bannerBackground: {
+    height: 180,
+    width: "100%",
+  },
+  bannerOverlay: {
+    height: "100%",
+    width: "100%",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 20,
+  },
+  bannerContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  welcomeText: {
+    color: "#fff",
+    fontSize: i18n.locale === "ur" ? 18: 16,
+    
+    opacity: 0.9,
+  },
+  usernameText: {
+    color: "#fff",
+    fontSize: 28,
+    fontWeight: "bold",
     marginTop: 5,
   },
-  campaignContent: {
-    padding: 10,
-  },
-  campaignTitle: {
-    color: theme.colors.ivory,
-    fontSize: 16,
-    alignSelf: "center",
-  },
-  campaignButtonContainer: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  campaignButton: {
-    width: '90%',
-    paddingVertical: 10,
-    borderRadius: 25,
-    backgroundColor: theme.colors.sageGreen,
-    alignItems: 'center',
-  },
-  campaignButtonText: {
-    color: theme.colors.ivory,
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  CampCards: {
-    height: 220,
-    backgroundColor: theme.colors.TaupeBlack,
-    marginLeft: 20,
-    marginTop: 20,
-    borderRadius: 20,
-    width: 300,
-    borderColor: theme.colors.sageGreen,
-    borderWidth: 3,
-    alignItems: 'center',
-  },
-  headings: { color: theme.colors.ivory, fontSize: 23, paddingTop: 20, fontWeight: "bold", marginLeft: 10 },
-  viewAllButton: {
-    color: theme.colors.ivory,
-    fontSize: 16,
-    paddingTop: 20,
-    marginLeft: 10,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    borderRadius: 10,
-  },
-});
 
-export default HomeScreenRec;
+  // Hero Section
+  heroContainer: {
+    marginTop: 25,
+    marginHorizontal: 20,
+    height: 180,
+    borderRadius: 20,
+    overflow: "hidden",
+  },
+  heroImage: {
+    width: "100%",
+    height: "100%",
+  },
+  heroImageStyle: {
+    borderRadius: 20,
+  },
+  heroOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "space-between",
+    padding: 20,
+  },
+  heroContent: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  heroTitle: {
+    color: "#fff",
+    fontWeight: "bold",
+    width: "60%",
+    textShadowColor: "rgba(0,0,0,0.75)",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
+  },
+  heroButton: {
+    backgroundColor: theme.colors.sageGreen,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    elevation: 3,
+  },
+  heroButtonText: {
+    color: theme.colors.ivory,
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+
+  // Section Containers
+  sectionContainer: {
+    marginTop: 25,
+    paddingHorizontal: 20,
+  },
+  sectionTitle: {
+    color: theme.colors.ivory,
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 15,
+  },
+
+  // Categories Section - Styled like donor home screen
+  categoriesContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  categoryButton: {
+    alignItems: "center",
+    width: "30%",
+  },
+  activeCategoryButton: {
+    transform: [{ scale: 1.05 }],
+  },
+  categoryIconContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: theme.colors.outerSpace,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: theme.colors.sageGreen,
+  },
+  activeCategoryIconContainer: {
+    backgroundColor: theme.colors.sageGreen,
+  },
+  categoryText: {
+    color: theme.colors.ivory,
+    marginTop: 5,
+    fontSize: i18n.locale === "ur" ? 16: 14,
+    
+  },
+  activeCategoryText: {
+    color: theme.colors.sageGreen,
+    fontWeight: "bold",
+  },
+
+  // Post campaign button
+  postCampaignContainer: {
+    marginTop: 30,
+    marginHorizontal: 20,
+  },
+  postCampaignButton: {
+    backgroundColor: theme.colors.sageGreen,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 14,
+    borderRadius: 30,
+    elevation: 4,
+  },
+  buttonIcon: {
+    marginRight: 8,
+  },
+  postCampaignText: {
+    color: theme.colors.ivory,
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+})
+
+export default HomeScreenRec

@@ -12,9 +12,11 @@ import { AuthContext } from "../context/AuthContext"
 import { UserProfileContext } from "../context/UserProfileContext"
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete"
 import axios from 'axios'
+import i18n, { t } from "../i18n"
 
 // You would replace this with your actual API key
 const GOOGLE_API_KEY = "";
+
 
 const RecipientProfileForm = ({ navigation }) => {
   const [khairPoints] = useState({value:100});
@@ -31,20 +33,86 @@ const RecipientProfileForm = ({ navigation }) => {
   const [cityError, setCityError] = useState("")
   const [showCityModal, setShowCityModal] = useState(false)
   
-  // Define the cities
-  const cities = ["Karachi", "Lahore", "Islamabad"]
+  // Define the cities with their translations
+  const cities = [
+    { value: "Karachi", label: i18n.locale === "ur" ? t("options.cities.karachi") : "Karachi" },
+    { value: "Lahore", label: i18n.locale === "ur" ? t("options.cities.lahore") : "Lahore" },
+    { value: "Islamabad", label: i18n.locale === "ur" ? t("options.cities.islamabad") : "Islamabad" }
+  ]
 
-  const genderOptions = ["Male", "Female", "Other"]
-  const maritalStatusOptions = ["Single", "Married", "Divorced", "Widowed"]
-  const occupationStatusOptions = ["Student", "Employed", "Unemployed"]
-  const educationalStatusOptions = ["College", "University", "Special Education"]
-  const clothingSizes = ["S", "M", "L", "XL", "XXL"]
+  // Define options with their translations
+  const genderOptions = [
+    { value: "Male", label: i18n.locale === "ur"  ? t("options.gender.male") : "Male" },
+    { value: "Female", label: i18n.locale === "ur" ? t("options.gender.female") : "Female" },
+    { value: "Other", label: i18n.locale === "ur" ? t("options.gender.other") : "Other" }
+  ]
+  
+  const maritalStatusOptions = [
+    { value: "Single", label: i18n.locale === "ur" ? t("options.marital_status.single") : "Single" },
+    { value: "Married", label: i18n.locale === "ur" ? t("options.marital_status.married") : "Married" },
+    { value: "Divorced", label: i18n.locale === "ur"  ? t("options.marital_status.divorced") : "Divorced" },
+    { value: "Widowed", label: i18n.locale === "ur"  ? t("options.marital_status.widowed") : "Widowed" }
+  ]
+  
+  const occupationStatusOptions = [
+    { value: "Student", label: i18n.locale === "ur" ? t("options.occupation.student") : "Student" },
+    { value: "Employed", label: i18n.locale === "ur"  ? t("options.occupation.employed") : "Employed" },
+    { value: "Unemployed", label: i18n.locale === "ur"  ? t("options.occupation.unemployed") : "Unemployed" }
+  ]
+  
+  const educationalStatusOptions = [
+    { value: "School", label: i18n.locale === "ur"  ? t("options.education.school") : "Schorgrgol" },
+    { value: "College", label: i18n.locale === "ur" ? t("options.education.college") : "College" },
+    { value: "University", label: i18n.locale === "ur" ? t("options.education.university") : "University" },
+    { value: "Special Education", label: i18n.locale === "ur"  ? t("options.education.special") : "Special Education" }
+  ]
+  
+  const clothingSizes = [
+    { value: "S", label: i18n.locale === "ur"  ? t("options.clothing_sizes.S") : "S" },
+    { value: "M", label: i18n.locale === "ur" ? t("options.clothing_sizes.M") : "M" },
+    { value: "L", label: i18n.locale === "ur"  ? t("options.clothing_sizes.L") : "L" },
+    { value: "XL", label: i18n.locale === "ur"  ? t("options.clothing_sizes.XL") : "XL" },
+    { value: "XXL", label: i18n.locale === "ur"  ? t("options.clothing_sizes.XXL") : "XXL" }
+  ]
+  
+  // Numeric sizes remain the same in both languages
   const shirtSizes = ["36", "38", "40", "42", "44", "46", "48"]
   const shoeSizes = ["34", "36", "38", "40", "42", "44", "46"]
   const trouserSizes = ["28", "30", "32", "34", "36", "38", "40", "42"]
-  const gradeOption = ["Nursery", "KG", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"]
-  const uniYearOption = ["1st", "2nd", "3rd", "4th"]
-  const collegeYearOption = ["1st Year", "2nd Year"]
+  
+  const gradeOption = [
+    { value: "Nursery", label: i18n.locale === "ur" ? t("options.grades.nursery") : "Nursery" },
+    { value: "KG", label: i18n.locale === "ur" ? t("options.grades.kg") : "KG" },
+    { value: "1", label: "1" },
+    { value: "2", label: "2" },
+    { value: "3", label: "3" },
+    { value: "4", label: "4" },
+    { value: "5", label: "5" },
+    { value: "6", label: "6" },
+    { value: "7", label: "7" },
+    { value: "8", label: "8" },
+    { value: "9", label: "9" },
+    { value: "10", label: "10" },
+    { value: "11", label: "11" }
+  ]
+  
+  const uniYearOption = [
+    { value: "1st", label: i18n.locale === "ur"  ? t("options.university_years.1st") : "1st" },
+    { value: "2nd", label: i18n.locale === "ur" ? t("options.university_years.2nd") : "2nd" },
+    { value: "3rd", label: i18n.locale === "ur" ? t("options.university_years.3rd") : "3rd" },
+    { value: "4th", label: i18n.locale === "ur"  ? t("options.university_years.4th") : "4th" }
+  ]
+  
+  const collegeYearOption = [
+    { value: "1st Year", label: i18n.locale === "ur"  ? t("options.college_years.1st_year") : "1st Year" },
+    { value: "2nd Year", label: i18n.locale === "ur"  ? t("options.college_years.2nd_year") : "2nd Year" }
+  ]
+
+  // Helper function to get English value from translated label
+  const getEnglishValue = (translatedValue, optionsArray) => {
+    const option = optionsArray.find(opt => opt.label === translatedValue);
+    return option ? option.value : translatedValue;
+  }
 
   // Validate address and get coordinates using Google Maps API
   const validateAndGetCoordinates = async (address) => {
@@ -84,7 +152,7 @@ const RecipientProfileForm = ({ navigation }) => {
   // Validate if the selected city is in the address
   const validateCityInAddress = (address) => {
     if (!selectedCity) {
-      setCityError("Please select a city");
+      setCityError(t("errors.city_required"));
       return false;
     }
 
@@ -92,8 +160,12 @@ const RecipientProfileForm = ({ navigation }) => {
       return false;
     }
 
+    // Get the English city name
+    const cityObj = cities.find(city => city.value === selectedCity || city.label === selectedCity);
+    const cityName = cityObj ? cityObj.value : selectedCity;
+
     // Check if the selected city is in the address string
-    if (!address.includes(selectedCity)) {
+    if (!address.includes(cityName)) {
       return false;
     }
 
@@ -108,69 +180,93 @@ const RecipientProfileForm = ({ navigation }) => {
     const ageError = validateAge(values.age)
     if (ageError) errors.age = ageError
   
-    if (!values.age) errors.age = "Age is required"
-    if (isNaN(values.age)) errors.age = "Age must be a number"
-    if (values.age < 18) errors.age = "Age must be greater than 18"
-    if (!values.gender) errors.gender = "Gender is required"
-    if (!values.maritalStatus) errors.maritalStatus = "Marital status is required"
-    if (values.maritalStatus == "Married" || values.maritalStatus == "Widowed" || values.maritalStatus == "Divorced") {
-      if (!values.children) errors.children = "Number of children is required"
-      if (isNaN(values.children)) errors.children = "Number of children must be a number"
-      if (values.children < 0) errors.children = "Number of children can not be negative"
+    if (!values.age) errors.age = t("errors.age_required")
+    if (isNaN(values.age)) errors.age = t("errors.age_number")
+    if (values.age < 18) errors.age = t("errors.age_min")
+    if (!values.gender) errors.gender = t("errors.gender_required")
+    if (!values.maritalStatus) errors.maritalStatus = t("errors.marital_status_required")
+    
+    // Get English values for comparison
+    const marriedValue = maritalStatusOptions.find(opt => opt.value === "Married").label;
+    const widowedValue = maritalStatusOptions.find(opt => opt.value === "Widowed").label;
+    const divorcedValue = maritalStatusOptions.find(opt => opt.value === "Divorced").label;
+    
+    if (values.maritalStatus === marriedValue || 
+        values.maritalStatus === widowedValue || 
+        values.maritalStatus === divorcedValue ||
+        values.maritalStatus === "Married" ||
+        values.maritalStatus === "Widowed" ||
+        values.maritalStatus === "Divorced") {
+      if (!values.children) errors.children = t("errors.children_required")
+      if (isNaN(values.children)) errors.children = t("errors.children_number")
+      if (values.children < 0) errors.children = t("errors.children_negative")
       if (Number(values.children) !== Number.parseInt(values.children))
-        errors.children = "Number of children must be a whole number"
+        errors.children = t("errors.children_whole")
       if (Number.parseInt(values.children) > Number.parseInt(values.membersCount)) {
-        errors.children = "Number of children can not exceed number of family members"
+        errors.children = t("errors.children_exceed")
       }
     }
+    
     if (!values.occupation || values.occupation === "notsel") {
-      errors.occupation = "Occupation is required"
+      errors.occupation = t("errors.occupation_required")
     }
-    if (values.occupation === "Employed") {
-      if (!values.income) errors.income = "Income is required"
+    
+    // Get English value for employed
+    const employedValue = occupationStatusOptions.find(opt => opt.value === "Employed").label;
+    
+    if (values.occupation === employedValue || values.occupation === "Employed") {
+      if (!values.income) errors.income = t("errors.income_required")
       if (values.income.trim() === "") {
-        errors.income = "Income cannot contain only spaces."
+        errors.income = t("errors.income_spaces")
       }
-      if (isNaN(values.income)) errors.income = "Income must be a number"
+      if (isNaN(values.income)) errors.income = t("errors.income_number")
       if (values.income < 0) {
-        errors.income = "Income can not be negative"
+        errors.income = t("errors.income_negative")
       }
     }
     
     // City validation
     if (!selectedCity) {
-      errors.city = "City is required";
+      errors.city = t("errors.city_required");
     }
   
     // Address validation
-    if (!values.address) errors.address = "Address is required"
+    if (!values.address) errors.address = t("errors.address_required")
     if (!addressCoordinates && values.address) {
-      errors.address = "Please select a valid address from the suggestions"
+      errors.address = t("errors.address_invalid")
     }
     
     // Check if address contains the selected city
-    if (selectedCity && values.address && !values.address.includes(selectedCity)) {
-      errors.address = `Your address must include ${selectedCity}`;
+    if (selectedCity && values.address) {
+      const cityObj = cities.find(city => city.value === selectedCity || city.label === selectedCity);
+      const cityName = cityObj ? cityObj.value : selectedCity;
+      
+      if (!values.address.includes(cityName)) {
+        errors.address = `${t("errors.address_city")} ${cityObj ? cityObj.label : selectedCity}`;
+      }
     }
+    
+    // Get English value for student
+    const studentValue = occupationStatusOptions.find(opt => opt.value === "Student").label;
   
     // Only validate education-related fields if occupation is "Student"
-    if (values.occupation === "Student") {
-      if (!values.educationLevel) errors.educationLevel = "Education level is required"
-      if (!values.institution) errors.institution = "Institution is required"
-      if (!values.class) errors.class = "Class/Year is required"
+    if (values.occupation === studentValue || values.occupation === "Student") {
+      if (!values.educationLevel) errors.educationLevel = t("errors.education_required")
+      if (!values.institution) errors.institution = t("errors.institution_required")
+      if (!values.class) errors.class = t("errors.class_required")
     }
   
-    if (!values.shoeSize) errors.shoeSize = "Shoe size is required"
-    if (!values.clothingSize) errors.clothingSize = "Clothing size is required"
-    if (!values.shirtSize) errors.shirtSize = "Shirt size is required"
-    if (!values.trouserSize) errors.trouserSize = "Trouser size is required"
+    if (!values.shoeSize) errors.shoeSize = t("errors.shoe_size_required")
+    if (!values.clothingSize) errors.clothingSize = t("errors.clothing_size_required")
+    if (!values.shirtSize) errors.shirtSize = t("errors.shirt_size_required")
+    if (!values.trouserSize) errors.trouserSize = t("errors.trouser_size_required")
   
-    if (!values.membersCount && values.membersCount !== 0) errors.membersCount = "Number of family members is required"
-    if (isNaN(values.membersCount)) errors.membersCount = "Number of family members must be a number"
-    if (values.membersCount < 0) errors.membersCount = "Number of family members cannot be negative"
+    if (!values.membersCount && values.membersCount !== 0) errors.membersCount = t("errors.members_required")
+    if (isNaN(values.membersCount)) errors.membersCount = t("errors.members_number")
+    if (values.membersCount < 0) errors.membersCount = t("errors.members_negative")
     if (Number(values.membersCount) !== Number.parseInt(values.membersCount))
-      errors.membersCount = "Number of family members must be a whole number"
-    if (values.membersCount > 10) errors.membersCount = "Number of family members should be less than 10"
+      errors.membersCount = t("errors.members_whole")
+    if (values.membersCount > 10) errors.membersCount = t("errors.members_max")
   
     console.log(errors)
   
@@ -183,12 +279,51 @@ const RecipientProfileForm = ({ navigation }) => {
     
     // Check if address contains the selected city
     if (!validateCityInAddress(values.address)) {
-      Alert.alert('Address Error', `Your address must include ${selectedCity}`);
+      const cityObj = cities.find(city => city.value === selectedCity || city.label === selectedCity);
+      Alert.alert('Address Error', `${t("errors.address_city")} ${cityObj ? cityObj.label : selectedCity}`);
       return;
     }
     
+    // Convert translated values to English before saving to Firestore
+    const englishGender = getEnglishValue(values.gender, genderOptions);
+    const englishMaritalStatus = getEnglishValue(values.maritalStatus, maritalStatusOptions);
+    const englishOccupation = getEnglishValue(values.occupation, occupationStatusOptions);
+    const englishEducationLevel = getEnglishValue(values.educationLevel, educationalStatusOptions);
+    const englishClothingSize = getEnglishValue(values.clothingSize, clothingSizes);
+    
+    // Get English value for city
+    const cityObj = cities.find(city => city.value === selectedCity || city.label === selectedCity);
+    const englishCity = cityObj ? cityObj.value : selectedCity;
+    
+    // Convert class/year to English if needed
+    let englishClass = values.class;
+    if (values.educationLevel === educationalStatusOptions.find(opt => opt.value === "College").label || 
+        values.educationLevel === "College") {
+      englishClass = getEnglishValue(values.class, collegeYearOption);
+    } else if (values.educationLevel === educationalStatusOptions.find(opt => opt.value === "University").label || 
+               values.educationLevel === "University") {
+      englishClass = getEnglishValue(values.class, uniYearOption);
+    } else if (values.educationLevel === educationalStatusOptions.find(opt => opt.value === "School").label || 
+               values.educationLevel === "School") {
+      englishClass = getEnglishValue(values.class, gradeOption);
+    }
+    
     if (Number.parseInt(values.children) > 0) {
-      navigation.navigate("ChildrenProfiles", { ParentValues: values })
+      // Create a new values object with English values
+      const englishValues = {
+        ...values,
+        gender: englishGender,
+        maritalStatus: englishMaritalStatus,
+        occupation: englishOccupation,
+        educationLevel: englishEducationLevel,
+        class: englishClass,
+        clothingSize: englishClothingSize,
+        city: englishCity,
+        addressCoordinates: addressCoordinates, // Add coordinates
+
+      };
+      
+      navigation.navigate("ChildrenProfiles", { ParentValues: englishValues })
     } else {
       setSubmitting(false)
       try {
@@ -197,20 +332,20 @@ const RecipientProfileForm = ({ navigation }) => {
           .doc(user.uid)
           .set({
             age: Number.parseInt(values.age), // Convert to integer
-            gender: values.gender,
-            maritalStatus: values.maritalStatus,
+            gender: englishGender,
+            maritalStatus: englishMaritalStatus,
             children: Number.parseInt(values.children) || 0, // Convert to integer, default to 0
-            occupation: values.occupation,
+            occupation: englishOccupation,
             income: Number.parseFloat(values.income) || 0, // Convert to decimal
-            educationLevel: values.educationLevel,
+            educationLevel: englishEducationLevel,
             institution: values.institution,
-            class: values.class,
+            class: englishClass,
             shoeSize: values.shoeSize,
-            clothingSize: values.clothingSize,
+            clothingSize: englishClothingSize,
             shirtSize: values.shirtSize,
             trouserSize: values.trouserSize,
             address: values.address,
-            city: selectedCity, // Add the selected city
+            city: englishCity, // Add the selected city in English
             addressCoordinates: addressCoordinates, // Add coordinates
             profileImage: values.profileImage || "", // Ensure string (or default empty)
             createdAt: firestore.FieldValue.serverTimestamp(), // Timestamp for when the profile is created
@@ -236,15 +371,15 @@ const RecipientProfileForm = ({ navigation }) => {
     >
       <View style={styles.modalContainer}>
         <View style={styles.modalHeader}>
-          <Text style={styles.modalTitle}>Search Location</Text>
+          <Text style={styles.modalTitle}>{t("location_modal.title")}</Text>
           <TouchableOpacity onPress={() => setShowLocationModal(false)} style={styles.closeButton}>
-            <Text style={styles.closeButtonText}>Close</Text>
+            <Text style={styles.closeButtonText}>{t("location_modal.close")}</Text>
           </TouchableOpacity>
         </View>
 
         <GooglePlacesAutocomplete
           ref={googlePlacesRef}
-          placeholder="Enter your address"
+          placeholder={t("recipient_profile.search_address")}
           minLength={2}
           fetchDetails={true}
           onPress={(data, details = null) => {
@@ -259,8 +394,13 @@ const RecipientProfileForm = ({ navigation }) => {
               });
               
               // Check if the selected city is in the address
-              if (selectedCity && !formattedAddress.includes(selectedCity)) {
-                Alert.alert('Address Error', `Your address must include ${selectedCity}`);
+              if (selectedCity) {
+                const cityObj = cities.find(city => city.value === selectedCity || city.label === selectedCity);
+                const cityName = cityObj ? cityObj.value : selectedCity;
+                
+                if (!formattedAddress.includes(cityName)) {
+                  Alert.alert('Address Error', `${t("errors.address_city")} ${cityObj ? cityObj.label : selectedCity}`);
+                }
               }
               
               setShowLocationModal(false);
@@ -276,33 +416,32 @@ const RecipientProfileForm = ({ navigation }) => {
               zIndex: 1,
             },
             textInputContainer: {
-              backgroundColor: theme.colors.TaupeBlack,
+              backgroundColor: theme.colors.pearlWhite,
               borderTopWidth: 0,
               borderBottomWidth: 0,
             },
             textInput: {
-              backgroundColor: theme.colors.TaupeBlack,
+              backgroundColor: theme.colors.pearlWhite,
               color: theme.colors.ivory,
               height: 50,
               borderWidth: 1,
               borderRadius: 10,
               borderColor: theme.colors.ivory,
-              fontSize: 16,
+              fontSize: i18n.locale === "ur" ? 16 : 16,
               marginLeft: 0,
               marginRight: 0,
             },
             listView: {
-              backgroundColor: theme.colors.TaupeBlack,
+              backgroundColor: theme.colors.pearlWhite,
               borderWidth: 1,
               borderColor: theme.colors.ivory,
               borderRadius: 5,
               marginTop: 5,
             },
             row: {
-              backgroundColor: theme.colors.TaupeBlack,
+              backgroundColor: theme.colors.pearlWhite,
               padding: 13,
               height: 'auto',
-              flexDirection: 'row',
               borderBottomWidth: 1,
               borderColor: theme.colors.ivory,
             },
@@ -318,7 +457,7 @@ const RecipientProfileForm = ({ navigation }) => {
               color: theme.colors.ivory,
             },
             poweredContainer: {
-              backgroundColor: theme.colors.TaupeBlack,
+              backgroundColor: theme.colors.pearlWhite,
               borderBottomLeftRadius: 5,
               borderBottomRightRadius: 5,
               borderColor: theme.colors.ivory,
@@ -347,26 +486,26 @@ const RecipientProfileForm = ({ navigation }) => {
     >
       <View style={styles.cityModalContainer}>
         <View style={styles.cityModalContent}>
-          <Text style={styles.cityModalTitle}>Select Your City</Text>
+          <Text style={styles.cityModalTitle}>{t("city_modal.title")}</Text>
 
           {cities.map((city) => (
             <TouchableOpacity
-              key={city}
-              style={[styles.cityOption, selectedCity === city && styles.selectedCityOption]}
+              key={city.value}
+              style={[styles.cityOption, selectedCity === city.value && styles.selectedCityOption]}
               onPress={() => {
-                setSelectedCity(city)
+                setSelectedCity(city.value)
                 setCityError("")
                 setShowCityModal(false)
               }}
             >
-              <Text style={[styles.cityOptionText, selectedCity === city && styles.selectedCityOptionText]}>
-                {city}
+              <Text style={[styles.cityOptionText, selectedCity === city.value && styles.selectedCityOptionText]}>
+                {city.label}
               </Text>
             </TouchableOpacity>
           ))}
 
           <TouchableOpacity style={styles.closeCityModalButton} onPress={() => setShowCityModal(false)}>
-            <Text style={styles.closeCityModalButtonText}>Close</Text>
+            <Text style={styles.closeCityModalButtonText}>{t("city_modal.close")}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -379,7 +518,7 @@ const RecipientProfileForm = ({ navigation }) => {
   return (
     <View style={[styles.container, { marginBottom: 20 }]}>
       <ScrollView>
-        <Text style={styles.title}>Recipient Profile</Text>
+        <Text style={styles.title}>{t("recipient_profile.title")}</Text>
         <View style={styles.line} />
 
         <Formik
@@ -407,48 +546,49 @@ const RecipientProfileForm = ({ navigation }) => {
             <>
               {/* Age Input */}
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>Age</Text>
+                <Text style={styles.label}>{t("recipient_profile.age")}</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { fontSize: i18n.locale === "ur" ? 18 : 15 , textAlign: i18n.locale === "ur"  ? "right": "left"}]}
                   onChangeText={handleChange("age")}
                   onBlur={handleBlur("age")}
                   value={values.age}
-                  placeholder="Enter your age"
+                  placeholder={t("recipient_profile.age")}
                   placeholderTextColor={theme.colors.ivory}
                   keyboardType="numeric"
                 />
-                {errors.age && touched.age && <Text style={styles.errorText}>{errors.age}</Text>}
+                {errors.age && touched.age && <Text style={[styles.errorText, { fontSize: i18n.locale === "ur"  ? 14 : 12 }]}>{errors.age}</Text>}
               </View>
 
               {/* Gender Selection */}
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>Gender</Text>
-                <View style={styles.radioContainer}>
+                <Text style={styles.label}>{t("recipient_profile.gender")}</Text>
+                <View style={[styles.radioContainer, {  }]}>
                   {genderOptions.map((option) => (
                     <TouchableOpacity
-                      key={option}
-                      style={styles.radioOption}
-                      onPress={() => setFieldValue("gender", option)}
+                      key={option.value}
+                      style={[styles.radioOption, {}]}
+                      onPress={() => setFieldValue("gender", option.label)}
                     >
-                      <View style={[styles.radioCircle, values.gender === option && styles.radioSelected]} />
-                      <Text style={styles.radioLabel}>{option}</Text>
+                      <View style={[styles.radioCircle, values.gender === option.label && styles.radioSelected, { marginRight: i18n.locale === "ur" ? 0 : 10, marginLeft: i18n.locale === "ur" ? 10 : 0 }]} />
+                      <Text style={[styles.radioLabel, {  }]}>{option.label}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
-                {errors.gender && touched.gender && <Text style={styles.errorText}>{errors.gender}</Text>}
+                {errors.gender && touched.gender && <Text style={[styles.errorText, {  fontSize: i18n.locale === "ur" ? 14 : 12 }]}>{errors.gender}</Text>}
               </View>
               
               {/* City Selection Field */}
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>City</Text>
+                <Text style={styles.label}>{t("recipient_profile.city")}</Text>
                 <View style={styles.addressContainer}>
                   <TextInput
                     style={[
                       styles.addressInput,
-                      cityError ? { borderColor: "red" } : null
+                      cityError ? { borderColor: "red" } : null,
+                      { fontSize: i18n.locale === "ur"  ? 16 : 15 }
                     ]}
-                    value={selectedCity}
-                    placeholder="Select your city"
+                    value={selectedCity ? cities.find(city => city.value === selectedCity).label : ""}
+                    placeholder={t("recipient_profile.select_city")}
                     placeholderTextColor={theme.colors.ivory}
                     editable={false}
                   />
@@ -458,23 +598,24 @@ const RecipientProfileForm = ({ navigation }) => {
                       setShowCityModal(true)
                     }}
                   >
-                    <Text style={styles.searchButtonText}>Select</Text>
+                    <Text style={styles.searchButtonText}>{t("recipient_profile.select")}</Text>
                   </TouchableOpacity>
                 </View>
-                {cityError && <Text style={styles.errorText}>{cityError}</Text>}
+                {cityError && <Text style={[styles.errorText, {  fontSize: i18n.locale === "ur" ? 14 : 12 }]}>{cityError}</Text>}
               </View>
 
               {/* Address Input with Location Search */}
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>Address</Text>
+                <Text style={styles.label}>{t("recipient_profile.address")}</Text>
                 <View style={styles.addressContainer}>
                   <TextInput
                     style={[
                       styles.addressInput,
-                      errors.address && touched.address && styles.errorBorder
+                      errors.address && touched.address && styles.errorBorder,
+                      {  fontSize: i18n.locale === "ur"  ? 16 : 15 }
                     ]}
                     value={values.address}
-                    placeholder="Search your address"
+                    placeholder={t("recipient_profile.search_address")}
                     placeholderTextColor={theme.colors.ivory}
                     editable={false}
                   />
@@ -485,194 +626,208 @@ const RecipientProfileForm = ({ navigation }) => {
                       setShowLocationModal(true)
                     }}
                   >
-                    <Text style={styles.searchButtonText}>Search</Text>
+                    <Text style={styles.searchButtonText}>{t("recipient_profile.search")}</Text>
                   </TouchableOpacity>
                 </View>
-                {errors.address && touched.address && <Text style={styles.errorText}>{errors.address}</Text>}
+                {errors.address && touched.address && <Text style={[styles.errorText, {  fontSize: i18n.locale === "ur"  ? 14 : 12 }]}>{errors.address}</Text>}
                 {addressCoordinates && (
-                  <Text style={styles.coordinatesText}>
-                    Address validated ✓
+                  <Text style={[styles.coordinatesText, {  }]}>
+                    {t("recipient_profile.address_validated")}
                   </Text>
                 )}
               </View>
 
               {/* Number of Family Members Input */}
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>Number of Family Members</Text>
+                <Text style={styles.label}>{t("recipient_profile.family_members")}</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, {  fontSize: i18n.locale === "ur"  ? 16 : 15 , textAlign: i18n.locale === "ur"  ? "right": "left"}]}
                   onChangeText={handleChange("membersCount")}
                   onBlur={handleBlur("membersCount")}
                   value={values.membersCount.toString()}
-                  placeholder="Enter number of family members"
+                  placeholder={t("recipient_profile.family_members")}
                   placeholderTextColor={theme.colors.ivory}
                   keyboardType="numeric"
                 />
                 {errors.membersCount && touched.membersCount && (
-                  <Text style={styles.errorText}>{errors.membersCount}</Text>
+                  <Text style={[styles.errorText, {  fontSize: i18n.locale === "ur"  ? 14 : 12 }]}>{errors.membersCount}</Text>
                 )}
               </View>
 
               {/* Marital Status Selection */}
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>Marital Status</Text>
+                <Text style={styles.label}>{t("recipient_profile.marital_status")}</Text>
                 <View style={styles.pickerContainer}>
                   <Picker
                     selectedValue={values.maritalStatus}
                     onValueChange={(itemValue) => setFieldValue("maritalStatus", itemValue)}
-                    style={styles.picker1}
+                    style={[styles.picker1, {}]}
                   >
-                    <Picker.Item label="Select marital status" value="" />
+                    <Picker.Item label={t("recipient_profile.marital_status")} value="" />
                     {maritalStatusOptions.map((status) => (
-                      <Picker.Item key={status} label={status} value={status} />
+                      <Picker.Item key={status.value} label={status.label} value={status.label} />
                     ))}
                   </Picker>
                 </View>
                 {errors.maritalStatus && touched.maritalStatus && (
-                  <Text style={styles.errorText}>{errors.maritalStatus}</Text>
+                  <Text style={[styles.errorText, { fontSize: i18n.locale === "ur"  ? 14 : 12 }]}>{errors.maritalStatus}</Text>
                 )}
               </View>
 
               {/* Children Input (Conditional) */}
-              {(values.maritalStatus === "Married" ||
+              {(values.maritalStatus === maritalStatusOptions.find(opt => opt.value === "Married")?.label ||
+                values.maritalStatus === maritalStatusOptions.find(opt => opt.value === "Divorced")?.label ||
+                values.maritalStatus === maritalStatusOptions.find(opt => opt.value === "Widowed")?.label ||
+                values.maritalStatus === "Married" ||
                 values.maritalStatus === "Divorced" ||
                 values.maritalStatus === "Widowed") && (
                 <View style={styles.inputContainer}>
-                  <Text style={styles.label}>Number of Children *under 18*</Text>
+                  <Text style={styles.label}>{t("recipient_profile.children")}</Text>
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, {  fontSize: i18n.locale === "ur"  ? 16 : 15 ,textAlign: i18n.locale === "ur"  ? "right": "left"}]}
                     onChangeText={handleChange("children")}
                     onBlur={handleBlur("children")}
                     value={values.children}
-                    placeholder="Enter number of children"
+                    placeholder={t("recipient_profile.children")}
                     placeholderTextColor={theme.colors.ivory}
                     keyboardType="numeric"
                   />
-                  {errors.children && touched.children && <Text style={styles.errorText}>{errors.children}</Text>}
+                  {errors.children && touched.children && <Text style={[styles.errorText, { fontSize: i18n.locale === "ur" ? 14 : 12 }]}>{errors.children}</Text>}
                 </View>
               )}
 
               {/* occupation Status Selection */}
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>Occupation</Text>
+                <Text style={styles.label}>{t("recipient_profile.occupation")}</Text>
                 <View style={styles.pickerContainer}>
                   <Picker
                     selectedValue={values.occupation}
                     onValueChange={(itemValue) => setFieldValue("occupation", itemValue)}
-                    style={styles.picker1}
+                    style={[styles.picker1, { }]}
                   >
-                    <Picker.Item label="Select Occupation status" value="" />
+                    <Picker.Item label={t("recipient_profile.occupation")} value="" />
                     {occupationStatusOptions.map((status) => (
-                      <Picker.Item key={status} label={status} value={status} />
+                      <Picker.Item key={status.value} label={status.label} value={status.label} />
                     ))}
                   </Picker>
                 </View>
-                {errors.occupation && touched.occupation && <Text style={styles.errorText}>{errors.occupation}</Text>}
+                {errors.occupation && touched.occupation && <Text style={[styles.errorText, {  fontSize: i18n.locale === "ur" ? 14 : 12 }]}>{errors.occupation}</Text>}
               </View>
 
               {/* Income Input */}
-              {values.occupation === "Employed" && (
+              {(values.occupation === occupationStatusOptions.find(opt => opt.value === "Employed")?.label ||
+                values.occupation === "Employed") && (
                 <View style={styles.inputContainer}>
-                  <Text style={styles.label}>Monthly Income</Text>
+                  <Text style={styles.label}>{t("recipient_profile.income")}</Text>
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, {  fontSize: i18n.locale === "ur"  ? 16 : 15,textAlign: i18n.locale === "ur"  ? "right": "left" }]}
                     onChangeText={handleChange("income")}
                     onBlur={handleBlur("income")}
                     value={values.income}
-                    placeholder="Enter your monthly income"
+                    placeholder={t("recipient_profile.income")}
                     placeholderTextColor={theme.colors.ivory}
                     keyboardType="numeric"
                   />
-                  {errors.income && touched.income && <Text style={styles.errorText}>{errors.income}</Text>}
+                  {errors.income && touched.income && <Text style={[styles.errorText, {  fontSize: i18n.locale === "ur"  ? 14 : 12 }]}>{errors.income}</Text>}
                 </View>
               )}
 
               {/* Student-specific fields (Conditional) */}
-              {values.occupation === "Student" && (
+              {(values.occupation === occupationStatusOptions.find(opt => opt.value === "Student")?.label ||
+                values.occupation === "Student") && (
                 <>
                   {/* Educational level Status Selection */}
                   <View style={styles.inputContainer}>
-                    <Text style={styles.label}>Educationl Level</Text>
+                    <Text style={styles.label}>{t("recipient_profile.education_level")}</Text>
                     <View style={styles.pickerContainer}>
                       <Picker
                         selectedValue={values.educationLevel}
                         onValueChange={(itemValue) => setFieldValue("educationLevel", itemValue)}
-                        style={styles.picker1}
+                        style={[styles.picker1, { }]}
                       >
-                        <Picker.Item label="Select Educational Level" value="" />
+                        <Picker.Item label={t("recipient_profile.education_level")} value="" />
                         {educationalStatusOptions.map((status) => (
-                          <Picker.Item key={status} label={status} value={status} />
+                          <Picker.Item key={status.value} label={status.label} value={status.label} />
                         ))}
                       </Picker>
                     </View>
                     {errors.educationLevel && touched.educationLevel && (
-                      <Text style={styles.errorText}>{errors.educationLevel}</Text>
+                      <Text style={[styles.errorText, {  fontSize: i18n.locale === "ur"  ? 14 : 12 }]}>{errors.educationLevel}</Text>
                     )}
                   </View>
 
                   <View style={styles.inputContainer}>
-                    <Text style={styles.label}>Institution Name</Text>
+                    <Text style={styles.label}>{t("recipient_profile.institution")}</Text>
                     <TextInput
-                      style={styles.input}
+                      style={[styles.input, {  fontSize: i18n.locale === "ur"  ? 16 : 15 ,textAlign: i18n.locale === "ur"  ? "right": "left"}]}
                       onChangeText={handleChange("institution")}
                       onBlur={handleBlur("institution")}
                       value={values.institution}
-                      placeholder="Enter institution name"
+                      placeholder={t("recipient_profile.institution")}
                       placeholderTextColor={theme.colors.ivory}
                     />
                     {errors.institution && touched.institution && (
-                      <Text style={styles.errorText}>{errors.institution}</Text>
+                      <Text style={[styles.errorText, {  fontSize: i18n.locale === "ur"  ? 14 : 12 }]}>{errors.institution}</Text>
                     )}
                   </View>
 
-                  {(values.educationLevel === "College" || values.educationLevel === "University" || values.educationLevel==="Special Education") && (
+                  {(values.educationLevel === educationalStatusOptions.find(opt => opt.value === "College")?.label || 
+                    values.educationLevel === educationalStatusOptions.find(opt => opt.value === "University")?.label || 
+                    values.educationLevel === educationalStatusOptions.find(opt => opt.value === "Special Education")?.label ||
+                    values.educationLevel === "College" ||
+                    values.educationLevel === "University" ||
+                    values.educationLevel === "Special Education") && (
                     <>
                       {/* Year of Study */}
                       <View style={styles.inputContainer}>
-                        <Text style={styles.label}>Year Of Study</Text>
+                        <Text style={styles.label}>{t("recipient_profile.year_of_study")}</Text>
                         <View style={styles.pickerContainer}>
-                          {values.educationLevel === "College" && (
+                          {(values.educationLevel === educationalStatusOptions.find(opt => opt.value === "College")?.label ||
+                            values.educationLevel === "College") && (
                             <>
                               <Picker
-                                selectedValue={values.educationLevel}
+                                selectedValue={values.class}
                                 onValueChange={(itemValue) => setFieldValue("class", itemValue)}
-                                style={styles.picker1}
+                                style={[styles.picker1, {  }]}
                               >
-                                <Picker.Item label="Select Year of Study" value="" />
-                                {collegeYearOption.map((status) => (
-                                  <Picker.Item key={status} label={status} value={status} />
+                                <Picker.Item label={t("recipient_profile.year_of_study")} value="" />
+                                {collegeYearOption.map((year) => (
+                                  <Picker.Item key={year.value} label={year.label} value={year.label} />
                                 ))}
                               </Picker>
                             </>
                           )}
-                          {values.educationLevel === "University" && (
+                          {(values.educationLevel === educationalStatusOptions.find(opt => opt.value === "University")?.label ||
+                            values.educationLevel === "University") && (
                             <>
                               <Picker
-                                selectedValue={values.educationLevel}
+                                selectedValue={values.class}
                                 onValueChange={(itemValue) => setFieldValue("class", itemValue)}
-                                style={styles.picker1}
+                                style={[styles.picker1, {  }]}
                               >
-                                <Picker.Item label="Select Year of Study" value="" />
-                                {uniYearOption.map((status) => (
-                                  <Picker.Item key={status} label={status} value={status} />
+                                <Picker.Item label={t("recipient_profile.year_of_study")} value="" />
+                                {uniYearOption.map((year) => (
+                                  <Picker.Item key={year.value} label={year.label} value={year.label} />
                                 ))}
                               </Picker>
                             </>
                           )}
 
-                          {values.educationLevel === "Special Education" && (
+                          {(values.educationLevel === educationalStatusOptions.find(opt => opt.value === "Special Education")?.label ||
+                            values.educationLevel === "Special Education") && (
                             <>
                               <Picker
-                                selectedValue={values.educationLevel}
+                                selectedValue={values.class}
                                 onValueChange={(itemValue) => setFieldValue("class", itemValue)}
-                                style={styles.picker1}
+                                style={[styles.picker1, {  }]}
                               >
-                                <Picker.Item label="Special Education" value="Special Education" />
+                                <Picker.Item label={educationalStatusOptions.find(opt => opt.value === "Special Education")?.label || "Special Education"} 
+                                             value={educationalStatusOptions.find(opt => opt.value === "Special Education")?.label || "Special Education"} />
                               </Picker>
                             </>
                           )}
                         </View>
-                        {errors.class && touched.class && <Text style={styles.errorText}>{errors.class}</Text>}
+                        {errors.class && touched.class && <Text style={[styles.errorText, {  fontSize: i18n.locale === "ur" ? 14 : 12 }]}>{errors.class}</Text>}
                       </View>
                     </>
                   )}
@@ -681,89 +836,93 @@ const RecipientProfileForm = ({ navigation }) => {
 
               {/* Shoe Size Selection */}
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>Shoe Size</Text>
+                <Text style={styles.label}>{t("recipient_profile.shoe_size")}</Text>
                 <View style={styles.pickerContainer}>
                   <Picker
                     selectedValue={values.shoeSize}
                     onValueChange={(itemValue) => setFieldValue("shoeSize", itemValue)}
-                    style={styles.picker1}
+                    style={[styles.picker1, { }]}
                   >
-                    <Picker.Item label="Select shoe size" value="" />
+                    <Picker.Item label={t("recipient_profile.shoe_size")} value="" />
                     {shoeSizes.map((size) => (
                       <Picker.Item key={size} label={size} value={size} />
                     ))}
                   </Picker>
                 </View>
-                {errors.shoeSize && touched.shoeSize && <Text style={styles.errorText}>{errors.shoeSize}</Text>}
+                {errors.shoeSize && touched.shoeSize && <Text style={[styles.errorText, {  fontSize: i18n.locale === "ur" ? 14 : 12 }]}>{errors.shoeSize}</Text>}
               </View>
 
               {/* Clothing Size Selection */}
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>Clothing Size</Text>
+                <Text style={styles.label}>{t("recipient_profile.clothing_size")}</Text>
                 <View style={styles.pickerContainer}>
                   <Picker
                     selectedValue={values.clothingSize}
                     onValueChange={(itemValue) => setFieldValue("clothingSize", itemValue)}
-                    style={styles.picker1}
+                    style={[styles.picker1, {  }]}
                   >
-                    <Picker.Item label="Select clothing size" value="" />
+                    <Picker.Item label={t("recipient_profile.clothing_size")} value="" />
                     {clothingSizes.map((size) => (
-                      <Picker.Item key={size} label={size} value={size} />
+                      <Picker.Item key={size.value} label={size.label} value={size.label} />
                     ))}
                   </Picker>
                 </View>
                 {errors.clothingSize && touched.clothingSize && (
-                  <Text style={styles.errorText}>{errors.clothingSize}</Text>
+                  <Text style={[styles.errorText, {  fontSize: i18n.locale === "ur" ? 14 : 12 }]}>{errors.clothingSize}</Text>
                 )}
               </View>
 
               {/* Shirt Size Selection */}
-              <View style={styles.inputContainer}>
-                <Text style={styles.label}>Shirt Size</Text>
-                <View style={styles.pickerContainer}>
-                  <Picker
-                    selectedValue={values.shirtSize}
-                    onValueChange={(itemValue) => setFieldValue("shirtSize", itemValue)}
-                    style={styles.picker1}
-                  >
-                    <Picker.Item label="Select shirt size" value="" />
-                    {shirtSizes.map((size) => (
-                      <Picker.Item key={size} label={size} value={size} />
-                    ))}
-                  </Picker>
-                </View>
-                {errors.shirtSize && touched.shirtSize && <Text style={styles.errorText}>{errors.shirtSize}</Text>}
-              </View>
+             <View style={styles.inputContainer}>
+  <Text style={styles.label}>{t("recipient_profile.shirt_size")}</Text>
+  <View style={styles.pickerContainer}>
+    <Picker
+      selectedValue={values.shirtSize}
+      onValueChange={(itemValue) => setFieldValue("shirtSize", itemValue)}
+      style={[styles.picker1, { }]}
+    >
+      <Picker.Item label={t("recipient_profile.shirt_size")} value="" />
+      {shirtSizes.map((size) => (
+        <Picker.Item key={size} label={size} value={size} />
+      ))}
+    </Picker>
+  </View>
+  {errors.shirtSize && touched.shirtSize && (
+    <Text style={[styles.errorText, { fontSize: i18n.locale === "ur" ? 14 : 12 }]}>
+      {errors.shirtSize}
+    </Text>
+  )}
+</View>
 
               {/* Trouser Size Selection */}
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>Trouser Size</Text>
+                <Text style={styles.label}>{t("recipient_profile.trouser_size")}</Text>
                 <View style={styles.pickerContainer}>
                   <Picker
                     selectedValue={values.trouserSize}
                     onValueChange={(itemValue) => setFieldValue("trouserSize", itemValue)}
-                    style={styles.picker1}
+                    style={[styles.picker1, {  }]}
                   >
-                    <Picker.Item label="Select trouser size" value="" />
+                    <Picker.Item label={t("recipient_profile.trouser_size")} value="" />
                     {trouserSizes.map((size) => (
                       <Picker.Item key={size} label={size} value={size} />
                     ))}
                   </Picker>
                 </View>
                 {errors.trouserSize && touched.trouserSize && (
-                  <Text style={styles.errorText}>{errors.trouserSize}</Text>
+                  <Text style={[styles.errorText, { fontSize: i18n.locale === "ur" ? 14 : 12 }]}>{errors.trouserSize}</Text>
                 )}
               </View>
 
               {/* Profile Picture Upload */}
               <View style={styles.inputContainer}>
-                <Text style={styles.label}>Profile Picture</Text>
+                <Text style={styles.label}>{t("recipient_profile.profile_picture")}</Text>
                 <ImagePickerComponent
                   maxImages={1}
                   selectedImages={image ? [image] : []}
                   onImagesChange={(images) => setImage(images[0])}
                 />
-                {errors.image && <Text style={styles.errorText}>{errors.image}</Text>}
+                {errors.image && <Text style={[styles.errorText, {  fontSize: i18n.locale === "ur"  ? 14 : 12 }]}>{errors.image}</Text>}
               </View>
 
               {/* Submit Button */}
@@ -774,7 +933,7 @@ const RecipientProfileForm = ({ navigation }) => {
                 }}
                 style={styles.submitButton}
               >
-                <Text style={styles.submitButtonText}>Save Profile</Text>
+                <Text style={[styles.submitButtonText, { fontSize: i18n.locale === "ur"  ? 18 : 16 }]}>{t("recipient_profile.save_profile")}</Text>
               </TouchableOpacity>
             </>
           )}
@@ -813,23 +972,25 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
-    fontSize: 16,
+  fontSize: i18n.locale === "ur" ? 18: 16,
+    
     fontWeight: "bold",
     color: theme.colors.ivory,
     marginBottom: 5,
   },
   input: {
-    backgroundColor: theme.colors.TaupeBlack,
+    backgroundColor: theme.colors.pearlWhite,
     height: 40,
     borderWidth: 1,
     borderRadius: 10,
     borderColor: theme.colors.ivory,
     paddingHorizontal: 15,
     color: theme.colors.ivory,
-    fontSize: 16,
+    fontSize: i18n.locale === "ur" ? 18: 16,
+    
   },
   textArea: {
-    backgroundColor: theme.colors.TaupeBlack,
+    backgroundColor: theme.colors.pearlWhite,
     height: 80,
     borderWidth: 1,
     borderRadius: 10,
@@ -862,7 +1023,8 @@ const styles = StyleSheet.create({
   },
   radioLabel: {
     color: theme.colors.ivory,
-    fontSize: 16,
+        fontSize: i18n.locale === "ur" ? 18: 16,
+    
   },
   pickerContainer: {
     borderWidth: 1,
@@ -873,12 +1035,12 @@ const styles = StyleSheet.create({
   picker: {
     height: 40,
     color: theme.colors.ivory,
-    backgroundColor: theme.colors.TaupeBlack,
+    backgroundColor: theme.colors.pearlWhite,
   },
   picker1: {
     height: 50,
     color: theme.colors.ivory,
-    backgroundColor: theme.colors.TaupeBlack,
+    backgroundColor: theme.colors.pearlWhite,
   },
   submitButton: {
     backgroundColor: theme.colors.sageGreen,
@@ -894,7 +1056,8 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: "red",
-    fontSize: 12,
+        fontSize: i18n.locale === "ur" ? 14: 12,
+    
     marginTop: 5,
   },
   errorBorder: {
@@ -906,14 +1069,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   addressInput: {
-    backgroundColor: theme.colors.TaupeBlack,
+    backgroundColor: theme.colors.pearlWhite,
     height: 40,
     borderWidth: 1,
     borderRadius: 10,
     borderColor: theme.colors.ivory,
     paddingHorizontal: 15,
     color: theme.colors.ivory,
-    fontSize: 16,
+    fontSize: i18n.locale === "ur" ? 16: 12,
+    
     flex: 1,
   },
   searchButton: {

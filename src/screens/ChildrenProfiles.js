@@ -10,7 +10,7 @@ import { AuthContext } from "../context/AuthContext"
 import firestore from "@react-native-firebase/firestore"
 import { IsCnicUnique } from "../helpers/IsCnicUnique";
 import { idCardValidator } from "../helpers/idCardValidator";
-
+import i18n, { t } from "../i18n"
 
 
 const ChildrenProfiles = ({ navigation, route }) => {
@@ -23,16 +23,63 @@ const ChildrenProfiles = ({ navigation, route }) => {
   useEffect(() => {
   }, [numberOfChildren])
 
-  const genderOptions = ["Male", "Female", "Other"]
-  const enrollmentOptions = ["Enrolled", "Not Enrolled"]
-  const educationalStatusOptions = ["School", "College", "Special Education"]
-  const clothingSizes = ["S", "M", "L", "XL", "XXL"]
+  // Define options with their translations
+  const genderOptions = [
+    { value: "Male", label:i18n.locale === "ur" ? t("options.gender.male") : "Male" },
+    { value: "Female", label: i18n.locale === "ur"? t("options.gender.female") : "Female" },
+    { value: "Other", label: i18n.locale === "ur"? t("options.gender.other") : "Other" }
+  ]
+  
+  const enrollmentOptions = [
+    { value: "Enrolled", label:i18n.locale === "ur" ? t("options.enrollment.enrolled") : "Enrolled" },
+    { value: "Not Enrolled", label: i18n.locale === "ur"? t("options.enrollment.not_enrolled") : "Not Enrolled" }
+  ]
+  
+  const educationalStatusOptions = [
+    { value: "School", label: i18n.locale === "ur" ? t("options.education.school") : "School" },
+    { value: "College", label: i18n.locale === "ur" ? t("options.education.college") : "College" },
+    { value: "Special Education", label:i18n.locale === "ur"? t("options.education.special") : "Special Education" }
+  ]
+  
+  const clothingSizes = [
+    { value: "S", label: i18n.locale === "ur" ? t("options.clothing_sizes.S") : "S" },
+    { value: "M", label: i18n.locale === "ur"? t("options.clothing_sizes.M") : "M" },
+    { value: "L", label: i18n.locale === "ur" ? t("options.clothing_sizes.L") : "L" },
+    { value: "XL", label: i18n.locale === "ur" ? t("options.clothing_sizes.XL") : "XL" },
+    { value: "XXL", label: i18n.locale === "ur"? t("options.clothing_sizes.XXL") : "XXL" }
+  ]
+  
+  // Numeric sizes remain the same in both languages
   const shirtSizes = ["36", "38", "40", "42", "44", "46", "48"]
   const shoeSizes = ["34", "36", "38", "40", "42", "44", "46"]
   const trouserSizes = ["28", "30", "32", "34", "36", "38", "40", "42"]
-  const gradeOption = ['Nursery', 'KG', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'];
-  const uniYearOption = ['1st', '2nd', '3rd', '4th'];
-  const collegeYearOption = ['1st Year', '2nd Year'];
+  
+  const gradeOption = [
+    { value: "Nursery", label:i18n.locale === "ur" ? t("options.grades.nursery") : "Nursery" },
+    { value: "KG", label: i18n.locale === "ur" ? t("options.grades.kg") : "KG" },
+    { value: "1", label: "1" },
+    { value: "2", label: "2" },
+    { value: "3", label: "3" },
+    { value: "4", label: "4" },
+    { value: "5", label: "5" },
+    { value: "6", label: "6" },
+    { value: "7", label: "7" },
+    { value: "8", label: "8" },
+    { value: "9", label: "9" },
+    { value: "10", label: "10" },
+    { value: "11", label: "11" }
+  ]
+  
+  const collegeYearOption = [
+    { value: "1st Year", label:i18n.locale === "ur" ? t("options.college_years.1st_year") : "1st Year" },
+    { value: "2nd Year", label: i18n.locale === "ur"? t("options.college_years.2nd_year") : "2nd Year" }
+  ]
+
+  // Helper function to get English value from translated label
+  const getEnglishValue = (translatedValue, optionsArray) => {
+    const option = optionsArray.find(opt => opt.label === translatedValue);
+    return option ? option.value : translatedValue;
+  }
 
   // Function to check if ID card is duplicate within the form
   const isDuplicateIdCard = (idCard, currentIndex, allChildren) => {
@@ -47,34 +94,33 @@ const ChildrenProfiles = ({ navigation, route }) => {
     const errors = {}
     values.children.forEach((child, index) => {
       const childErrors = {}
-      if (!child.age) childErrors.age = "Age is required"
-      if (isNaN(child.age)) childErrors.age = "Age must be a number"
-      if (child.age>=18)childErrors.age="Child older than 18 can not be registered"
-      if (child.age>=18)childErrors.age="Child older than 18 can not be registered"
-      if (child.age && child.age<1)childErrors.age="Child younger than 1 year can not be registered"
+      if (!child.age) childErrors.age = t("errors.age_required")
+      if (isNaN(child.age)) childErrors.age = t("errors.age_number")
+      if (child.age>=18) childErrors.age = t("errors.age_child_max")
+      if (child.age && child.age<1) childErrors.age = t("errors.age_child_min")
 
-
-      if (!child.gender) childErrors.gender = "Gender is required"
-      if (!child.enrollmentStatus) childErrors.enrollmentStatus = "Enrollment status is required"
+      if (!child.gender) childErrors.gender = t("errors.gender_required")
+      if (!child.enrollmentStatus) childErrors.enrollmentStatus = t("errors.required")
       
       // Only validate education fields if child is enrolled
-      if (child.enrollmentStatus === "Enrolled") {
-        if (!child.educationLevel) childErrors.educationLevel = "Education level is required"
-        if (!child.institution) childErrors.institution = "Institution is required"
-        if (!child.class) childErrors.class = "Class/Year is required"
+      const enrolledValue = enrollmentOptions.find(opt => opt.value === "Enrolled").label;
+      if (child.enrollmentStatus === enrolledValue || child.enrollmentStatus === "Enrolled") {
+        if (!child.educationLevel) childErrors.educationLevel = t("errors.education_required")
+        if (!child.institution) childErrors.institution = t("errors.institution_required")
+        if (!child.class) childErrors.class = t("errors.class_required")
       }
       
-      if (!child.shoeSize) childErrors.shoeSize = "Shoe size is required"
-      if (!child.clothingSize) childErrors.clothingSize = "Clothing size is required"
-      if (!child.shirtSize) childErrors.shirtSize = "Shirt size is required"
-      if (!child.trouserSize) childErrors.trouserSize = "Trouser size is required"
-      if (!child.idCard) childErrors.idCard = "ID Card is required"
+      if (!child.shoeSize) childErrors.shoeSize = t("errors.shoe_size_required")
+      if (!child.clothingSize) childErrors.clothingSize = t("errors.clothing_size_required")
+      if (!child.shirtSize) childErrors.shirtSize = t("errors.shirt_size_required")
+      if (!child.trouserSize) childErrors.trouserSize = t("errors.trouser_size_required")
+      if (!child.idCard) childErrors.idCard = t("errors.id_card_required")
       else {
         const idCardError = idCardValidator(child.idCard)
         if (idCardError) {
           childErrors.idCard = idCardError
         } else if (isDuplicateIdCard(child.idCard, index, values.children)) {
-          childErrors.idCard = "This ID Card is already used for another child"
+          childErrors.idCard = t("errors.id_card_duplicate")
         }
       }
       if (Object.keys(childErrors).length > 0) {
@@ -130,19 +176,30 @@ const ChildrenProfiles = ({ navigation, route }) => {
           membersCount: Number.parseInt(ParentValues.membersCount) || 0,
           khairPoints:khairPoints.value + (khairPoints.value * numberOfChildren),
           lastPointsReassignmentDate:firestore.FieldValue.serverTimestamp(),
+          city:ParentValues.city,
+          addressCoordinates: ParentValues.addressCoordinates, // Add coordinates
 
-          
-
-            
           });
           
       } catch (error) {
         console.log("Error saving details of parent", error);
       }
         
+      // Convert translated values to English before saving to Firestore
       const childrenProfiles = values.children.map((child) => ({
         ...child,
         age: Number.parseInt(child.age),
+        gender: getEnglishValue(child.gender, genderOptions),
+        enrollmentStatus: getEnglishValue(child.enrollmentStatus, enrollmentOptions),
+        educationLevel: getEnglishValue(child.educationLevel, educationalStatusOptions),
+        clothingSize: getEnglishValue(child.clothingSize, clothingSizes),
+        class: child.class ? (
+          educationalStatusOptions.find(opt => opt.label === child.educationLevel || opt.value === child.educationLevel)?.value === "School" ? 
+            getEnglishValue(child.class, gradeOption) : 
+          educationalStatusOptions.find(opt => opt.label === child.educationLevel || opt.value === child.educationLevel)?.value === "College" ? 
+            getEnglishValue(child.class, collegeYearOption) : 
+            child.class
+        ) : ""
       }))
 
       await firestore().collection("children_profiles").doc(user.uid).set({ children: childrenProfiles })
@@ -173,8 +230,8 @@ const ChildrenProfiles = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <ScrollView>
-        <Text style={styles.title}>Children Profiles</Text>
-        <Text style={styles.subtitle}>Number of children: {numberOfChildren}</Text>
+        <Text style={styles.title}>{t("children_profiles.title")}</Text>
+        <Text style={styles.subtitle}>{t("children_profiles.number_of_children")}: {numberOfChildren}</Text>
         <View style={styles.line} />
 
         <Formik initialValues={initialValues} validate={validate} onSubmit={onSubmit}>
@@ -185,49 +242,47 @@ const ChildrenProfiles = ({ navigation, route }) => {
                 <>
                   {values.children.map((child, index) => (
                     <View key={index} style={styles.childContainer}>
-                      <Text style={styles.childTitle}>Child {index + 1}</Text>
-
-                     
+                      <Text style={styles.childTitle}>{t("children_profiles.child")} {index + 1}</Text>
 
                       <View style={styles.inputContainer}>
-                        <Text style={styles.label}>Age</Text>
+                        <Text style={styles.label}>{t("children_profiles.age")}</Text>
                         <TextInput
-                          style={styles.input}
+                          style={[styles.input, {  fontSize: i18n.locale === "ur" ? 16 : 15 ,textAlign: i18n.locale === "ur"  ? "right": "left"}]}
                           onChangeText={handleChange(`children[${index}].age`)}
                           onBlur={handleBlur(`children[${index}].age`)}
                           value={child.age}
-                          placeholder="Enter child's age"
+                          placeholder={t("children_profiles.age")}
                           placeholderTextColor={theme.colors.ivory}
                           keyboardType="numeric"
                         />
                         {errors.children?.[index]?.age && touched.children?.[index]?.age && (
-                          <Text style={styles.errorText}>{errors.children[index].age}</Text>
+                          <Text style={[styles.errorText, {  fontSize: i18n.locale === "ur" ? 14 : 12 }]}>{errors.children[index].age}</Text>
                         )}
                       </View>
 
                       <View style={styles.inputContainer}>
-                        <Text style={styles.label}>Gender</Text>
-                        <View style={styles.radioContainer}>
+                        <Text style={styles.label}>{t("children_profiles.gender")}</Text>
+                        <View style={[styles.radioContainer, { }]}>
                           {genderOptions.map((option) => (
                             <TouchableOpacity
-                              key={option}
-                              style={styles.radioOption}
-                              onPress={() => setFieldValue(`children[${index}].gender`, option)}
+                              key={option.value}
+                              style={[styles.radioOption, {  }]}
+                              onPress={() => setFieldValue(`children[${index}].gender`, option.label)}
                             >
-                              <View style={[styles.radioCircle, child.gender === option && styles.radioSelected]} />
-                              <Text style={styles.radioLabel}>{option}</Text>
+                              <View style={[styles.radioCircle, child.gender === option.label && styles.radioSelected, { marginRight: i18n.locale === "ur" ? 0 : 10, marginLeft: i18n.locale === "ur"? 10 : 0 }]} />
+                              <Text style={[styles.radioLabel, { }]}>{option.label}</Text>
                             </TouchableOpacity>
                           ))}
                         </View>
                         {errors.children?.[index]?.gender && touched.children?.[index]?.gender && (
-                          <Text style={styles.errorText}>{errors.children[index].gender}</Text>
+                          <Text style={[styles.errorText, {  fontSize: i18n.locale === "ur" ? 14 : 12 }]}>{errors.children[index].gender}</Text>
                         )}
                       </View>
 
                       <View style={styles.inputContainer}>
-                        <Text style={styles.label}>ID Card</Text>
+                        <Text style={styles.label}>{t("children_profiles.id_card")}</Text>
                         <TextInput
-                          style={styles.input}
+                          style={[styles.input, { fontSize: i18n.locale === "ur" ? 16 : 15 ,textAlign: i18n.locale === "ur"  ? "right": "left"}]}
                           onChangeText={handleChange(`children[${index}].idCard`)}
                           onBlur={async (e) => {
                             handleBlur(`children[${index}].idCard`)(e)
@@ -235,203 +290,208 @@ const ChildrenProfiles = ({ navigation, route }) => {
                             if (child.idCard && !idCardValidator(child.idCard)) {
                               // First check if it's duplicate within the form
                               if (isDuplicateIdCard(child.idCard, index, values.children)) {
-                                setFieldValue(`children[${index}].idCardError`, "This ID Card is already used for another child")
+                                setFieldValue(`children[${index}].idCardError`, t("errors.id_card_duplicate"))
                                 return
                               }
                               
                               // Then check if it's unique in the database
                               const isUnique = await IsCnicUnique(child.idCard)
                               if (!isUnique) {
-                                setFieldValue(`children[${index}].idCardError`, "This ID Card is already registered")
+                                setFieldValue(`children[${index}].idCardError`, t("errors.id_card_registered"))
                               } else {
                                 setFieldValue(`children[${index}].idCardError`, "")
                               }
                             }
                           }}
                           value={child.idCard}
-                          placeholder="Format: 34101-7678623-8"
+                          placeholder={t("children_profiles.id_card_format")}
                           placeholderTextColor={theme.colors.ivory}
                         />
                         {errors.children?.[index]?.idCard && touched.children?.[index]?.idCard && (
-                          <Text style={styles.errorText}>{errors.children[index].idCard}</Text>
+                          <Text style={[styles.errorText, {  fontSize: i18n.locale === "ur" ? 14 : 12 }]}>{errors.children[index].idCard}</Text>
                         )}
                         {child.idCardError && (
-                          <Text style={styles.errorText}>{child.idCardError}</Text>
+                          <Text style={[styles.errorText, { fontSize: i18n.locale === "ur"? 14 : 12 }]}>{child.idCardError}</Text>
                         )}
                       </View>
 
                       <View style={styles.inputContainer}>
-                        <Text style={styles.label}>Enrollment Status</Text>
-                        <View style={styles.radioContainer}>
+                        <Text style={styles.label}>{t("children_profiles.enrollment_status")}</Text>
+                        <View style={[styles.radioContainer, {  }]}>
                           {enrollmentOptions.map((option) => (
                             <TouchableOpacity
-                              key={option}
-                              style={styles.radioOption}
+                              key={option.value}
+                              style={[styles.radioOption, {  }]}
                               onPress={() => {
-                                setFieldValue(`children[${index}].enrollmentStatus`, option)
+                                setFieldValue(`children[${index}].enrollmentStatus`, option.label)
                                 // Clear education fields if changing to Not Enrolled
-                                if (option === "Not Enrolled") {
+                                if (option.value === "Not Enrolled") {
                                   setFieldValue(`children[${index}].educationLevel`, "")
                                   setFieldValue(`children[${index}].institution`, "")
                                   setFieldValue(`children[${index}].class`, "")
                                 }
                               }}
                             >
-                              <View style={[styles.radioCircle, child.enrollmentStatus === option && styles.radioSelected]} />
-                              <Text style={styles.radioLabel}>{option}</Text>
+                              <View style={[styles.radioCircle, child.enrollmentStatus === option.label && styles.radioSelected, { marginRight: i18n.locale === "ur" ? 0 : 10, marginLeft: i18n.locale === "ur" ? 10 : 0 }]} />
+                              <Text style={[styles.radioLabel, {  }]}>{option.label}</Text>
                             </TouchableOpacity>
                           ))}
                         </View>
                         {errors.children?.[index]?.enrollmentStatus && touched.children?.[index]?.enrollmentStatus && (
-                          <Text style={styles.errorText}>{errors.children[index].enrollmentStatus}</Text>
+                          <Text style={[styles.errorText, {  fontSize: i18n.locale === "ur" ? 14 : 12 }]}>{errors.children[index].enrollmentStatus}</Text>
                         )}
                       </View>
 
-                      {child.enrollmentStatus === "Enrolled" && (
+                      {(child.enrollmentStatus === enrollmentOptions.find(opt => opt.value === "Enrolled")?.label ||
+                        child.enrollmentStatus === "Enrolled") && (
                         <>
                           <View style={styles.inputContainer}>
-                            <Text style={styles.label}>Educational Level</Text>
+                            <Text style={styles.label}>{t("children_profiles.educational_level")}</Text>
                             <View style={styles.pickerContainer}>
                               <Picker
                                 selectedValue={child.educationLevel}
                                 onValueChange={(itemValue) => setFieldValue(`children[${index}].educationLevel`, itemValue)}
-                                style={styles.picker1}
+                                style={[styles.picker1, { }]}
                               >
-                                <Picker.Item label="Select Educational Level" value="" />
+                                <Picker.Item label={t("children_profiles.educational_level")} value="" />
                                 {educationalStatusOptions.map((status) => (
-                                  <Picker.Item key={status} label={status} value={status} />
+                                  <Picker.Item key={status.value} label={status.label} value={status.label} />
                                 ))}
                               </Picker>
                             </View>
                             {errors.children?.[index]?.educationLevel && touched.children?.[index]?.educationLevel && (
-                              <Text style={styles.errorText}>{errors.children[index].educationLevel}</Text>
+                              <Text style={[styles.errorText, {  fontSize: i18n.locale === "ur" ? 14 : 12 }]}>{errors.children[index].educationLevel}</Text>
                             )}
                           </View>
 
                           <View style={styles.inputContainer}>
-                            <Text style={styles.label}>Institution Name</Text>
+                            <Text style={styles.label}>{t("children_profiles.institution")}</Text>
                             <TextInput
-                              style={styles.input}
+                              style={[styles.input, { fontSize: i18n.locale === "ur" ? 16 : 15 ,textAlign: i18n.locale === "ur"  ? "right": "left"}]}
                               onChangeText={handleChange(`children[${index}].institution`)}
                               onBlur={handleBlur(`children[${index}].institution`)}
                               value={child.institution}
-                              placeholder="Enter institution name"
+                              placeholder={t("children_profiles.institution")}
                               placeholderTextColor={theme.colors.ivory}
                             />
                             {errors.children?.[index]?.institution && touched.children?.[index]?.institution && (
-                              <Text style={styles.errorText}>{errors.children[index].institution}</Text>
+                              <Text style={[styles.errorText, {  fontSize: i18n.locale === "ur" ? 14 : 12 }]}>{errors.children[index].institution}</Text>
                             )}
                           </View>
                           
                           <View style={styles.inputContainer}>
-                            <Text style={styles.label}>Class/Year</Text>
+                            <Text style={styles.label}>{t("children_profiles.class_year")}</Text>
                             <View style={styles.pickerContainer}>
                               <Picker
                                 selectedValue={child.class}
                                 onValueChange={(itemValue) => setFieldValue(`children[${index}].class`, itemValue)}
-                                style={styles.picker1}
+                                style={[styles.picker1, { }]}
                               >
-                                <Picker.Item label="Select Class/Year" value="" />
-                                {child.educationLevel === 'School' && (
+                                <Picker.Item label={t("children_profiles.class_year")} value="" />
+                                {(child.educationLevel === educationalStatusOptions.find(opt => opt.value === "School")?.label ||
+                                  child.educationLevel === "School") && (
                                   gradeOption.map((grade) => (
-                                    <Picker.Item key={grade} label={grade} value={grade} />
+                                    <Picker.Item key={grade.value} label={grade.label} value={grade.label} />
                                   ))
                                 )}
-                                {child.educationLevel === 'College' && (
+                                {(child.educationLevel === educationalStatusOptions.find(opt => opt.value === "College")?.label ||
+                                  child.educationLevel === "College") && (
                                   collegeYearOption.map((year) => (
-                                    <Picker.Item key={year} label={year} value={year} />
+                                    <Picker.Item key={year.value} label={year.label} value={year.label} />
                                   ))
                                 )}
                               
-                                {child.educationLevel === 'Special Education' && (
-                                  <Picker.Item label="Special Education" value="Special Education" />
+                                {(child.educationLevel === educationalStatusOptions.find(opt => opt.value === "Special Education")?.label ||
+                                  child.educationLevel === "Special Education") && (
+                                  <Picker.Item 
+                                    label={educationalStatusOptions.find(opt => opt.value === "Special Education")?.label || "Special Education"} 
+                                    value={educationalStatusOptions.find(opt => opt.value === "Special Education")?.label || "Special Education"} 
+                                  />
                                 )}
                               </Picker>
                             </View>
                             {errors.children?.[index]?.class && touched.children?.[index]?.class && (
-                              <Text style={styles.errorText}>{errors.children[index].class}</Text>
+                              <Text style={[styles.errorText, {  fontSize: i18n.locale === "ur" ? 14 : 12 }]}>{errors.children[index].class}</Text>
                             )}
                           </View>
                         </>
                       )}
 
                       <View style={styles.inputContainer}>
-                        <Text style={styles.label}>Shoe Size</Text>
+                        <Text style={styles.label}>{t("children_profiles.shoe_size")}</Text>
                         <View style={styles.pickerContainer}>
                           <Picker
                             selectedValue={child.shoeSize}
                             onValueChange={(itemValue) => setFieldValue(`children[${index}].shoeSize`, itemValue)}
-                            style={styles.picker1}
+                            style={[styles.picker1, { }]}
                           >
-                            <Picker.Item label="Select shoe size" value="" />
+                            <Picker.Item label={t("children_profiles.shoe_size")} value="" />
                             {shoeSizes.map((size) => (
                               <Picker.Item key={size} label={size} value={size} />
                             ))}
                           </Picker>
                         </View>
                         {errors.children?.[index]?.shoeSize && touched.children?.[index]?.shoeSize && (
-                          <Text style={styles.errorText}>{errors.children[index].shoeSize}</Text>
+                          <Text style={[styles.errorText, { fontSize:i18n.locale === "ur" ? 14 : 12 }]}>{errors.children[index].shoeSize}</Text>
                         )}
                       </View>
 
                       <View style={styles.inputContainer}>
-                        <Text style={styles.label}>Clothing Size</Text>
+                        <Text style={styles.label}>{t("children_profiles.clothing_size")}</Text>
                         <View style={styles.pickerContainer}>
                           <Picker
                             selectedValue={child.clothingSize}
                             onValueChange={(itemValue) => setFieldValue(`children[${index}].clothingSize`, itemValue)}
-                            style={styles.picker1}
+                            style={[styles.picker1, { }]}
                           >
-                            <Picker.Item label="Select clothing size" value="" />
+                            <Picker.Item label={t("children_profiles.clothing_size")} value="" />
                             {clothingSizes.map((size) => (
-                              <Picker.Item key={size} label={size} value={size} />
+                              <Picker.Item key={size.value} label={size.label} value={size.label} />
                             ))}
                           </Picker>
                         </View>
                         {errors.children?.[index]?.clothingSize && touched.children?.[index]?.clothingSize && (
-                          <Text style={styles.errorText}>{errors.children[index].clothingSize}</Text>
+                          <Text style={[styles.errorText, {  fontSize: i18n.locale === "ur" ? 14 : 12 }]}>{errors.children[index].clothingSize}</Text>
                         )}
                       </View>
 
                       <View style={styles.inputContainer}>
-                        <Text style={styles.label}>Shirt Size</Text>
+                        <Text style={styles.label}>{t("children_profiles.shirt_size")}</Text>
                         <View style={styles.pickerContainer}>
                           <Picker
                             selectedValue={child.shirtSize}
                             onValueChange={(itemValue) => setFieldValue(`children[${index}].shirtSize`, itemValue)}
-                            style={styles.picker1}
+                            style={[styles.picker1, {  }]}
                           >
-                            <Picker.Item label="Select shirt size" value="" />
+                            <Picker.Item label={t("children_profiles.shirt_size")} value="" />
                             {shirtSizes.map((size) => (
                               <Picker.Item key={size} label={size} value={size} />
                             ))}
                           </Picker>
                         </View>
                         {errors.children?.[index]?.shirtSize && touched.children?.[index]?.shirtSize && (
-                          <Text style={styles.errorText}>{errors.children[index].shirtSize}</Text>
+                          <Text style={[styles.errorText, {  fontSize: i18n.locale === "ur"? 14 : 12 }]}>{errors.children[index].shirtSize}</Text>
                         )}
                       </View>
 
                       <View style={styles.inputContainer}>
-                        <Text style={styles.label}>Trouser Size</Text>
+                        <Text style={styles.label}>{t("children_profiles.trouser_size")}</Text>
                         <View style={styles.pickerContainer}>
                           <Picker
                             selectedValue={child.trouserSize}
                             onValueChange={(itemValue) => setFieldValue(`children[${index}].trouserSize`, itemValue)}
-                            style={styles.picker1}
+                            style={[styles.picker1, { }]}
                           >
-                            <Picker.Item label="Select trouser size" value="" />
+                            <Picker.Item label={t("children_profiles.trouser_size")} value="" />
                             {trouserSizes.map((size) => (
                               <Picker.Item key={size} label={size} value={size} />
                             ))}
                           </Picker>
                         </View>
                         {errors.children?.[index]?.trouserSize && touched.children?.[index]?.trouserSize && (
-                          <Text style={styles.errorText}>{errors.children[index].trouserSize}</Text>
+                          <Text style={[styles.errorText, { fontSize: i18n.locale === "ur" ? 14 : 12 }]}>{errors.children[index].trouserSize}</Text>
                         )}
                       </View>
-
-                
                     </View>
                   ))}
 
@@ -442,7 +502,7 @@ const ChildrenProfiles = ({ navigation, route }) => {
                     }}
                     style={styles.submitButton}
                   >
-                    <Text style={styles.submitButtonText}>Save Profiles</Text>
+                    <Text style={[styles.submitButtonText, { fontSize: i18n.locale === "ur" ? 18 : 16 }]}>{t("children_profiles.save_profiles")}</Text>
                   </TouchableOpacity>
                 </>
               )}
@@ -502,7 +562,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   input: {
-    backgroundColor: theme.colors.TaupeBlack,
+    backgroundColor: theme.colors.pearlWhite,
     height: 40,
     borderWidth: 1,
     borderRadius: 10,
@@ -545,12 +605,12 @@ const styles = StyleSheet.create({
   picker: {
     height: 40,
     color: theme.colors.ivory,
-    backgroundColor: theme.colors.TaupeBlack,
+    backgroundColor: theme.colors.pearlWhite,
   },
   picker1: {
     height: 50,
     color: theme.colors.ivory,
-    backgroundColor: theme.colors.TaupeBlack,
+    backgroundColor: theme.colors.pearlWhite,
   },
   submitButton: {
     backgroundColor: theme.colors.sageGreen,
