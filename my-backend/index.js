@@ -1010,3 +1010,52 @@ app.get('/api/claimed-items/unscheduled', (req, res) => {
       });
   });
 });
+
+
+
+app.put("/api/update-delivery-status", (req, res) => {
+  const { id, scheduledelivery } = req.body
+
+  if (!id || !scheduledelivery) {
+    return res.status(400).json({
+      status: "error",
+      message: "Missing required fields: id and scheduledelivery ",
+    })
+  }
+
+  console.log(`Updating delivery status for claimed item ${id} to ${scheduledelivery}`)
+
+  const query = `
+    UPDATE ClaimedItems 
+    SET scheduledelivery = ? 
+    WHERE id = ?
+  `
+
+  db.query(query, [scheduledelivery, id], (err, result) => {
+    if (err) {
+      console.error("Error updating delivery status:", err)
+      return res.status(500).json({
+        status: "error",
+        message: "Error updating delivery status",
+        error: err.message,
+      })
+    }
+
+    // Check if any rows were affected
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        status: "error",
+        message: "Claimed item not found",
+      })
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Delivery status updated successfully",
+      data: {
+        id,
+        scheduledelivery,
+      },
+    })
+  })
+})
