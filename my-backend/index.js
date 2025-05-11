@@ -734,6 +734,9 @@ app.get('/api/claimed-items/unscheduled', (req, res) => {
               error: err.message, // Optional: Remove in production
           });
       }
+      else{
+        console.log("this is the result",results)
+      }
 
       // Return the results in a structured format
       return res.status(200).json({
