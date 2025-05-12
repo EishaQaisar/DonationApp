@@ -274,10 +274,11 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
       hasErrors = true
     }
 
-    if (!pickupCoordinates) {
+   /* if (!pickupCoordinates) {
       newErrors.pickupCoordinates = true
       hasErrors = true
-    }
+      console.log("hfsf")
+    }*/
 
     // If there are errors, update state and show alert
     if (hasErrors) {
@@ -297,6 +298,7 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
     // If we get here, all validation passed, continue with saving
     try {
       // Save the order to Firebase
+      console.log("sgfrg")
       await firestore()
         .collection("orders")
         .doc(id.toString()) // Use the claimed item ID as the order ID

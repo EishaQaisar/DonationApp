@@ -42,7 +42,7 @@ const CircleLogoStepper = () => {
           {/* Step */}
           <View style={styles.step}>
             <View style={styles.circleContainer}>
-              <View style={[styles.circle, step.active && { backgroundColor: theme.colors.pearlWhite }]}>
+              <View style={[styles.circle, step.active && { backgroundColor: theme.colors.sageGreen }]}>
                 {step.icon}
               </View>
               <RTLText style={styles.circleText}>{step.text}</RTLText>
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: theme.colors.sageGreen,
+    backgroundColor: theme.colors.outerSpace,
     justifyContent: "center",
     alignItems: "center",
   },

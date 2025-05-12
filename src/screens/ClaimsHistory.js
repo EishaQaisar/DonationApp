@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: 16,
-    color: theme.colors.pearlWhite,
+    color: theme.colors.TaupeBlack,
   },
   activeTabText: {
     color: theme.colors.primary,

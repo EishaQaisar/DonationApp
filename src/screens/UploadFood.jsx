@@ -153,7 +153,7 @@ const UploadFood = ({navigation}) => {
       quantity: quantity.value,
       images: images,
       donorUsername: user.username,
-      donorCity:user.username
+      donorCity:user.city
     };
 
     try {
@@ -333,7 +333,7 @@ const UploadFood = ({navigation}) => {
 
 const Styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.charcoalBlack,
+    backgroundColor: theme.colors.pearlWhite,
     flex: 1,
     padding: 10,
     paddingTop: 30,
@@ -345,7 +345,7 @@ const Styles = StyleSheet.create({
     marginTop: 10,
   },
   optionButton: {
-    backgroundColor: theme.colors.TaupeBlack,
+    backgroundColor: theme.colors.outerSpace,
     borderWidth: 1,
     borderColor: theme.colors.ivory,
     borderRadius: 10,
@@ -425,7 +425,7 @@ const Styles = StyleSheet.create({
     fontSize: 20, // Increased font size for Urdu
   },
   descri: {
-    backgroundColor: theme.colors.TaupeBlack,
+    backgroundColor: theme.colors.outerSpace,
     height: 150,
     borderWidth: 1,
     borderRadius: 10,
@@ -441,7 +441,7 @@ const Styles = StyleSheet.create({
     fontSize: 18, // Increased font size for Urdu input
   },
   name: {
-    backgroundColor: theme.colors.TaupeBlack,
+    backgroundColor: theme.colors.outerSpace,
     height: 40,
     borderWidth: 1,
     borderRadius: 10,

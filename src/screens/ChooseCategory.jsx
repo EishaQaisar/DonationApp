@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useContext } from "react"
-import { View, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, ImageBackground, Text } from "react-native"
+import { View, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, Text } from "react-native"
 import { theme } from "../core/theme"
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
 import CircleLogoStepper from "../components/CircleLogoStepper"
@@ -16,45 +16,33 @@ const ChooseCategory = ({ navigation }) => {
 
   return (
     <SafeAreaView style={[styles.safeContainer, { marginBottom: tabBarHeight }]}>
-      {/* Background Image */}
-      <ImageBackground source={require("../../assets/items/poor1.jpg")} style={styles.backgroundImage}>
-        <ScrollView contentContainerStyle={styles.container}>
-          <CircleLogoStepper />
-          <View style={styles.line} />
+      <ScrollView contentContainerStyle={styles.container}>
+        <CircleLogoStepper />
+        <View style={styles.line} />
 
-          <Text style={styles.title}>{t("chooseCategory.title", "Donation Categories")}</Text>
+        <Text style={styles.title}>{t("chooseCategory.title", "Donation Categories")}</Text>
 
-          {/* Education Category */}
+        {/* Category List */}
+        {[
+          { label: t("chooseCategory.education", "Education"), nav: "UploadEdu", key: "education" },
+          { label: t("chooseCategory.food", "Food"), nav: "UploadFood", key: "food" },
+          { label: t("chooseCategory.clothing", "Clothing"), nav: "UploadClothes", key: "clothes" }
+        ].map((item) => (
           <TouchableOpacity
-            style={[styles.categoryBox, hoveredCategory === "education" && styles.categoryBoxHovered]}
-            onPress={() => navigation.navigate("UploadEdu")}
-            onMouseEnter={() => setHoveredCategory("education")}
+            key={item.key}
+            style={[
+              styles.categoryBox,
+              hoveredCategory === item.key && styles.categoryBoxHovered
+            ]}
+            onPress={() => navigation.navigate(item.nav)}
+            onMouseEnter={() => setHoveredCategory(item.key)}
             onMouseLeave={() => setHoveredCategory(null)}
+            activeOpacity={0.85}
           >
-            <Text style={styles.categoryText}>{t("chooseCategory.education", "Education")}</Text>
+            <Text style={styles.categoryText}>{item.label}</Text>
           </TouchableOpacity>
-
-          {/* Food Category */}
-          <TouchableOpacity
-            style={[styles.categoryBox, hoveredCategory === "food" && styles.categoryBoxHovered]}
-            onPress={() => navigation.navigate("UploadFood")}
-            onMouseEnter={() => setHoveredCategory("food")}
-            onMouseLeave={() => setHoveredCategory(null)}
-          >
-            <Text style={styles.categoryText}>{t("chooseCategory.food", "Food")}</Text>
-          </TouchableOpacity>
-
-          {/* Clothing Category */}
-          <TouchableOpacity
-            style={[styles.categoryBox, hoveredCategory === "clothes" && styles.categoryBoxHovered]}
-            onPress={() => navigation.navigate("UploadClothes")}
-            onMouseEnter={() => setHoveredCategory("clothes")}
-            onMouseLeave={() => setHoveredCategory(null)}
-          >
-            <Text style={styles.categoryText}>{t("chooseCategory.clothing", "Clothing")}</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </ImageBackground>
+        ))}
+      </ScrollView>
     </SafeAreaView>
   )
 }
@@ -64,59 +52,50 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.charcoalBlack,
   },
-  backgroundImage: {
-    flex: 1,
-    width: "100%",
-    height: "100%",
-  },
   container: {
     alignItems: "center",
-    paddingVertical: 20,
-    paddingHorizontal: 10,
-    marginTop: 30,
-    width: "100%",
+    paddingVertical: 30,
+    paddingHorizontal: 20,
   },
   title: {
     fontSize: 26,
     fontWeight: "bold",
-    marginBottom: 30,
     color: theme.colors.ivory,
-    textAlign: "center",
-    marginTop: 50,
-    width: "100%",
-  },
-  categoryBox: {
-    width: "90%",
-    backgroundColor: "transparent",
-    paddingVertical: 25,
-    borderRadius: 15,
-    marginVertical: 15,
-    borderWidth: 2,
-    borderColor: theme.colors.sageGreen,
-    shadowColor: theme.colors.sageGreen,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  categoryBoxHovered: {
-    backgroundColor: theme.colors.sageGreen,
-    borderColor: theme.colors.charcoalBlack,
-  },
-  categoryText: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#FFFFFF",
+    marginBottom: 30,
+    marginTop: 20,
     textAlign: "center",
   },
   line: {
     borderBottomWidth: 1,
     borderColor: theme.colors.sageGreen,
-    marginVertical: 10,
+    marginVertical: 15,
     width: "80%",
+  },
+  categoryBox: {
+    width: "100%",
+    backgroundColor: theme.colors.sageGreen,
+    borderWidth: 2,
+    borderColor: theme.colors.sageGreen,
+    borderRadius: 14,
+    paddingVertical: 25,
+    marginVertical: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: theme.colors.sageGreen,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  categoryBoxHovered: {
+    backgroundColor: theme.colors.sageGreen,
+  },
+  categoryText: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: theme.colors.ivory,
+    textAlign: "center",
   },
 })
 
 export default ChooseCategory
-

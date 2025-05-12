@@ -21,7 +21,7 @@ import firestore from "@react-native-firebase/firestore"
 import { AuthContext } from "../context/AuthContext"
 import { getBaseUrl } from "../helpers/deviceDetection"
 import axios from "axios"
-import { t } from "../i18n" // Import the translation function
+import i18n, { t } from "../i18n"
 
 const ItemDetail = ({ route }) => {
   const { item, category, role } = route.params
@@ -40,17 +40,17 @@ const ItemDetail = ({ route }) => {
   // Dynamic styles based on language
   const dynamicStyles = {
     detailLabel: {
-      fontSize: isUrdu ? 18 : 16, // Increase font size for Urdu
+      fontSize: isUrdu ? 18 : 16,
       color: theme.colors.ivory,
       marginBottom: 2,
     },
     detailValue: {
-      fontSize: isUrdu ? 20 : 18, // Increase font size for Urdu
+      fontSize: isUrdu ? 20 : 18,
       color: theme.colors.pearlWhite,
       fontWeight: "500",
     },
     modalMessage: {
-      fontSize: isUrdu ? 20 : 18, // Increase font size for Urdu
+      fontSize: isUrdu ? 20 : 18,
       color: theme.colors.ivory,
       textAlign: "center",
       marginBottom: 25,
@@ -125,18 +125,29 @@ const ItemDetail = ({ route }) => {
           <View>
             <Text style={styles.title}>{item.foodName}</Text>
             <View style={styles.detailsCard}>
-              <DetailItem
-                icon="food"
-                label={t("itemDetail.meal")}
-                value={t(`food.meal_options.${item.mealType}`, { defaultValue: item.mealType })}
-              />
-              <DetailItem
-                icon="silverware-fork-knife"
-                label={t("itemDetail.foodType")}
-                value={t(`food.food_type_options.${item.foodType}`, { defaultValue: item.foodType })}
-              />
-              <DetailItem icon="numeric" label={t("itemDetail.quantity")} value={item.quantity.toString()} />
-              <DetailItem icon="text-short" label={t("itemDetail.description")} value={item.description} />
+              <View style={styles.detailsSection}>
+                <Text style={styles.sectionTitle}>{t("itemDetail.basicInfo")}</Text>
+                <DetailItem
+                  icon="food"
+                  label={t("itemDetail.meal")}
+                  value={t(`food.meal_options.${item.mealType}`, { defaultValue: item.mealType })}
+                />
+                <DetailItem
+                  icon="silverware-fork-knife"
+                  label={t("itemDetail.foodType")}
+                  value={t(`food.food_type_options.${item.foodType}`, { defaultValue: item.foodType })}
+                />
+                <DetailItem icon="numeric" label={t("itemDetail.quantity")} value={item.quantity.toString()} />
+              </View>
+              
+              <View style={styles.divider} />
+              
+              <View style={styles.detailsSection}>
+                <Text style={styles.sectionTitle}>{t("itemDetail.additionalInfo")}</Text>
+                <DetailItem icon="text-short" label={t("itemDetail.description")} value={item.description} />
+                <DetailItem icon="map-marker" label={t("itemDetail.location")} value={item.donorCity || "N/A"} />
+                <DetailItem icon="account" label={t("itemDetail.donorUsername")} value={item.donorUsername} />
+              </View>
             </View>
           </View>
         )
@@ -156,52 +167,68 @@ const ItemDetail = ({ route }) => {
             )}
 
             <View style={styles.detailsCard}>
-              {/* Conditionally display size with appropriate value based on category */}
-              <DetailItem
-                icon="tshirt-crew"
-                label={t("clothes.size")}
-                value={
-                  item.itemCategory === "Clothes"
-                    ? item.clothesCategory === "Upper Wear"
-                      ? t(`clothes.size_options.${item.upperWearSize}`, { defaultValue: item.upperWearSize })
-                      : item.clothesCategory === "Bottom Wear"
-                        ? t(`clothes.size_options.${item.bottomWearSize}`, { defaultValue: item.bottomWearSize })
-                        : item.clothesCategory === "Full Outfit"
-                          ? t(`clothes.size_options.${item.clothingSize}`, { defaultValue: item.clothingSize })
-                          : "N/A"
-                    : item.itemCategory === "Shoes"
-                      ? t(`clothes.size_options.${item.shoeSize}`, { defaultValue: item.shoeSize })
-                      : "N/A"
-                }
-              />
+              <View style={styles.detailsSection}>
+                <Text style={styles.sectionTitle}>{t("itemDetail.basicInfo")}</Text>
+                {/* Conditionally display size with appropriate value based on category */}
+                <DetailItem
+                  icon="tshirt-crew"
+                  label={t("clothes.size")}
+                  value={
+                    item.itemCategory === "Clothes"
+                      ? item.clothesCategory === "Upper Wear"
+                        ? t(`clothes.size_options.${item.upperWearSize}`, { defaultValue: item.upperWearSize })
+                        : item.clothesCategory === "Bottom Wear"
+                          ? t(`clothes.size_options.${item.bottomWearSize}`, { defaultValue: item.bottomWearSize })
+                          : item.clothesCategory === "Full Outfit"
+                            ? t(`clothes.size_options.${item.clothingSize}`, { defaultValue: item.clothingSize })
+                            : "N/A"
+                      : item.itemCategory === "Shoes"
+                        ? t(`clothes.size_options.${item.shoeSize}`, { defaultValue: item.shoeSize })
+                        : "N/A"
+                  }
+                />
+                <DetailItem
+                  icon="gender-male-female"
+                  label={t("clothes.gender")}
+                  value={t(`clothes.gender_options.${item.gender}`, { defaultValue: item.gender })}
+                />
+                <DetailItem
+                  icon="human-male-child"
+                  label={t("itemDetail.age")}
+                  value={t(`clothes.age_categories.${item.age_category}`, { defaultValue: item.age_category })}
+                />
+              </View>
+              
+              <View style={styles.divider} />
+              
+              <View style={styles.detailsSection}>
+                <Text style={styles.sectionTitle}>{t("itemDetail.specifications")}</Text>
+                {/* Only display fabric if not shoes and not accessories */}
+                {!(
+                  item.itemCategory === "Shoes" ||
+                  (item.itemCategory === "Clothes" && item.clothesCategory === "Accessories")
+                ) && <DetailItem icon="texture-box" label={t("itemDetail.fabric")} value={item.fabric} />}
 
-              {/* Only display fabric if not shoes and not accessories */}
-              {!(
-                item.itemCategory === "Shoes" ||
-                (item.itemCategory === "Clothes" && item.clothesCategory === "Accessories")
-              ) && <DetailItem icon="texture-box" label={t("itemDetail.fabric")} value={item.fabric} />}
-
-              <DetailItem
-                icon="weather-sunny"
-                label={t("itemDetail.season")}
-                value={t(`clothes.season_options.${item.season}`, { defaultValue: item.season })}
-              />
-              <DetailItem
-                icon="human-male-child"
-                label={t("itemDetail.age")}
-                value={t(`clothes.age_categories.${item.age_category}`, { defaultValue: item.age_category })}
-              />
-              <DetailItem
-                icon="gender-male-female"
-                label={t("clothes.gender")}
-                value={t(`clothes.gender_options.${item.gender}`, { defaultValue: item.gender })}
-              />
-              <DetailItem
-                icon="star-outline"
-                label={t("itemDetail.condition")}
-                value={t(`clothes.condition_options.${item.c_condition}`, { defaultValue: item.c_condition })}
-              />
-              <DetailItem icon="numeric" label={t("itemDetail.quantity")} value={item.quantity.toString()} />
+                <DetailItem
+                  icon="weather-sunny"
+                  label={t("itemDetail.season")}
+                  value={t(`clothes.season_options.${item.season}`, { defaultValue: item.season })}
+                />
+                <DetailItem
+                  icon="star-outline"
+                  label={t("itemDetail.condition")}
+                  value={t(`clothes.condition_options.${item.c_condition}`, { defaultValue: item.c_condition })}
+                />
+                <DetailItem icon="numeric" label={t("itemDetail.quantity")} value={item.quantity.toString()} />
+              </View>
+              
+              <View style={styles.divider} />
+              
+              <View style={styles.detailsSection}>
+                <Text style={styles.sectionTitle}>{t("itemDetail.donorInfo")}</Text>
+                <DetailItem icon="account" label={t("itemDetail.donorUsername")} value={item.donorUsername} />
+                <DetailItem icon="map-marker" label={t("itemDetail.location")} value={item.donorCity || "N/A"} />
+              </View>
             </View>
           </View>
         )
@@ -210,41 +237,57 @@ const ItemDetail = ({ route }) => {
           <View>
             <Text style={styles.title}>{item.itemName}</Text>
             <View style={styles.detailsCard}>
-              {item.type !== "Stationary" && (
+              <View style={styles.detailsSection}>
+                <Text style={styles.sectionTitle}>{t("itemDetail.basicInfo")}</Text>
                 <DetailItem
-                  icon="book-open-variant"
-                  label={t("itemDetail.subject")}
-                  value={t(`education.subjects.${item.subject}`, { defaultValue: item.subject })}
+                  icon="shape-outline"
+                  label={t("itemDetail.type")}
+                  value={t(`education.types.${item.type}`, { defaultValue: item.type })}
                 />
-              )}
-              {item.type === "Books" && (
                 <DetailItem
                   icon="school"
-                  label={t("itemDetail.grade")}
-                  value={t(`education.grades.${item.grade}`, { defaultValue: item.grade })}
+                  label={t("education.level")}
+                  value={t(`education.levels.${item.level}`, { defaultValue: item.level })}
                 />
-              )}
-              {item.type === "Books" && (
-                <DetailItem icon="school" label={t("itemDetail.institute")} value={item.institution} />
-              )}
-              <DetailItem
-                icon="school"
-                label={t("education.level")}
-                value={t(`education.levels.${item.level}`, { defaultValue: item.level })}
-              />
-              <DetailItem
-                icon="shape-outline"
-                label={t("itemDetail.type")}
-                value={t(`education.types.${item.type}`, { defaultValue: item.type })}
-              />
-              <DetailItem
-                icon="star-outline"
-                label={t("itemDetail.condition")}
-                value={t(`education.conditions.${item.c_condition}`, { defaultValue: item.c_condition })}
-              />
-              <DetailItem icon="numeric" label={t("itemDetail.quantity")} value={item.quantity.toString()} />
-              <DetailItem icon="text-short" label={t("itemDetail.description")} value={item.description} />
-              <DetailItem icon="account" label={t("itemDetail.donorUsername")} value={item.donorUsername} />
+                <DetailItem icon="numeric" label={t("itemDetail.quantity")} value={item.quantity.toString()} />
+              </View>
+              
+              <View style={styles.divider} />
+              
+              <View style={styles.detailsSection}>
+                <Text style={styles.sectionTitle}>{t("itemDetail.specifications")}</Text>
+                {item.type !== "Stationary" && (
+                  <DetailItem
+                    icon="book-open-variant"
+                    label={t("itemDetail.subject")}
+                    value={t(`education.subjects.${item.subject}`, { defaultValue: item.subject })}
+                  />
+                )}
+                {item.type === "Books" && (
+                  <DetailItem
+                    icon="school"
+                    label={t("itemDetail.grade")}
+                    value={t(`education.grades.${item.grade}`, { defaultValue: item.grade })}
+                  />
+                )}
+                {item.type === "Books" && (
+                  <DetailItem icon="school" label={t("itemDetail.institute")} value={item.institution} />
+                )}
+                <DetailItem
+                  icon="star-outline"
+                  label={t("itemDetail.condition")}
+                  value={t(`education.conditions.${item.c_condition}`, { defaultValue: item.c_condition })}
+                />
+              </View>
+              
+              <View style={styles.divider} />
+              
+              <View style={styles.detailsSection}>
+                <Text style={styles.sectionTitle}>{t("itemDetail.additionalInfo")}</Text>
+                <DetailItem icon="text-short" label={t("itemDetail.description")} value={item.description} />
+                <DetailItem icon="account" label={t("itemDetail.donorUsername")} value={item.donorUsername} />
+                <DetailItem icon="map-marker" label={t("itemDetail.location")} value={item.donorCity || "N/A"} />
+              </View>
             </View>
           </View>
         )
@@ -343,7 +386,6 @@ const ItemDetail = ({ route }) => {
       // Optionally show an error toast or alert
     }
   }
-  // Modify the handleClaim function to check city match first
   const handleClaim = () => {
     // First check if cities match
     if (item.donorCity !== userProfile.city) {
@@ -369,17 +411,34 @@ const ItemDetail = ({ route }) => {
 
   return (
     <ScrollView style={[styles.container, { marginBottom: tabBarHeight }]}>
+      {/* Header with item count */}
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerText}>
+          {t("itemDetail.viewingItem")} {currentImageIndex + 1}/{item.images.length}
+        </Text>
+      </View>
+      
+      {/* Image carousel with improved styling */}
       <View style={styles.imageContainer}>
         <TouchableOpacity onPress={handlePreviousImage} style={styles.navButton}>
-          <Icon name="chevron-left" size={20} color={theme.colors.ivory} />
+          <Icon name={i18n.locale=='ur' ? "chevron-right" : "chevron-left"} size={20} color={theme.colors.pearlWhite} />
         </TouchableOpacity>
         <Image source={item.images[currentImageIndex]} style={styles.image} />
         <TouchableOpacity onPress={handleNextImage} style={styles.navButton}>
-          <Icon name="chevron-right" size={20} color={theme.colors.ivory} />
+          <Icon name={i18n.locale=='ur' ? "chevron-left" : "chevron-right"} size={20} color={theme.colors.pearlWhite} />
         </TouchableOpacity>
       </View>
 
+      {/* Item details with improved organization */}
       {renderCategoryDetails()}
+
+      {/* Khair Points required indicator */}
+      <View style={styles.khairPointsContainer}>
+        <MaterialIcon name="star-circle" size={24} color={theme.colors.pearlWhite} />
+        <Text style={styles.khairPointsText}>
+          {t("itemDetail.requiredPoints")}: {(khairPointsPerCategory[category] || 0) * item.quantity}
+        </Text>
+      </View>
 
       {/* Only show claim button if user is NOT a donor */}
       {!isDonor && (
@@ -399,7 +458,7 @@ const ItemDetail = ({ route }) => {
             <TouchableWithoutFeedback>
               <View style={styles.modalContent}>
                 <Text style={styles.modalTitle}>{t("itemDetail.confirmClaim")}</Text>
-                <Text style={dynamicStyles.modalMessage}>
+                <Text style={styles.modalMessage}>
                   {t("itemDetail.confirmClaimMessage")}
                   {"\n"} {requiredKhairPoints} {t("itemDetail.khairPoints")}
                 </Text>
@@ -425,7 +484,7 @@ const ItemDetail = ({ route }) => {
             <TouchableWithoutFeedback>
               <View style={styles.modalContent}>
                 <Text style={styles.modalTitle}>{t("itemDetail.insufficientPoints")}</Text>
-                <Text style={dynamicStyles.modalMessage}>{t("itemDetail.insufficientPointsMessage")}</Text>
+                <Text style={styles.modalMessage}>{t("itemDetail.insufficientPointsMessage")}</Text>
 
                 <View style={styles.modalButtons}>
                   <TouchableOpacity style={[styles.modalButton, styles.confirmButton]} onPress={hideErrorModal}>
@@ -437,6 +496,7 @@ const ItemDetail = ({ route }) => {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
+
       {/* City Error Modal when recipient tries to claim from another city */}
       <Modal
         transparent={true}
@@ -449,7 +509,7 @@ const ItemDetail = ({ route }) => {
             <TouchableWithoutFeedback>
               <View style={styles.modalContent}>
                 <Text style={styles.modalTitle}>{t("itemDetail.differentCity")}</Text>
-                <Text style={dynamicStyles.modalMessage}>{t("itemDetail.differentCityMessage")}</Text>
+                <Text style={styles.modalMessage}>{t("itemDetail.differentCityMessage")}</Text>
 
                 <View style={styles.modalButtons}>
                   <TouchableOpacity style={[styles.modalButton, styles.confirmButton]} onPress={hideCityErrorModal}>
@@ -466,29 +526,12 @@ const ItemDetail = ({ route }) => {
 }
 
 const DetailItem = ({ icon, label, value }) => {
-  // Detect language by comparing a known translation
-  const isUrdu = t("food.donations_title") !== "Food Donations"
-
-  // Dynamic styles based on language
-  const dynamicStyles = {
-    detailLabel: {
-      fontSize: isUrdu ? 18 : 16, // Increase font size for Urdu
-      color: theme.colors.ivory,
-      marginBottom: 2,
-    },
-    detailValue: {
-      fontSize: isUrdu ? 20 : 18, // Increase font size for Urdu
-      color: theme.colors.pearlWhite,
-      fontWeight: "500",
-    },
-  }
-
   return (
     <View style={styles.detailItem}>
       <MaterialIcon name={icon} size={24} color={theme.colors.sageGreen} style={styles.detailIcon} />
       <View style={styles.detailTextContainer}>
-        <Text style={dynamicStyles.detailLabel}>{label}</Text>
-        <Text style={dynamicStyles.detailValue}>{value}</Text>
+        <Text style={styles.detailLabel}>{label}</Text>
+        <Text style={styles.detailValue}>{value}</Text>
       </View>
     </View>
   )
@@ -497,114 +540,237 @@ const DetailItem = ({ icon, label, value }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.charcoalBlack,
+    backgroundColor: theme.colors.pearlWhite, // Changed to pearlWhite
+    paddingHorizontal: 16,
+  },
+  headerContainer: {
+    backgroundColor: theme.colors.sageGreen, // Changed to sageGreen
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginTop: 16,
+    marginBottom: 8,
+    alignItems: "center",
+  },
+  headerText: {
+    color: theme.colors.pearlWhite, // White text on sageGreen
+    fontSize: 16,
+    fontWeight: "500",
   },
   imageContainer: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    marginVertical: 20,
-  },
-  navButton: {
-    padding: 10,
+    justifyContent: "space-between",
+    backgroundColor: theme.colors.outerSpace, // sageGreen background
+    paddingVertical: 20,
+    paddingHorizontal: 15,
+    borderRadius: 12,
+    marginVertical: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 5,
   },
   image: {
     width: 250,
     height: 250,
-    borderRadius: 10,
-    marginHorizontal: 20,
+    resizeMode: "contain",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.copper, // Mint green border
+    backgroundColor: theme.colors.pearlWhite, // White background for image
+  },
+  navButton: {
+    padding: 12,
+    backgroundColor: theme.colors.copper, // Mint green for buttons
+    borderRadius: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
   },
   title: {
     fontSize: 28,
-    color: theme.colors.pearlWhite,
     fontWeight: "bold",
+    color: theme.colors.sageGreen, // Changed to sageGreen
     textAlign: "center",
-    marginBottom: 20,
+    marginVertical: 16,
+    letterSpacing: 0.5,
   },
   detailsCard: {
-    backgroundColor: theme.colors.TaupeBlack,
-    borderRadius: 15,
-    padding: 20,
-    marginHorizontal: 20,
-    marginBottom: 20,
+    backgroundColor: theme.colors.pearlWhite, // Changed to pearlWhite
+    borderRadius: 12,
+    padding: 0,
+    marginVertical: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: theme.colors.sageGreen, // Changed to sageGreen
+    overflow: "hidden",
+  },
+  detailsSection: {
+    padding: 16,
+    backgroundColor: theme.colors.outerSpace, // Changed to pearlWhite
+    
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(42, 93, 75, 0.1)', // Very light sageGreen
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: theme.colors.sageGreen, // Changed to sageGreen
+    marginBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(42, 93, 75, 0.1)', // Very light sageGreen
+    paddingBottom: 6,
+    
   },
   detailItem: {
     flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 15,
+    alignItems: "flex-start",
+    marginBottom: 14,
+    paddingHorizontal: 4,
   },
   detailIcon: {
-    marginRight: 15,
+    marginRight: 12,
+    marginTop: 2,
   },
   detailTextContainer: {
     flex: 1,
   },
-  // detailLabel and detailValue moved to dynamicStyles
+  detailLabel: {
+    fontSize: i18n.locale=='ur' ? 19 : 16,
+    color: theme.colors.sageGreen, // Changed to sageGreen
+    marginBottom: 2,
+    fontWeight: "600",
+  },
+  detailValue: {
+    fontSize: i18n.locale=='ur' ? 16 : 15,
+    color: theme.colors.ivory, // Black text (ivory in your theme)
+    fontWeight: "400",
+    lineHeight: 22,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: 'rgba(42, 93, 75, 0.1)', // Very light sageGreen
+    width: '100%',
+  },
   noDetailsText: {
     fontSize: 16,
-    color: theme.colors.ivory,
+    color: theme.colors.error,
     textAlign: "center",
+    fontStyle: "italic",
+    padding: 20,
+  },
+  khairPointsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: theme.colors.sageGreen, // Changed to sageGreen
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginVertical: 16,
+  },
+  khairPointsText: {
+    fontSize: 16,
+    color: theme.colors.pearlWhite, // White text on sageGreen
+    fontWeight: "600",
+    marginLeft: 8,
   },
   claimButton: {
-    backgroundColor: theme.colors.sageGreen,
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 8,
-    marginHorizontal: 20,
-    marginBottom: 30,
+    backgroundColor: theme.colors.sageGreen, // sageGreen button
+    margin: 16,
+    padding: 16,
+    borderRadius: 12,
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
   },
   disabledClaimButton: {
-    backgroundColor: theme.colors.outerSpace,
+    backgroundColor: theme.colors.placeholder,
+    shadowOpacity: 0.1,
   },
   claimButtonText: {
+    color: theme.colors.pearlWhite, // White text on sageGreen
     fontSize: 18,
-    color: theme.colors.ivory,
-    fontWeight: "bold",
+    fontWeight: "600",
+    letterSpacing: 0.5,
   },
   modalOverlay: {
     flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
   },
   modalContent: {
-    width: 300,
-    backgroundColor: theme.colors.charcoalBlack,
-    padding: 20,
-    borderRadius: 15,
+    backgroundColor: theme.colors.pearlWhite, // Changed to pearlWhite
+    padding: 24,
+    borderRadius: 16,
+    width: "85%",
     alignItems: "center",
-    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: theme.colors.sageGreen, // Changed to sageGreen
   },
   modalTitle: {
-    fontSize: 24,
-    color: theme.colors.pearlWhite,
+    fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 15,
+    color: theme.colors.sageGreen, // sageGreen text
+    marginBottom: 16,
+    textAlign: "center",
   },
-  // modalMessage moved to dynamicStyles
+  modalMessage: {
+    fontSize: i18n.locale=='ur' ? 20 : 18,
+    color: theme.colors.ivory, // Black text (ivory in your theme)
+    textAlign: "center",
+    marginBottom: 25,
+  },
   modalButtons: {
     flexDirection: "row",
     justifyContent: "space-between",
+    marginTop: 20,
     width: "100%",
   },
   modalButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    flex: 1,
+    padding: 14,
     borderRadius: 8,
-    width: "45%",
+    marginHorizontal: 8,
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
   },
   cancelButton: {
-    backgroundColor: theme.colors.outerSpace,
+    backgroundColor: theme.colors.error,
+    borderWidth: 1,
+    borderColor: theme.colors.error + "80",
   },
   confirmButton: {
-    backgroundColor: theme.colors.sageGreen,
+    backgroundColor: theme.colors.sageGreen, // sageGreen button
+    borderWidth: 1,
+    borderColor: theme.colors.sageGreen + "80",
   },
   modalButtonText: {
-    fontSize: 18,
-    color: theme.colors.ivory,
-    fontWeight: "bold",
+    color: theme.colors.pearlWhite, // White text on buttons
+    fontSize: 16,
+    fontWeight: "600",
+    letterSpacing: 0.5,
   },
 })
 

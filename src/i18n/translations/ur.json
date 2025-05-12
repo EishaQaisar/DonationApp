@@ -369,6 +369,13 @@
     }
   },
   "itemDetail": {
+     "viewingItem": "آئٹم ",
+    "basicInfo": "بنیادی معلومات",
+    "additionalInfo": "اضافی معلومات",
+    "specifications": "تفصیلات",
+    "donorInfo": "عطیہ دہندہ کی معلومات",
+    "location": "مقام",
+     "requiredPoints": "درکار خیر پوائنٹس",
     "meal": "کھانا",
     "foodType": "کھانے کی قسم",
     "quantity": "تعداد",
@@ -656,7 +663,9 @@
       "usernameExists": "یہ صارف نام پہلے سے لیا جا چکا ہے۔",
       "phoneExists": "فون نمبر پہلے سے رجسٹرڈ ہے۔",
       "cnicExists": "یہ CNIC پہلے سے رجسٹرڈ ہے۔"
-    }
+    },
+    "address": "پتہ",
+    "city":"شہر"
   },
   "validation": {
     "required": "براہ کرم اس فیلڈ کو پُر کریں۔",

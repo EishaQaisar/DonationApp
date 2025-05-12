@@ -274,6 +274,7 @@
   },
   
     "clothes": {
+      "size":"Size",
       "title": "Clothes",
       "description": "Donate clothes to help those in need.",
       "select_category": "Select Category",
@@ -355,6 +356,13 @@
       }
     },
     "itemDetail": {
+       "viewingItem": "Viewing Item",
+    "basicInfo": "Basic Information",
+    "additionalInfo": "Additional Information",
+    "specifications": "Specifications",
+    "donorInfo": "Donor Information",
+        "location": "Location",
+"requiredPoints": "Required Khair Points",
       "meal": "Meal",
       "foodType": "Food Type",
       "quantity": "Quantity",
@@ -638,7 +646,9 @@
       "usernameExists": "This username is already taken.",
       "phoneExists": "Phone number is already registered.",
       "cnicExists": "This CNIC is already registered."
-    }
+    },
+    "address":"Address",
+    "city":"City"
   },
   "validation": {
     "required": "Please fill in this field.",

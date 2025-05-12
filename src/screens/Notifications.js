@@ -350,10 +350,11 @@ const styles = StyleSheet.create({
     direction: 'rtl',
   },
   header: {
-    padding: 20,
+    marginTop: 10,
+    padding: 10,
     alignItems: "center",
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
     backgroundColor: theme.colors.sageGreen,
   },
   title: {
@@ -372,17 +373,19 @@ const styles = StyleSheet.create({
   },
   notificationItem: {
     backgroundColor: theme.colors.outerSpace,
-    padding: 20,
+    padding: 10,
     borderRadius: 15,
+    marginTop: 20, // 👈 Added this
     marginBottom: 20,
     borderWidth: 2,
     borderColor: theme.colors.sageGreen,
     shadowColor: theme.colors.sageGreen,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.5,
     shadowRadius: 8,
     elevation: 5,
   },
+  
   itemText: {
     fontSize: 18,
     color: theme.colors.ivory,
@@ -413,7 +416,7 @@ const styles = StyleSheet.create({
   },
   approvedText: {
     fontSize: 16,
-    color: theme.colors.copper,
+    color: theme.colors.sageGreen,
     marginTop: 10,
     fontWeight: "bold",
   },

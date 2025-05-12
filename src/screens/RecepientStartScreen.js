@@ -1,53 +1,90 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity, ImageBackground } from "react-native";
-import {theme} from "../core/theme"; // Ensure theme is imported correctly
-import{t}from '../i18n'
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from "react-native";
+import { theme } from "../core/theme"; // Ensure theme usage
+import { t } from '../i18n';
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
 
+// Category data with icons and descriptions
+const categories = [
+  {
+    id: 'education',
+    name: "chooseCategory.education",
+    defaultName: "Education",
+    icon: "📚",
+    description: "Books, stationery, and educational resources",
+    screen: "Education"
+  },
+  {
+    id: 'food',
+    name: "chooseCategory.food",
+    defaultName: "Food",
+    icon: "🍲",
+    description: "Meals, groceries, and food supplies",
+    screen: "Food"
+  },
+  {
+    id: 'clothes',
+    name: "chooseCategory.clothing",
+    defaultName: "Clothing",
+    icon: "👕",
+    description: "Clothes, shoes, and accessories for all ages",
+    screen: "Clothes"
+  }
+];
 
 const RecepientStartScreen = ({ navigation }) => {
+    const tabBarHeight = useBottomTabBarHeight()
+
   const [hoveredCategory, setHoveredCategory] = useState(null);
 
+  // Render a single category card
+  const renderCategory = (category) => (
+    <TouchableOpacity
+      key={category.id}
+      style={[styles.categoryBox, hoveredCategory === category.id && styles.categoryBoxHovered]}
+      onPress={() => navigation.navigate(category.screen)}
+      onMouseEnter={() => setHoveredCategory(category.id)}
+      onMouseLeave={() => setHoveredCategory(null)}
+    >
+      <View style={styles.categoryBoxInner}>
+        <Text 
+          style={[ 
+            styles.categoryIcon, 
+            hoveredCategory === category.id && styles.categoryIconHovered
+          ]}
+        >
+          {category.icon}
+        </Text>
+
+        <Text 
+          style={[ 
+            styles.categoryText, 
+            hoveredCategory === category.id && styles.categoryTextHovered 
+          ]}
+        >
+          {t(category.name, category.defaultName)}
+        </Text>
+
+        <Text 
+          style={[ 
+            styles.categoryDescription, 
+            hoveredCategory === category.id && styles.categoryDescriptionHovered 
+          ]}
+        >
+          {category.description}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+
   return (
-    <SafeAreaView style={styles.safeContainer}>
-      {/* Background Image */}
-      <ImageBackground
-        source={require("../../assets/items/poor1.jpg")}
-        style={styles.backgroundImage}
-      >
-        <ScrollView contentContainerStyle={styles.container}>
-          <Text style={styles.title}>Available Donations</Text>
-
-          {/* Education Category */}
-          <TouchableOpacity
-            style={[styles.categoryBox, hoveredCategory === 'education' && styles.categoryBoxHovered]}
-            onPress={() => navigation.navigate("Education")}
-            onMouseEnter={() => setHoveredCategory('education')}
-            onMouseLeave={() => setHoveredCategory(null)}
-          >
-            <Text style={styles.categoryText}>{t("chooseCategory.education", "Education")}</Text>
-          </TouchableOpacity>
-
-          {/* Food Category */}
-          <TouchableOpacity
-            style={[styles.categoryBox, hoveredCategory === 'food' && styles.categoryBoxHovered]}
-            onPress={() => navigation.navigate("Food")}
-            onMouseEnter={() => setHoveredCategory('food')}
-            onMouseLeave={() => setHoveredCategory(null)}
-          >
-            <Text style={styles.categoryText}>{t("chooseCategory.food", "Food")}</Text>
-          </TouchableOpacity>
-
-          {/* Clothing Category */}
-          <TouchableOpacity
-            style={[styles.categoryBox, hoveredCategory === 'clothes' && styles.categoryBoxHovered]}
-            onPress={() => navigation.navigate("Clothes")}
-            onMouseEnter={() => setHoveredCategory('clothes')}
-            onMouseLeave={() => setHoveredCategory(null)}
-          >
-            <Text style={styles.categoryText}>{t("chooseCategory.clothing", "Clothing")}</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </ImageBackground>
+    <SafeAreaView style={[styles.safeContainer,{ marginBottom: tabBarHeight }]}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>{t("chooseCategory.title", "Available Donations")}</Text>
+        
+        {/* Render all categories dynamically */}
+        {categories.map(renderCategory)}
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -55,48 +92,94 @@ const RecepientStartScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   safeContainer: {
     flex: 1,
-  },
-  backgroundImage: {
-    flex: 1,
+    backgroundColor: "#f5f5f5", // Light gray background color for a soft, professional look
     justifyContent: "center",
-    alignItems: "center",
+    paddingHorizontal: 10, // Reduced padding
   },
   container: {
     alignItems: "center",
-    paddingVertical: 20,
+    paddingVertical: 20, // Reduced padding
+    flexGrow: 1,
+    paddingHorizontal: 15, // Reduced horizontal padding
   },
   title: {
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 30,
-    color: theme.colors.charcoalBlack, // Darker shade for title
+    fontSize: 30, // Reduced font size
+    fontWeight: "700", // Less bold for a subtle look
+    marginBottom: 25, // Reduced space
+    color: theme.colors.sageGreen,
     textAlign: "center",
+    fontFamily: "Roboto", 
+    letterSpacing: 0.4,
+    textShadowColor: 'rgba(42, 93, 75, 0.1)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 3,
   },
   categoryBox: {
-    width: "90%",
-    backgroundColor: "transparent", // Transparent background
-    paddingVertical: 25,
-    borderRadius: 15,
-    marginVertical: 15,
-    borderWidth: 2,
-    borderColor: theme.colors.sageGreen, // Border color set to Sage Green
-    shadowColor: theme.colors.sageGreen, // Shadow color set to Sage Green
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
+    width: "90%", // Slightly smaller width
+    backgroundColor: theme.colors.pearlWhite,
+    paddingVertical: 20, // Reduced padding
+    paddingHorizontal: 18, // Reduced padding
+    borderRadius: 20, // Less rounded corners
+    marginVertical: 12, // Reduced vertical margin
+    borderWidth: 2, 
+    borderColor: theme.colors.sageGreen,
+    shadowColor: theme.colors.sageGreen,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
     justifyContent: "center",
     alignItems: "center",
-    transition: "all 0.3s ease-in-out", // Smooth transition for hover effect
+    elevation: 8, // Reduced elevation
+    transition: "all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
   },
   categoryBoxHovered: {
-    backgroundColor: theme.colors.sageGreen, // Hover background color
-    borderColor: theme.colors.outerSpace, // Change border color on hover
+    backgroundColor: theme.colors.sageGreen,
+    borderColor: theme.colors.copper, 
+    transform: [{ scale: 1.05 }, { translateY: -4 }],
+    shadowColor: theme.colors.sageGreen,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.25,
+    shadowRadius: 18,
+    elevation: 10, 
   },
   categoryText: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#FFFFFF", // Set text color to white
+    fontSize: 22, // Reduced font size
+    fontWeight: "500", // Slightly lighter
+    color: theme.colors.TaupeBlack,
     textAlign: "center",
+    fontFamily: "Roboto", 
+    letterSpacing: 0.4,
+    transition: "color 0.3s ease", 
+  },
+  categoryTextHovered: {
+    color: theme.colors.pearlWhite,
+    fontWeight: "600", 
+    letterSpacing: 0.6,
+  },
+  categoryIcon: {
+    fontSize: 28, // Reduced icon size
+    marginBottom: 10, // Reduced space
+    color: theme.colors.sageGreen,
+  },
+  categoryIconHovered: {
+    color: theme.colors.pearlWhite,
+  },
+  categoryBoxInner: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 5,
+  },
+  categoryDescription: {
+    fontSize: 12, // Reduced font size
+    color: theme.colors.placeholder || "#8A8F8D",
+    marginTop: 5, // Reduced space
+    textAlign: "center",
+    fontFamily: "Roboto",
+    maxWidth: "80%", // Reduced max width for better spacing
+  },
+  categoryDescriptionHovered: {
+    color: theme.colors.copper, 
   },
 });
 

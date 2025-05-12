@@ -273,7 +273,7 @@ export default function NgoPostDetailsScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.TaupeBlack,
+    backgroundColor: theme.colors.outerSpace,
     padding: 20,
   },
   loadingContainer: {

@@ -120,7 +120,7 @@ const DonorHomeScreen = ({ navigation }) => {
                 />
               </View>
               <Text style={[styles.categoryText, activeCategory === "education" && styles.activeCategoryText]}>
-                {getTranslation("education")}
+                {getTranslation("donorHome.education")}
               </Text>
             </TouchableOpacity>
 
@@ -141,7 +141,7 @@ const DonorHomeScreen = ({ navigation }) => {
                 />
               </View>
               <Text style={[styles.categoryText, activeCategory === "clothes" && styles.activeCategoryText]}>
-                {getTranslation("clothes")}
+                {getTranslation("donorHome.clothes")}
               </Text>
             </TouchableOpacity>
 
@@ -159,7 +159,7 @@ const DonorHomeScreen = ({ navigation }) => {
                 />
               </View>
               <Text style={[styles.categoryText, activeCategory === "food" && styles.activeCategoryText]}>
-                {getTranslation("food")}
+                {getTranslation("donorHome.food")}
               </Text>
             </TouchableOpacity>
           </View>
@@ -464,7 +464,8 @@ const styles = StyleSheet.create({
   },
   categoryText: {
     color: theme.colors.TaupeBlack, // Deep slate blue
-    fontSize: 14,
+        fontSize: i18n.locale === "ur" ? 16 : 14,
+
     marginTop: 5,
   },
   activeCategoryText: {
@@ -617,7 +618,8 @@ const styles = StyleSheet.create({
   },
   campaignBadgeText: {
     color: "#fff",
-    fontSize: 10,
+    fontSize: i18n.locale === "ur" ? 12 : 10,
+
     fontWeight: "bold",
   },
   campaignContent: {
@@ -655,12 +657,12 @@ const styles = StyleSheet.create({
   },
   progressText: {
     color: theme.colors.sageGreen,
-    fontSize: i18n.locale === "ur" ? 14 : 12,
+    fontSize: i18n.locale === "ur" ? 15: 12,
     fontWeight: "bold",
   },
   daysLeftText: {
     color: theme.colors.placeholder, // Soft slate blue
-    fontSize: i18n.locale === "ur" ? 14 : 12,
+    fontSize: i18n.locale === "ur" ? 15 : 12,
   },
   noCampaignsContainer: {
     alignItems: "center",

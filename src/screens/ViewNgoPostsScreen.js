@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   ngoName: {
-    color: theme.colors.sageGreen,
+    color: theme.colors.pearlWhite,
     fontWeight: 'bold',
     fontSize: 14,
   },
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 14,
-    color: theme.colors.pearlWhite,
+    color: theme.colors.ivory,
     marginBottom: 12,
     lineHeight: 20,
   },
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
   },
   contactText: {
     fontSize: 13,
-    color: theme.colors.pearlWhite,
+    color: theme.colors.ivory,
     marginLeft: 8,
   },
   buttonContainer: {
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   noDataSubText: {
-    color: theme.colors.pearlWhite,
+    color: theme.colors.ivory,
     fontSize: 14,
     marginTop: 8,
     opacity: 0.7,

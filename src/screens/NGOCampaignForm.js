@@ -283,7 +283,7 @@ const NGOCampaignForm = ({ navigation }) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: theme.colors.charcoalBlack,
+        backgroundColor: theme.colors.pearlWhite,
         flex: 1,
         padding: 20,
         paddingTop: 30,
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
         marginBottom: 5,
     },
     input: {
-        backgroundColor: theme.colors.TaupeBlack,
+        backgroundColor: theme.colors.outerSpace,
         height: 40,
         borderWidth: 1,
         borderRadius: 10,
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
         textAlign: 'right',
     },
     textArea: {
-        backgroundColor: theme.colors.TaupeBlack,
+        backgroundColor: theme.colors.outerSpace,
         height: 100,
         borderWidth: 1,
         borderRadius: 10,

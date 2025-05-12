@@ -681,7 +681,7 @@ const UploadClothes = ({ navigation }) => {
 
 const Styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.charcoalBlack,
+    backgroundColor: theme.colors.pearlWhite,
     flex: 1,
     padding: 10,
     paddingTop: 30,
@@ -693,7 +693,7 @@ const Styles = StyleSheet.create({
     marginTop: 10,
   },
   optionButton: {
-    backgroundColor: theme.colors.TaupeBlack,
+    backgroundColor: theme.colors.outerSpace,
     borderWidth: 1,
     borderColor: theme.colors.ivory,
     borderRadius: 10,
@@ -742,7 +742,7 @@ const Styles = StyleSheet.create({
     fontSize: 20, // Increased font size for Urdu headings
   },
   descri: {
-    backgroundColor: theme.colors.TaupeBlack,
+    backgroundColor: theme.colors.outerSpace,
     height: 150,
     borderWidth: 1,
     borderRadius: 10,
