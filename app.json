@@ -27,9 +27,9 @@
       ],
       "package": "com.zhalay.DK2",
       "config": {
-       // "googleMaps": {
-         // "apiKey": "A"
-       // }
+       "googleMaps": {
+         "apiKey": "AIzaSyAAt8OqnkBz7phiQqy75spQMs5tthoCTZw"
+       }
       }
     },
     "web": {
