@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { useRoute } from "@react-navigation/native"
 import Background from "../components/Background"
-import { StyleSheet, View, Text, ScrollView } from "react-native"
+import { StyleSheet,View, Text, ScrollView } from "react-native"
 import { theme } from "../core/theme"
 import Button from "../components/Button"
 import TextInput from "../components/TextInput"
@@ -47,8 +47,7 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
   const [error, setError] = useState(null)
   const [pickupTime, setPickupTime] = useState(new Date())
   const [showTimePicker, setShowTimePicker] = useState(false)
-  const [pickupCoordinates, setPickupCoordinates] = useState(null)
-  const [dropOffCoordinates, setDropOffCoordinates] = useState(null)
+  // Coordinates removed as requested
 
   // Ref for GooglePlacesAutocomplete
   const googlePlacesRef = useRef(null)
@@ -191,49 +190,6 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
     fetchDonorAddress()
   }, [donorUsername]) // Runs when donorUsername changes
 
-  // Validate address and get coordinates using Google Maps API
-  const validateAndGetCoordinates = async (address, locationType) => {
-    console.log("in validateAndGetCoordinates")
-    if (!address) return
-
-    try {
-      const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${GOOGLE_API_KEY}`,
-      )
-
-      if (response.data.status === "OK" && response.data.results.length > 0) {
-        const location = response.data.results[0].geometry.location
-        const coordinates = {
-          latitude: location.lat,
-          longitude: location.lng,
-        }
-
-        // Format the address
-        const formattedAddress = response.data.results[0].formatted_address
-        console.log("formatted address", formattedAddress)
-
-        if (locationType === "pickup") {
-          setPickupCoordinates(coordinates)
-          setPickupLocation(formattedAddress)
-        } else if (locationType === "dropoff") {
-          setDropOffCoordinates(coordinates)
-          setDropOffLocation(formattedAddress)
-        }
-        console.log("coordinates of drop off", coordinates)
-
-        return coordinates
-      } else {
-        console.error("Address validation failed:", response.data.status)
-        Alert.alert("Invalid Address", "Please enter a valid address")
-        return null
-      }
-    } catch (error) {
-      console.error("Error validating address:", error)
-      Alert.alert("Error", "Failed to validate address")
-      return null
-    }
-  }
-
   const onDateChange = (date) => setSelectedStartDate(date)
 
   const onTimeChange = (event, selectedTime) => {
@@ -248,7 +204,6 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
       date: false,
       pickupLocation: false,
       dropOffLocation: false,
-      pickupCoordinates: false,
     })
 
     // Check all required fields and set validation errors
@@ -274,13 +229,8 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
       hasErrors = true
     }
 
-   /* if (!pickupCoordinates) {
-      newErrors.pickupCoordinates = true
-      hasErrors = true
-      console.log("hfsf")
-    }*/
-
     // If there are errors, update state and show alert
+    console.log("ergergwrgwer")
     if (hasErrors) {
       setValidationErrors(newErrors)
 
@@ -298,20 +248,18 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
     // If we get here, all validation passed, continue with saving
     try {
       // Save the order to Firebase
-      console.log("sgfrg")
+      console.log("egwge")
+      console.log("pick",pickupLocation)
+      console.log("drop",dropOffLocation)
       await firestore()
         .collection("orders")
         .doc(id.toString()) // Use the claimed item ID as the order ID
         .set({
           orderId: id,
           origin: {
-            latitude: pickupCoordinates.latitude,
-            longitude: pickupCoordinates.longitude,
             address: pickupLocation,
           },
           destination: {
-            latitude: dropOffCoordinates.latitude,
-            longitude: dropOffCoordinates.longitude,
             address: dropOffLocation,
           },
           pickupDate: selectedStartDate.toISOString(),
@@ -338,19 +286,6 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
     } catch (error) {
       console.error("Error scheduling delivery:", error)
       Alert.alert("Error", "Failed to schedule delivery. Please try again.")
-    }
-  }
-
-  // Handle address input change and validation
-  const handleAddressChange = (text, type) => {
-    if (type === "pickup") {
-      setPickupLocation(text)
-      // Clear coordinates when manually editing
-      setPickupCoordinates(null)
-    } else if (type === "dropoff") {
-      setDropOffLocation(text)
-      // Clear coordinates when manually editing
-      setDropOffCoordinates(null)
     }
   }
 
@@ -466,19 +401,10 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
 
                 {/* Save Button */}
                 <View>
-                <Button
-                   
-                   onPress={handleSaveDelivery}
-                   style={styles.button2}
-                   labelStyle={styles.saveButtonText}
-                 >
-                   {t("scheduleDelivery.scheduleDelivery")}
-                 </Button>
-
+                  <Button onPress={handleSaveDelivery} style={styles.button2} labelStyle={styles.saveButtonText}>
+                    {t("scheduleDelivery.scheduleDelivery")}
+                  </Button>
                 </View>
-                
-                 
-              
               </>
             )}
           </ScrollView>

@@ -10,7 +10,7 @@ import RowOptionButtons from '../components/RowOptionButtons';
 import ImagePickerComponent from '../components/ImagePickerComponent';
 import { addFoodDonation } from '../helpers/addFoodDonation';
 import { AuthContext } from "../context/AuthContext";
-import { t } from "../i18n";
+import i18n,{ t } from "../i18n";
 
 // Translation mapping for form values
 const valueTranslations = {
@@ -83,6 +83,14 @@ const UploadFood = ({navigation}) => {
     if (!name.value) {
       setName((prev) => ({ ...prev, error: t("uploadFood.errors.nameRequired", "Food Name is required") }));
       isValid = false;
+
+    }
+    if (name.value.trim() === "") {
+      setName((prev) => ({
+        ...prev,
+        error: t("uploadFood.errors.nameWhitespace", "Food Name cannot contain only spaces"),
+      }))
+      isValid = false
     }
     if (name.value.length < 3 && name.value.length > 0) {
       setName((prev) => ({ ...prev, error: t("uploadFood.errors.nameTooShort", "Too short") }));
@@ -97,6 +105,13 @@ const UploadFood = ({navigation}) => {
       setDesc((prev) => ({ ...prev, error: t("uploadFood.errors.descriptionRequired", "Description is required") }));
       isValid = false;
     }
+    if (desc.value.trim() === "") {
+      setDesc((prev) => ({
+        ...prev,
+        error: t("uploadFood.errors.descriptionWhitespace", "Description cannot contain only spaces"),
+      }))
+      isValid = false
+    } 
     if (desc.value.length > 40) {
       setDesc((prev) => ({ ...prev, error: t("uploadFood.errors.descriptionTooLong", "Too long") }));
       isValid = false;
@@ -494,7 +509,7 @@ const Styles = StyleSheet.create({
   },
   errorText: {
     color: 'red', // Adjust color for error messages
-    fontSize: 12,
+    fontSize:i18n.locale=="ur"?14: 12,
     marginTop: 5,
     marginLeft: 15,
   },

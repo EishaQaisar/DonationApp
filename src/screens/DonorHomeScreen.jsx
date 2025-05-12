@@ -225,20 +225,7 @@ const DonorHomeScreen = ({ navigation }) => {
               </ImageBackground>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.navigate("DonorOrderTrcaking")} style={styles.featureCard}>
-              <ImageBackground
-                source={require("../../assets/items/viewanalytics2.jpg")}
-                style={styles.featureImage}
-                imageStyle={styles.featureImageStyle}
-              >
-                <View style={styles.featureOverlay}>
-                  <View style={styles.featureContent}>
-                    <Icon name="insert-chart" size={24} color="#fff" style={styles.featureIcon} />
-                    <Text style={styles.featureText}>{getTranslation("donorHome.features.viewAnalytics")}</Text>
-                  </View>
-                </View>
-              </ImageBackground>
-            </TouchableOpacity>
+          
           </ScrollView>
         </View>
 

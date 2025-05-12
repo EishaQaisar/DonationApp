@@ -10,7 +10,7 @@ import ImagePickerComponent from "../components/ImagePickerComponent"
 import { Formik } from "formik"
 import { AuthContext } from "../context/AuthContext"
 import { addEduDonation } from "../helpers/addEduDonations"
-import { t } from "../i18n"
+import i18n,{ t } from "../i18n"
 
 // Translation mapping for form values
 const valueTranslations = {
@@ -176,6 +176,12 @@ const UploadEdu = ({ navigation }) => {
         }))
         isValid = false
       }
+      if (institution.value.trim() === "") {
+      setInstitution((prev) => ({
+        ...prev,
+        error: t("uploadEdu.errors.institutionWhitespace", "Institution cannot contain only spaces"),
+      }))
+      isValid = false}
 
       if (!grade.value) {
         setGrade((prev) => ({ ...prev, error: t("uploadEdu.errors.gradeRequired", "Grade is required") }))
@@ -223,6 +229,12 @@ const UploadEdu = ({ navigation }) => {
       setItemName((prev) => ({ ...prev, error: t("uploadEdu.errors.itemNameRequired", "Item name is required") }))
       isValid = false
     }
+      if (itemName.value.trim() === "") {
+      setItemName((prev) => ({
+        ...prev,
+        error: t("uploadEdu.errors.itemNameWhitespace", "Item name cannot contain only spaces"),
+      }))
+      isValid = false}
 
     if (itemName.value.length > 30) {
       setItemName((prev) => ({ ...prev, error: t("uploadEdu.errors.itemNameTooLong", "Too long") }))
@@ -241,6 +253,12 @@ const UploadEdu = ({ navigation }) => {
       }))
       isValid = false
     }
+    if (description.value.trim() === "") {
+      setDescription((prev) => ({
+        ...prev,
+        error: t("uploadEdu.errors.descriptionWhitespace", "Description cannot contain only spaces"),
+      }))
+      isValid = false}
 
     if (description.value.length > 40) {
       setDescription((prev) => ({ ...prev, error: t("uploadEdu.errors.descriptionTooLong", "Too long") }))
@@ -745,7 +763,7 @@ const Styles = StyleSheet.create({
   },
   errorText: {
     color: "red",
-    fontSize: 12,
+    fontSize:i18n.locale=='ur'?14: 12,
     marginTop: 5,
   },
 })

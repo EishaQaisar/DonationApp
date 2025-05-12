@@ -1,41 +1,46 @@
-import React, { useState } from "react";
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from "react-native";
-import { theme } from "../core/theme"; // Ensure theme usage
-import { t } from '../i18n';
+"use client"
+
+import { useState } from "react"
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, TouchableOpacity } from "react-native"
+import { theme } from "../core/theme" // Ensure theme usage
+import i18n,{ t } from "../i18n"
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs"
 
 // Category data with icons and descriptions
 const categories = [
   {
-    id: 'education',
+    id: "education",
     name: "chooseCategory.education",
     defaultName: "Education",
     icon: "📚",
-    description: "Books, stationery, and educational resources",
-    screen: "Education"
+    description: "chooseCategory.educationDesc",
+    defaultDescription: "Books, stationery, and educational resources",
+    screen: "Education",
   },
   {
-    id: 'food',
+    id: "food",
     name: "chooseCategory.food",
     defaultName: "Food",
     icon: "🍲",
-    description: "Meals, groceries, and food supplies",
-    screen: "Food"
+    description: "chooseCategory.foodDesc",
+    defaultDescription: "Meals, groceries, and food supplies",
+    screen: "Food",
   },
   {
-    id: 'clothes',
+    id: "clothes",
     name: "chooseCategory.clothing",
     defaultName: "Clothing",
     icon: "👕",
-    description: "Clothes, shoes, and accessories for all ages",
-    screen: "Clothes"
-  }
-];
+    description: "chooseCategory.clothingDesc",
+    defaultDescription: "Clothes, shoes, and accessories for all ages",
+    screen: "Clothes",
+  },
+]
 
 const RecepientStartScreen = ({ navigation }) => {
-    const tabBarHeight = useBottomTabBarHeight()
+  const tabBarHeight = useBottomTabBarHeight()
 
-  const [hoveredCategory, setHoveredCategory] = useState(null);
+  const [hoveredCategory, setHoveredCategory] = useState(null)
 
   // Render a single category card
   const renderCategory = (category) => (
@@ -47,47 +52,34 @@ const RecepientStartScreen = ({ navigation }) => {
       onMouseLeave={() => setHoveredCategory(null)}
     >
       <View style={styles.categoryBoxInner}>
-        <Text 
-          style={[ 
-            styles.categoryIcon, 
-            hoveredCategory === category.id && styles.categoryIconHovered
-          ]}
-        >
+        <Text style={[styles.categoryIcon, hoveredCategory === category.id && styles.categoryIconHovered]}>
           {category.icon}
         </Text>
 
-        <Text 
-          style={[ 
-            styles.categoryText, 
-            hoveredCategory === category.id && styles.categoryTextHovered 
-          ]}
-        >
+        <Text style={[styles.categoryText, hoveredCategory === category.id && styles.categoryTextHovered]}>
           {t(category.name, category.defaultName)}
         </Text>
 
-        <Text 
-          style={[ 
-            styles.categoryDescription, 
-            hoveredCategory === category.id && styles.categoryDescriptionHovered 
-          ]}
+        <Text
+          style={[styles.categoryDescription, hoveredCategory === category.id && styles.categoryDescriptionHovered]}
         >
-          {category.description}
+          {t(category.description, category.defaultDescription)}
         </Text>
       </View>
     </TouchableOpacity>
-  );
+  )
 
   return (
-    <SafeAreaView style={[styles.safeContainer,{ marginBottom: tabBarHeight }]}>
+    <SafeAreaView style={[styles.safeContainer, { marginBottom: tabBarHeight }]}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>{t("chooseCategory.title", "Available Donations")}</Text>
-        
+
         {/* Render all categories dynamically */}
         {categories.map(renderCategory)}
       </ScrollView>
     </SafeAreaView>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   safeContainer: {
@@ -108,9 +100,9 @@ const styles = StyleSheet.create({
     marginBottom: 25, // Reduced space
     color: theme.colors.sageGreen,
     textAlign: "center",
-    fontFamily: "Roboto", 
+    fontFamily: "Roboto",
     letterSpacing: 0.4,
-    textShadowColor: 'rgba(42, 93, 75, 0.1)',
+    textShadowColor: "rgba(42, 93, 75, 0.1)",
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 3,
   },
@@ -121,7 +113,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18, // Reduced padding
     borderRadius: 20, // Less rounded corners
     marginVertical: 12, // Reduced vertical margin
-    borderWidth: 2, 
+    borderWidth: 2,
     borderColor: theme.colors.sageGreen,
     shadowColor: theme.colors.sageGreen,
     shadowOffset: { width: 0, height: 6 },
@@ -134,26 +126,26 @@ const styles = StyleSheet.create({
   },
   categoryBoxHovered: {
     backgroundColor: theme.colors.sageGreen,
-    borderColor: theme.colors.copper, 
+    borderColor: theme.colors.copper,
     transform: [{ scale: 1.05 }, { translateY: -4 }],
     shadowColor: theme.colors.sageGreen,
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.25,
     shadowRadius: 18,
-    elevation: 10, 
+    elevation: 10,
   },
   categoryText: {
     fontSize: 22, // Reduced font size
     fontWeight: "500", // Slightly lighter
-    color: theme.colors.TaupeBlack,
+    color: theme.colors.ivory,
     textAlign: "center",
-    fontFamily: "Roboto", 
+    fontFamily: "Roboto",
     letterSpacing: 0.4,
-    transition: "color 0.3s ease", 
+    transition: "color 0.3s ease",
   },
   categoryTextHovered: {
     color: theme.colors.pearlWhite,
-    fontWeight: "600", 
+    fontWeight: "600",
     letterSpacing: 0.6,
   },
   categoryIcon: {
@@ -171,7 +163,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   categoryDescription: {
-    fontSize: 12, // Reduced font size
+    fontSize:i18n.locale=='ur'?15: 14, // Reduced font size
     color: theme.colors.placeholder || "#8A8F8D",
     marginTop: 5, // Reduced space
     textAlign: "center",
@@ -179,8 +171,8 @@ const styles = StyleSheet.create({
     maxWidth: "80%", // Reduced max width for better spacing
   },
   categoryDescriptionHovered: {
-    color: theme.colors.copper, 
+    color: theme.colors.copper,
   },
-});
+})
 
-export default RecepientStartScreen;
+export default RecepientStartScreen

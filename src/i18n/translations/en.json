@@ -94,7 +94,11 @@
       "title": "Donation Categories",
       "education": "Education",
       "food": "Food",
-      "clothing": "Clothing"
+      "clothing": "Clothing",
+  
+    "educationDesc": "Books, stationery, and educational resources",
+    "foodDesc": "Meals, groceries, and food supplies",
+    "clothingDesc": "Clothes, shoes, and accessories for all ages"
     },
     "circleLogoStepper": {
       "selectCategory": "Select Category",
@@ -140,7 +144,10 @@
         "descriptionRequired": "Description is required",
         "descriptionTooLong": "Too long",
         "descriptionTooShort": "Too short",
-        "imageRequired": "At least one image is required"
+        "imageRequired": "At least one image is required",
+         "institutionWhitespace": "Institution cannot contain only spaces",
+      "itemNameWhitespace": "Item name cannot contain only spaces",
+      "descriptionWhitespace": "Description cannot contain only spaces"
       }
     },
     "education": {
@@ -230,7 +237,9 @@
       "quantityPositive": "Quantity must be greater than 0",
       "quantityTooLarge": "Max limit exceeded",
       "quantityNumeric": "Quantity must be a numeric value",
-      "imageRequired": "At least one image is required"
+      "imageRequired": "At least one image is required",
+        "nameWhitespace": "Food name cannot contain only spaces",
+      "descriptionWhitespace": "Description cannot contain only spaces"
     }
   },
   "uploadClothes": {
@@ -269,7 +278,9 @@
       "descriptionRequired": "Description is required",
       "descriptionTooLong": "Too long",
       "descriptionTooShort": "Too short",
-      "imageRequired": "At least one image is required"
+      "imageRequired": "At least one image is required",
+      "fabricWhitespace": "Fabric cannot contain only spaces",
+      "descriptionWhitespace": "Description cannot contain only spaces"
     }
   },
   
@@ -835,6 +846,24 @@
       "recipients_max": "Number of recipients should be less than 500",
       "recipients_whole": "Number of recipients must be a whole number",
       "recipients_digits": "Number of recipients must contain only digits"
+    }
+  },
+   "deliveryHistory": {
+    "loading": "Loading your delivery history...",
+    "errorLoading": "Failed to load delivery history",
+    "noDeliveries": "You haven't made any deliveries yet",
+    "orderPrefix": "Order #",
+    "unknown": "Unknown",
+    "customerId": "Customer ID",
+    "distance": "Distance",
+    "km": "km",
+    "noDate": "No date",
+    "earnings": "Earnings",
+    "status": {
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "pending": "Pending",
+      "inProgress": "In Progress"
     }
   }
       

@@ -13,7 +13,8 @@
     "ngo_campaigns": "این جی او مہمات",
      "claims_history": "دعویٰ کی تاریخ",
   "donations_history": "عطیہ کی تاریخ",
-  "your_cart":"آپ کی ٹوکری"
+  "your_cart":"آپ کی ٹوکری",
+  "delivery_history":"ڈلیوری کی تاریخ"
   },
   
   "chooseRole":{
@@ -95,7 +96,10 @@
       "title": "عطیہ کی اقسام",
       "education": "تعلیم",
       "food": "کھانا",
-      "clothing": "لباس"
+      "clothing": "لباس",
+      "educationDesc": "کتابیں، اسٹیشنری، اور تعلیمی وسائل",
+    "foodDesc": "کھانے، گروسری، اور کھانے کی فراہمی",
+    "clothingDesc": "ہر عمر کے لیے کپڑے، جوتے، اور لوازمات"
     },
     "circleLogoStepper": {
       "selectCategory": "قسم منتخب کریں",
@@ -141,7 +145,10 @@
         "descriptionRequired": "تفصیل درکار ہے",
         "descriptionTooLong": "بہت لمبی",
         "descriptionTooShort": "بہت چھوٹی",
-        "imageRequired": "کم از کم ایک تصویر درکار ہے"
+        "imageRequired": "کم از کم ایک تصویر درکار ہے",
+         "institutionWhitespace": "ادارہ صرف خالی جگہوں پر مشتمل نہیں ہو سکتا",
+      "itemNameWhitespace": "آئٹم کا نام صرف خالی جگہوں پر مشتمل نہیں ہو سکتا",
+      "descriptionWhitespace": "تفصیل صرف خالی جگہوں پر مشتمل نہیں ہو سکتی"
       }
       
     },
@@ -241,7 +248,9 @@
       "quantityPositive": "مقدار 0 سے زیادہ ہونی چاہیے",
       "quantityTooLarge": "زیادہ سے زیادہ حد سے تجاوز",
       "quantityNumeric": "مقدار عددی ہونی چاہیے",
-      "imageRequired": "کم از کم ایک تصویر درکار ہے"
+      "imageRequired": "کم از کم ایک تصویر درکار ہے",
+       "nameWhitespace": "کھانے کا نام صرف خالی جگہوں پر مشتمل نہیں ہو سکتا",
+      "descriptionWhitespace": "تفصیل صرف خالی جگہوں پر مشتمل نہیں ہو سکتی"
     }
   },
   "uploadClothes": {
@@ -280,7 +289,10 @@
       "descriptionRequired": "تفصیل درکار ہے",
       "descriptionTooLong": "بہت لمبا",
       "descriptionTooShort": "بہت چھوٹا",
-      "imageRequired": "کم از کم ایک تصویر درکار ہے"
+      "imageRequired": "کم از کم ایک تصویر درکار ہے",
+      
+       "fabricWhitespace": "کپڑے کا مواد صرف خالی جگہوں پر مشتمل نہیں ہو سکتا",
+      "descriptionWhitespace": "تفصیل صرف خالی جگہوں پر مشتمل نہیں ہو سکتی"
     }
   },
   
@@ -852,7 +864,25 @@
       "recipients_whole": "وصول کنندگان کی تعداد ایک مکمل نمبر ہونا چاہیے",
       "recipients_digits": "وصول کنندگان کی تعداد میں صرف ہندسے ہونے چاہئیں"
     }
+    },
+    "deliveryHistory": {
+    "loading": "آپ کی ڈیلیوری کی تاریخ لوڈ ہو رہی ہے...",
+    "errorLoading": "ڈیلیوری کی تاریخ لوڈ کرنے میں ناکام",
+    "noDeliveries": "آپ نے ابھی تک کوئی ڈیلیوری نہیں کی ہے",
+    "orderPrefix": "آرڈر #",
+    "unknown": "نامعلوم",
+    "customerId": "کسٹمر آئی ڈی",
+    "distance": "فاصلہ",
+    "km": "کلومیٹر",
+    "noDate": "کوئی تاریخ نہیں",
+    "earnings": "کمائی",
+    "status": {
+      "completed": "مکمل",
+      "cancelled": "منسوخ",
+      "pending": "زیر التواء",
+      "inProgress": "جاری ہے"
     }
+  }
   }
   
   

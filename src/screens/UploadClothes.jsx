@@ -11,7 +11,7 @@ import RowOptionButtons from '../components/RowOptionButtons';
 import { Formik } from 'formik';
 import { AuthContext } from "../context/AuthContext";
 import { addClothesDonation } from '../helpers/addClothesDonation';
-import { t } from "../i18n";
+import i18n,{ t } from "../i18n";
 
 // Translation mapping for form values
 const valueTranslations = {
@@ -252,7 +252,13 @@ const UploadClothes = ({ navigation }) => {
         setFabric((prev) => ({ ...prev, error: t("uploadClothes.errors.fabricRequired", "Fabric is required") }));
         isValid = false;
       }
-      
+      if (fabric.value.trim() === "") {
+        setFabric((prev) => ({
+          ...prev,
+          error: t("uploadClothes.errors.fabricWhitespace", "Fabric cannot contain only spaces"),
+        }))
+        isValid = false
+      } 
       if (fabric.value.length > 20) {
         setFabric((prev) => ({ ...prev, error: t("uploadClothes.errors.fabricTooLong", "Too long") }));
         isValid = false;
@@ -267,6 +273,13 @@ const UploadClothes = ({ navigation }) => {
     if (!description.value) {
       setDescription((prev) => ({ ...prev, error: t("uploadClothes.errors.descriptionRequired", "Description is required") }));
       isValid = false;
+    }
+    if (description.value.trim() === "") {
+      setDescription((prev) => ({
+        ...prev,
+        error: t("uploadClothes.errors.descriptionWhitespace", "Description cannot contain only spaces"),
+      }))
+      isValid = false
     }
     
     if (description.value.length > 40) {
@@ -758,7 +771,7 @@ const Styles = StyleSheet.create({
     fontSize: 18, // Increased font size for Urdu input
   },
   name: {
-    backgroundColor: theme.colors.TaupeBlack,
+    backgroundColor: theme.colors.pearlWhite,
     height: 40,
     borderWidth: 1,
     borderRadius: 10,
@@ -856,7 +869,7 @@ const Styles = StyleSheet.create({
   },
   errorText: {
     color: 'red',
-    fontSize: 12,
+    fontSize: i18n.locale=='ur'?14:12,
     marginTop: 5,
   },
 });

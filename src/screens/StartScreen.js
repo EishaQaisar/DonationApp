@@ -308,9 +308,7 @@ export default function StartScreen({ navigation }) {
             {t("startScreen.getStarted") || "Get Started"}
           </Button>
 
-          <TouchableOpacity onPress={() => navigation.navigate("Login")} style={styles.loginButton}>
-            <Text style={styles.loginText}>{t("startScreen.alreadyHaveAccount") || "Already have an account?"}</Text>
-          </TouchableOpacity>
+         
         </Animated.View>
       </View>
     </SafeAreaView>
