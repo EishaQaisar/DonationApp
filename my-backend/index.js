@@ -1026,7 +1026,7 @@ app.put("/api/update-delivery-status", (req, res) => {
     })
   }
 
-  console.log(`Updating delivery status for claimed item ${id} to ${scheduledelivery}`)
+  console.log(`in index end point Updating delivery status for claimed item ${id} to ${scheduledelivery}`)
 
   const query = `
     UPDATE ClaimedItems 
