@@ -17,8 +17,9 @@ import { KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } fr
 import axios from "axios"
 import i18n, { t } from "../i18n"
 
-const GOOGLE_API_KEY = "AI"
+const GOOGLE_API_KEY = "AIzaSyAAt8OqnkBz7phiQqy75spQMs5tthoCTZw"
 const isUrdu = i18n.locale === "ur"
+
 
 export default function ScheduleRDeliveryScreen({ navigation }) {
   const route = useRoute()
@@ -190,6 +191,31 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
     fetchDonorAddress()
   }, [donorUsername]) // Runs when donorUsername changes
 
+  // Function to get coordinates from address using Google Maps Geocoding API
+  const getCoordinatesFromAddress = async (address) => {
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+          address,
+        )}&key=${GOOGLE_API_KEY}`,
+      )
+
+      if (response.data.status === "OK" && response.data.results.length > 0) {
+        const location = response.data.results[0].geometry.location
+        return {
+          latitude: Number(location.lat),
+          longitude: Number(location.lng),
+        }
+      } else {
+        console.error("Geocoding API error:", response.data.status)
+        return null
+      }
+    } catch (error) {
+      console.error("Error getting coordinates:", error)
+      return null
+    }
+  }
+
   const onDateChange = (date) => setSelectedStartDate(date)
 
   const onTimeChange = (event, selectedTime) => {
@@ -245,12 +271,23 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
       return
     }
 
-    // If we get here, all validation passed, continue with saving
     try {
+      // Get coordinates for origin and destination
+      console.log("Getting coordinates for addresses...")
+
+      // Get coordinates for pickup location (origin)
+      const originCoordinates = await getCoordinatesFromAddress(pickupLocation)
+      console.log("Origin coordinates:", originCoordinates)
+
+      // Get coordinates for dropoff location (destination)
+      const destinationCoordinates = await getCoordinatesFromAddress(dropOffLocation)
+      console.log("Destination coordinates:", destinationCoordinates)
+
       // Save the order to Firebase
-      console.log("egwge")
-      console.log("pick",pickupLocation)
-      console.log("drop",dropOffLocation)
+      console.log("Saving order with coordinates")
+      console.log("pick", pickupLocation)
+      console.log("drop", dropOffLocation)
+
       await firestore()
         .collection("orders")
         .doc(id.toString()) // Use the claimed item ID as the order ID
@@ -258,9 +295,17 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
           orderId: id,
           origin: {
             address: pickupLocation,
+            ...(originCoordinates && {
+              latitude: originCoordinates.latitude,
+              longitude: originCoordinates.longitude,
+            }),
           },
           destination: {
             address: dropOffLocation,
+            ...(destinationCoordinates && {
+              latitude: destinationCoordinates.latitude,
+              longitude: destinationCoordinates.longitude,
+            }),
           },
           pickupDate: selectedStartDate.toISOString(),
           pickupTime: pickupTime.toISOString(),
@@ -413,6 +458,7 @@ export default function ScheduleRDeliveryScreen({ navigation }) {
     </Background>
   )
 }
+
 
 const styles = StyleSheet.create({
   scrollContainer: {

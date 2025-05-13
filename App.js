@@ -27,6 +27,7 @@ import {
   DeliveryHistory,
   DonorOrderTrackingScreen,
   NGOProfileDetailsScreen,
+  MapScreen,
 } from "./src/screens"
 import TabNavigator from "./src/navigator/TabNavigator"
 import ScheduleRDeliveryScreen from "./src/screens/ScheduleRDeliveryScreen"
@@ -100,6 +101,7 @@ export default function App() {
               <Stack.Screen name="RecipientProfileForm" component={RecipientProfileForm} />
               <Stack.Screen name="ChildrenProfiles" component={ChildrenProfiles} />
               <Stack.Screen name="RiderFinalHomeScreen" component={RiderFinalHomeScreen} />
+              <Stack.Screen name="MapScreen" component={MapScreen}/>
               <Stack.Screen name="DeliveryHistory" component={DeliveryHistory} />
               <Stack.Screen name="ScheduleRDeliveryScreen" component={ScheduleRDeliveryScreen} />
               <Stack.Screen name="DonorOrderTrackingScreen" component={DonorOrderTrackingScreen} />
