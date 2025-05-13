@@ -8,6 +8,8 @@ import { getBaseUrl } from "../helpers/deviceDetection"
 import axios from "axios"
 import i18n, { t } from "../i18n" // Import the translation function
 
+import { useNavigation } from "@react-navigation/native" // Import for navigation
+
 const ClaimsHistory = () => {
   const [clothesClaims, setClothesClaims] = useState([])
   const [foodClaims, setFoodClaims] = useState([])
@@ -16,6 +18,7 @@ const ClaimsHistory = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const { user } = useContext(AuthContext)
+  const navigation = useNavigation() // Initialize navigation
   
   const isUrdu = i18n.locale === "ur";
 
@@ -40,7 +43,7 @@ const ClaimsHistory = () => {
           const clothesItems = claimsResponse.data.filter(item => item.donationType === "Clothes")
           const foodItems = claimsResponse.data.filter(item => item.donationType === "Food")
           const educationItems = claimsResponse.data.filter(item => item.donationType === "Education")
-          
+
           setClothesClaims(clothesItems)
           setFoodClaims(foodItems)
           setEducationClaims(educationItems)
@@ -63,6 +66,37 @@ const ClaimsHistory = () => {
     return new Date(dateString).toLocaleDateString()
   }
 
+  // Function to navigate to feedback screen
+  const navigateToFeedback = (item) => {
+    // Prepare donation data to pass to the feedback screen
+    const donationData = {
+      id: item.id,
+      title: item.itemName || item.foodName ,
+      donorId: item.donorId,
+      donorName: item.donorUsername,
+      donationType: item.donationType || item.itemCategory
+    }
+  
+    // Navigate to the feedback screen with the donation data
+    navigation.navigate('Feedbackss', { item });
+  }
+  
+  const renderFeedbackButton = (item) => {
+    if (item.scheduledelivery === "Unscheduled") {
+      return (
+        <TouchableOpacity 
+          style={styles.feedbackButton}
+          onPress={() => navigateToFeedback(item)}  // Call the navigateToFeedback function here
+        >
+          <Text style={styles.feedbackButtonText}>
+            {t("claimsHistory.Give_Feedback")}
+          </Text>
+        </TouchableOpacity>
+      )
+    }
+    return null
+  }
+  
   if (loading) {
     return (
       <View style={[styles.container, styles.centered]}>
@@ -90,7 +124,7 @@ const ClaimsHistory = () => {
 
       <View style={styles.claimDetails}>
         <Text style={[styles.categoryInfo, isUrdu && styles.urduText]}>
-          {t("claimsHistory.category", "Category")}: {t(`titles.${(item.donationType || item.itemCategory || "Unknown").toLowerCase()}`, item.donationType || item.itemCategory || "Unknown")}
+          {t("claimsHistory.category")}: {t(`titles.${(item.donationType || item.itemCategory || "Unknown").toLowerCase()}`, item.donationType || item.itemCategory || "Unknown")}
         </Text>
 
         {item.gender && (
@@ -129,6 +163,14 @@ const ClaimsHistory = () => {
         <Text style={[styles.claimDate, isUrdu && styles.urduText]}>
           {t("claimsHistory.claimedOn", "Claimed on")}: {formatDate(item.claimDate || item.updatedAt)}
         </Text>
+        
+        {/* Display delivery status */}
+        <Text style={[styles.deliveryStatus, isUrdu && styles.urduText]}>
+          {t( "claimsHistory.Delivery Status")}: {t(`claimsHistory.${item.scheduledelivery }`)}
+        </Text>
+        
+        {/* Render feedback button if applicable */}
+        {renderFeedbackButton(item)}
       </View>
     </View>
   )
@@ -157,11 +199,20 @@ const ClaimsHistory = () => {
         )}
 
         <Text style={[styles.donorInfo, isUrdu && styles.urduText]}>
-          {t("claimsHistory.donatedBy", "Donated by")}: {item.donorUsername || t("claimsHistory.anonymous", "Anonymous")}
+          {t( "Donated by")}: {item.donorUsername || t("claimsHistory.anonymous", "Anonymous")}
         </Text>
         <Text style={[styles.claimDate, isUrdu && styles.urduText]}>
           {t("claimsHistory.claimedOn", "Claimed on")}: {formatDate(item.claimDate || item.updatedAt)}
         </Text>
+        
+        {/* Display delivery status */}
+       {/* Display delivery status */}
+        <Text style={[styles.deliveryStatus, isUrdu && styles.urduText]}>
+          {t( "claimsHistory.Delivery Status")}: {t(`claimsHistory.${item.scheduledelivery }`)}
+        </Text>
+        
+        {/* Render feedback button if applicable */}
+        {renderFeedbackButton(item)}
       </View>
     </View>
   )
@@ -201,6 +252,14 @@ const ClaimsHistory = () => {
         <Text style={[styles.claimDate, isUrdu && styles.urduText]}>
           {t("claimsHistory.claimedOn", "Claimed on")}: {formatDate(item.claimDate || item.updatedAt)}
         </Text>
+        
+        {/* Display delivery status */}
+        {/* Display delivery status */}
+        <Text style={[styles.deliveryStatus, isUrdu && styles.urduText]}>
+          {t( "claimsHistory.Delivery Status")}: {t(`claimsHistory.${item.scheduledelivery }`)}
+        </Text>
+        {/* Render feedback button if applicable */}
+        {renderFeedbackButton(item)}
       </View>
     </View>
   )
@@ -395,6 +454,12 @@ const styles = StyleSheet.create({
     color: theme.colors.pearlWhite,
     marginTop: 2,
   },
+  deliveryStatus: {
+    fontSize: 14,
+    color: theme.colors.pearlWhite,
+    marginTop: 2,
+    fontWeight: "500",
+  },
   loadingText: {
     marginTop: 10,
     color: theme.colors.ivory,
@@ -414,6 +479,20 @@ const styles = StyleSheet.create({
   urduText: {
     fontSize: 20, // Increase font size for Urdu
     fontFamily: 'System', // You might want to use a specific Urdu font if available
+  },
+  // New styles for feedback button
+  feedbackButton: {
+    backgroundColor: theme.colors.copper,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    marginTop: 10,
+    alignSelf: 'flex-start',
+  },
+  feedbackButtonText: {
+    color: theme.colors.ivory,
+    fontWeight: '600',
+    fontSize: 14,
   },
 })
 

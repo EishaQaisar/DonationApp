@@ -14,7 +14,8 @@
     "claims_history": "Claims History",
   "donations_history": "Donation History",
   "your_cart":"Your Cart",
-  "delivery_history":"Delivery History"
+  "delivery_history":"Delivery History",
+  "feedback":"Feedback"
   },
   
   "chooseRole":{
@@ -461,7 +462,12 @@
     "gradeLevel": "Grade/Level",
     "noClothesItems": "You haven't claimed any clothes items yet",
     "noFoodItems": "You haven't claimed any food items yet",
-    "noEducationItems": "You haven't claimed any education items yet"
+    "noEducationItems": "You haven't claimed any education items yet",
+    "Give_Feedback":"Give Feedback",
+    "Delivery Status":"Delivery Status",
+    "Unscheduled":"Unscheduled",
+    "Scheduled":"Scheduled",
+    "Delivered":"Delivered"
   },
   "scheduleDelivery":{
     "scheduleDelivery": "Schedule Delivery",
@@ -864,6 +870,63 @@
       "cancelled": "Cancelled",
       "pending": "Pending",
       "inProgress": "In Progress"
+    }
+  },
+  "feedback": {
+    "title": "We Value Your Feedback",
+    "subtitle": "Help us improve your experience",
+    "donationInfo": "Feedback for donation:",
+    "byDonor": "by",
+    "anonymousDonor": "Anonymous Donor",
+    "unnamedDonation": "Unnamed Donation",
+    "selectCategory": "Select Category",
+    "rateExperience": "Rate Your Experience",
+    "yourComments": "Your Comments",
+    "charactersRemaining": "characters remaining",
+    "submitFeedback": "Submit Feedback",
+    "submitting": "Submitting...",
+    "privacyNote": "Your feedback is confidential and helps us improve our services.",
+    "thankYou": "Thank You!",
+    "successMessage": "Your valuable feedback has been submitted successfully. We appreciate your time and input!",
+    "missingInfo": "Missing Information",
+    "provideFeedback": "Please provide your feedback comments",
+    "provideRating": "Please rate your experience",
+    "selectCategoryPrompt": "Please select a feedback category",
+    "error": "Error",
+    "errorSubmitting": "There was a problem submitting your feedback. Please try again.",
+    "feedbackGiven": "Feedback Given",
+    "giveFeedback": "Give Feedback",
+    
+    "categories": {
+      "food": {
+        "label": "Culinary Experience",
+        "title": "Culinary Feedback",
+        "description": "Quality, taste, and presentation of food items",
+        "placeholder": "Share your thoughts on taste, presentation, portion size, etc..."
+      },
+      "clothing": {
+        "label": "Fashion & Apparel",
+        "title": "Fashion Feedback",
+        "description": "Quality, fit, and style of clothing products",
+        "placeholder": "Tell us about fit, quality, style, comfort, etc..."
+      },
+      "education": {
+        "label": "Educational Content",
+        "title": "Educational Feedback",
+        "description": "Quality and effectiveness of learning materials",
+        "placeholder": "Comment on content quality, clarity, effectiveness, etc..."
+      },
+      "default": {
+        "placeholder": "Tell us what you think..."
+      }
+    },
+    
+    "ratings": {
+      "1": "Poor",
+      "2": "Fair",
+      "3": "Good",
+      "4": "Very Good",
+      "5": "Excellent"
     }
   }
       

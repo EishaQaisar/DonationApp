@@ -4,7 +4,7 @@ import {
   ChooseCategory, DonorHomeScreen, ScheduleRDeliveryScreen, UploadClothes, UploadEdu, UploadFood, HomeScreenRec, 
   Education, Clothes, Food, ClaimsHistory, ItemDetail, RecepientStartScreen, DonationSuccessScreen, 
   NgoPostDetailsScreen, ViewNgoPostsScreen, NGOCampaignForm, RiderFinalHomeScreen, DonorOrderTrackingScreen, 
-  DonationsHistory, NGOProfileDetailsScreen , DeliveryHistory,
+  DonationsHistory, NGOProfileDetailsScreen , DeliveryHistory
 } from '../screens';
 import i18n, {t} from '../i18n'
 const Stack = createStackNavigator();
@@ -173,6 +173,7 @@ const HomeStackNav = ({ navigation, route }) => {
           headerTintColor: theme.colors.ivory
         }} 
       />
+      
     
       <Stack.Screen name="NgoPostDetailsScreen" component={NgoPostDetailsScreen} options={{ headerShown: false }} initialParams={{ ...route.params }} />
 

@@ -1,5 +1,5 @@
 import { createStackNavigator } from "@react-navigation/stack"
-import { ClaimsHistory, Profile , DonationsHistory, DeliveryHistory} from "../screens"
+import { ClaimsHistory, Profile , DonationsHistory, DeliveryHistory,Feedbackss} from "../screens"
 import { useEffect } from "react";
 import { theme } from '../core/theme'
 import {t} from '../i18n'
@@ -44,6 +44,15 @@ const History = ({ route }) => {
               component={DeliveryHistory}
               options={{
                 title:  t('titles.delivery_history'), headerTitleStyle: { textAlign: 'center' },
+                headerTitleAlign: 'center', headerStyle: { backgroundColor: theme.colors.charcoalBlack, height: 70 },
+                headerTintColor: theme.colors.ivory
+              }} // Optional: Customize header title
+            />
+            <Stack.Screen
+              name="Feedbackss"
+              component={Feedbackss}
+              options={{
+                title:  t('titles.feedback'), headerTitleStyle: { textAlign: 'center' },
                 headerTitleAlign: 'center', headerStyle: { backgroundColor: theme.colors.charcoalBlack, height: 70 },
                 headerTintColor: theme.colors.ivory
               }} // Optional: Customize header title

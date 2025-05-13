@@ -60,7 +60,7 @@ export { default as RecepientStartScreen } from './RecepientStartScreen';
 export { default as NgoPostDetailsScreen} from "./NgoPostDetailsScreen";
 
 export {default as DonorOrderTrackingScreen} from "./DonerOrderTrackingScreen";
-
+export {default as Feedbackss} from "./Feedbackss"
 
 
 

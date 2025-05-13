@@ -14,7 +14,8 @@
      "claims_history": "دعویٰ کی تاریخ",
   "donations_history": "عطیہ کی تاریخ",
   "your_cart":"آپ کی ٹوکری",
-  "delivery_history":"ڈلیوری کی تاریخ"
+  "delivery_history":"ڈلیوری کی تاریخ",
+  "feedback":"رائے"
   },
   
   "chooseRole":{
@@ -477,7 +478,13 @@
     "gradeLevel": "گریڈ/سطح",
     "noClothesItems": "آپ نے ابھی تک کوئی کپڑے کا آئٹم حاصل نہیں کیا",
     "noFoodItems": "آپ نے ابھی تک کوئی کھانے کا آئٹم حاصل نہیں کیا",
-    "noEducationItems": "آپ نے ابھی تک کوئی تعلیمی آئٹم حاصل نہیں کیا"
+    "noEducationItems": "آپ نے ابھی تک کوئی تعلیمی آئٹم حاصل نہیں کیا",
+    "Give_Feedback":"رائے دیں",
+    "Delivery Status":"ڈلیوری کی حیثیت",
+    "Unscheduled":"غیرمقررہ",
+    "Scheduled":"مقرر",
+    "Delivered":" پہنچایا گیا"
+
   },
   "scheduleDelivery":{
     "scheduleDelivery": "ڈلیوری شیڈول کریں",
@@ -881,6 +888,63 @@
       "cancelled": "منسوخ",
       "pending": "زیر التواء",
       "inProgress": "جاری ہے"
+    }
+  },
+   "feedback": {
+    "title": "ہم آپ کی رائے کی قدر کرتے ہیں",
+    "subtitle": "ہماری خدمات کو بہتر بنانے میں ہماری مدد کریں",
+    "donationInfo": "عطیہ کے لیے رائے:",
+    "byDonor": "از",
+    "anonymousDonor": "گمنام عطیہ دہندہ",
+    "unnamedDonation": "بے نام عطیہ",
+    "selectCategory": "زمرہ منتخب کریں",
+    "rateExperience": "اپنے تجربے کی درجہ بندی کریں",
+    "yourComments": "آپ کی رائے",
+    "charactersRemaining": "حروف باقی ہیں",
+    "submitFeedback": "رائے جمع کرائیں",
+    "submitting": "جمع کرا رہے ہیں...",
+    "privacyNote": "آپ کی رائے خفیہ ہے اور ہماری خدمات کو بہتر بنانے میں مدد کرتی ہے۔",
+    "thankYou": "شکریہ!",
+    "successMessage": "آپ کی قیمتی رائے کامیابی سے جمع کرا دی گئی ہے۔ ہم آپ کے وقت اور تعاون کی قدر کرتے ہیں!",
+    "missingInfo": "معلومات ناموجود",
+    "provideFeedback": "براہ کرم اپنی رائے فراہم کریں",
+    "provideRating": "براہ کرم اپنے تجربے کی درجہ بندی کریں",
+    "selectCategoryPrompt": "براہ کرم رائے کا زمرہ منتخب کریں",
+    "error": "خرابی",
+    "errorSubmitting": "آپ کی رائے جمع کرانے میں مسئلہ پیش آیا۔ براہ کرم دوبارہ کوشش کریں۔",
+    "feedbackGiven": "رائے دی گئی",
+    "giveFeedback": "رائے دیں",
+    
+    "categories": {
+      "food": {
+        "label": "کھانے کا تجربہ",
+        "title": "کھانے کی رائے",
+        "description": "کھانے کی اشیاء کا معیار، ذائقہ اور پیشکش",
+        "placeholder": "ذائقہ، پیشکش، مقدار وغیرہ پر اپنے خیالات شیئر کریں..."
+      },
+      "clothing": {
+        "label": "فیشن اور لباس",
+        "title": "لباس کی رائے",
+        "description": "لباس کا معیار، فٹنگ اور اسٹائل",
+        "placeholder": "فٹنگ، معیار، اسٹائل، آرام وغیرہ کے بارے میں بتائیں..."
+      },
+      "education": {
+        "label": "تعلیمی مواد",
+        "title": "تعلیمی رائے",
+        "description": "تعلیمی مواد کا معیار اور مؤثر ہونا",
+        "placeholder": "مواد کے معیار، وضاحت، مؤثر ہونے وغیرہ پر تبصرہ کریں..."
+      },
+      "default": {
+        "placeholder": "ہمیں بتائیں کہ آپ کیا سوچتے ہیں..."
+      }
+    },
+    
+    "ratings": {
+      "1": "کمزور",
+      "2": "معمولی",
+      "3": "اچھا",
+      "4": "بہت اچھا",
+      "5": "بہترین"
     }
   }
   }
