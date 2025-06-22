@@ -21,6 +21,7 @@ Khair Points: Reward points for donors, fostering a culture of generosity and co
 Admin Panel: Provides administrators with tools to manage user approvals, review listings, and oversee app activity.
 
 Technologies Used
+
 Platform:
 
 -Mobile: Android
@@ -44,17 +45,32 @@ UI Framework:
 
 Getting Started
 1️⃣ Clone the Repository
+
 git clone https://github.com/21F-9108/DonationApp.git
+
 2️⃣ Install Dependencies
+
 npm install
+
 3️⃣ Run the App
+
 npx expo start
 
+
 Backend
+
 Ensure WAMP services (Apache & MySQL) are running on your PC.
+
 1️⃣ Change directory to the backend:
+
 cd my-backend
+
 2️⃣ Install backend dependencies:
+
 npm install
+
 3️⃣ Start the backend:
+
 nodemon index.js
+
+
