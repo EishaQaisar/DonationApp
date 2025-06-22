@@ -43,7 +43,10 @@ UI Framework:
 -React Native (for mobile app)
 
 
+
+
 Getting Started
+
 1️⃣ Clone the Repository
 
 git clone https://github.com/21F-9108/DonationApp.git
