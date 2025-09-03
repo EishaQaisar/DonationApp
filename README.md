@@ -149,7 +149,7 @@ Here’s a quick look at **Dast e Khair** in action:
   <img src="./images/feedback.jpg" alt="Feedback" width="200" />
 </p>
 
-##🌟 Why Dast e Khair?
+## 🌟 Why Dast e Khair?
 Seamless Experience: User-friendly design and efficient workflows.
 
 Community Impact: Encourages charitable giving with Khair Points.
@@ -157,5 +157,3 @@ Community Impact: Encourages charitable giving with Khair Points.
 Scalable Architecture: Built with React Native & Node.js for cross-platform growth.
 
 
-yaml
-Copy code
