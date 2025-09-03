@@ -68,10 +68,71 @@ npm install
 #Start backend server
 nodemon index.js
 ```
-## 📸 Screenshots
-#### SOME of the many screens:
+## 📸 Screenshots  
 
-<p align="center"> <img src="./images/login.jpg" alt="Login Screen" width="250" /> <img src="./images/signup.jpg" alt="Home Screen" width="250" /> <img src="./images/upload-donation.png" alt="Upload Donation" width="250" /> </p> <p align="center"> <img src="./images/admin-panel.png" alt="Admin Panel" width="500" /> </p>
+Here’s a quick look at **Dast e Khair** in action:  
+#### These are SOME of the many screens
+
+---
+
+### 🔑 Authentication Flow  
+<p align="center">
+  <img src="./images/startScreen.jpg" alt="Start Screen" width="200" />
+  <img src="./images/chooseRole.jpg" alt="Choose Role" width="200" />
+  <img src="./images/login.jpg" alt="Login" width="200" />
+  <img src="./images/signup.jpg" alt="Signup" width="200" />
+  <img src="./images/phoneAuth.jpg" alt="Phone Authentication" width="200" />
+  <img src="./images/recipientForm.jpg" alt="Recipient Form" width="200" />
+
+</p>
+
+---
+
+### 🏠 Home Screens  
+<p align="center">
+  <img src="./images/donorHome.jpg" alt="Donor Home" width="200" />
+  <img src="./images/donorHomeUrdu.jpg" alt="Donor Home Urdu" width="200" />
+  <img src="./images/recHome.jpg" alt="Recipient Home" width="200" />
+  <img src="./images/ngoHome.jpg" alt="NGO Home" width="200" />
+</p>
+
+---
+
+### 🎁 Donation Flow  
+<p align="center">
+  <img src="./images/chooseCategoy.jpg" alt="Choose Category" width="200" />
+  <img src="./images/foodDonation.jpg" alt="Food Donation" width="200" />
+  <img src="./images/clothingDonation.jpg" alt="Clothing Donation" width="200" />
+  <img src="./images/eduDonation.jpg" alt="Education Donation" width="200" />
+  <img src="./images/itemDetails.jpg" alt="Item Details" width="200" />
+</p>
+
+---
+
+### ✅ Claim & Confirmation  
+<p align="center">
+  <img src="./images/confirmClaim.jpg" alt="Confirm Claim" width="200" />
+  <img src="./images/confirmClaimDonor.jpg" alt="Confirm Claim (Donor View)" width="200" />
+  <img src="./images/donationHistory.jpg" alt="Donation History" width="200" />
+</p>
+
+---
+
+### 🚚 Pickup & Delivery  
+<p align="center">
+  <img src="./images/scheduleDelivery.jpg" alt="Schedule Delivery" width="200" />
+  <img src="./images/scheduleDelivery2.jpg" alt="Schedule Delivery 2" width="200" />
+  <img src="./images/rider1.jpg" alt="Rider Screen 1" width="200" />
+  <img src="./images/rider2.jpg" alt="Rider Screen 2" width="200" />
+</p>
+
+---
+
+### 💬 Feedback & Forms  
+<p align="center">
+  <img src="./images/feedback.jpg" alt="Feedback" width="200" />
+</p>
+
 ##🌟 Why Dast e Khair?
 Seamless Experience: User-friendly design and efficient workflows.
 
