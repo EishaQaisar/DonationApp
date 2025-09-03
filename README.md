@@ -7,16 +7,31 @@ The app focuses on making charitable contributions **seamless, accessible, and t
 
 ---
 
-## ✨ Features  
+## ✨ Features   
 
-✅ **User Registration & Login** – Secure signup and login process for donors, recipients, and riders.  
-✅ **Upload Donations** – Donors can add item details & images quickly.  
-✅ **Item Claiming** – Recipients can browse and claim available donations.  
-✅ **Profile Matching** – Smart suggestions based on user profile and needs.  
-✅ **Notifications** – Real-time alerts for new listings, claim approvals, and status updates.  
-✅ **Pickup Scheduling** – Coordinate pickup times and locations for smooth logistics.  
-✅ **Khair Points** – Reward system for donors to encourage ongoing participation.  
-✅ **Admin Panel** – Manage user approvals, review listings, and monitor overall activity.  
+✅ **User Registration & Login** – Secure signup and login process for donors, recipients, riders, and NGOs.  
+
+✅ **Upload Donations** – Donors can upload donations in **three categories** (Food, Clothes, Education) through simple, guided donation forms and attach images for better clarity.  
+
+✅ **Item Claiming** – Recipients can browse available donations, claim items that match their needs, and view claim status in real time.  
+
+✅ **Profile Matching** – Smart suggestions based on user profile and stated needs, making the process faster and more relevant.  
+
+✅ **Donation History** – Donors and recipients can track past donations, claims, and deliveries.  
+
+✅ **Rider Delivery & Navigation** – Riders get assigned deliveries, view pickup/drop-off locations, and navigate using **Google Maps API integration** for accurate routing.  
+
+✅ **Pickup Scheduling** – Donors, recipients, and riders can coordinate pickup times and delivery schedules seamlessly.  
+
+✅ **Notifications** – Real-time alerts for new listings, claim approvals, status updates, and upcoming deliveries.  
+
+✅ **Khair Points** – Reward points for donors, encouraging continuous participation and fostering a culture of generosity.  
+
+✅ **Feedback System** – Recipients can provide feedback on received items, helping maintain transparency and trust.  
+
+✅ **NGO Campaign Uploads** – NGOs can create and publish donation campaigns directly on the platform, allowing donors to contribute specifically to causes they care about.  
+
+✅ **Admin Panel** – Comprehensive web-based panel to approve users, manage campaigns, review listings, and monitor overall platform activity.  
 
 ---
 
@@ -71,7 +86,8 @@ nodemon index.js
 ## 📸 Screenshots  
 
 Here’s a quick look at **Dast e Khair** in action:  
-#### These are SOME of the many screens
+#### These are SOME of the many screens. 
+#### All screens are multilingual (English or Urdu) depending on user's choice of language.
 
 ---
 
