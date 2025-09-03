@@ -156,4 +156,11 @@ Community Impact: Encourages charitable giving with Khair Points.
 
 Scalable Architecture: Built with React Native & Node.js for cross-platform growth.
 
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** – you are welcome to use and modify this code to build your own donation platform, provided you include attribution to the original author.  
+See the [LICENSE](./LICENSE) file for the complete text.
+
 
