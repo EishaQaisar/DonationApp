@@ -71,7 +71,7 @@ nodemon index.js
 ## 📸 Screenshots
 #### SOME of the many screens:
 
-<p align="center"> <img src="./images/login-screen.png" alt="Login Screen" width="250" /> <img src="./images/home-screen.png" alt="Home Screen" width="250" /> <img src="./images/upload-donation.png" alt="Upload Donation" width="250" /> </p> <p align="center"> <img src="./images/admin-panel.png" alt="Admin Panel" width="500" /> </p>
+<p align="center"> <img src="./images/login.jpg" alt="Login Screen" width="250" /> <img src="./images/signup.jpg" alt="Home Screen" width="250" /> <img src="./images/upload-donation.png" alt="Upload Donation" width="250" /> </p> <p align="center"> <img src="./images/admin-panel.png" alt="Admin Panel" width="500" /> </p>
 ##🌟 Why Dast e Khair?
 Seamless Experience: User-friendly design and efficient workflows.
 
